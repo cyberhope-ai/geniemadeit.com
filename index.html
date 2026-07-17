@@ -144,8 +144,9 @@
 <script>
   // waitlist (front-end only for the splash; wired to a Worker/form service at deploy)
   const f=document.getElementById('wl');
-  f.addEventListener('submit',e=>{e.preventDefault();
-    if(!document.getElementById('em').value) return;
+  f.addEventListener('submit',async e=>{e.preventDefault();
+    const em=document.getElementById('em').value.trim(); if(!em) return;
+    try{ await fetch('/api/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:em})}); }catch(_){}
     f.classList.add('on'); document.getElementById('done').classList.add('on');
   });
   // gold dust rising (genie magic) — respects reduced-motion via CSS hiding the canvas
