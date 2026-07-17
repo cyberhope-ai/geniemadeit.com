@@ -1,0 +1,166 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenieMade — Your first three wishes are free</title>
+<meta name="description" content="Turn a few words into stunning images and video — instantly. Every creation comes sealed with a certificate of authenticity that's yours to keep.">
+<style>
+  :root{
+    --night:#130a26; --night2:#1c1140; --panel:#231553; --panel2:#2b1b63; --line:#3a2a6b;
+    --ink:#f7f1ff; --mut:#c6b6ea; --faint:#8f7fbb;
+    --gold:#f5c451; --gold2:#ffe390; --goldd:#c88f2c; --magic:#66e3e8;
+    --serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:
+      radial-gradient(1200px 620px at 78% -8%, rgba(245,196,81,.16), transparent 62%),
+      radial-gradient(900px 620px at 8% 108%, rgba(102,227,232,.10), transparent 60%),
+      linear-gradient(178deg,var(--night2),var(--night));
+    color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  #dust{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.75}
+  .page{position:relative;z-index:1;max-width:1080px;margin:0 auto;padding:0 22px 60px}
+
+  nav{display:flex;align-items:center;gap:12px;padding:22px 2px}
+  .brand{display:flex;align-items:center;gap:10px}
+  .lamp{width:34px;height:34px;filter:drop-shadow(0 3px 10px rgba(245,196,81,.5))}
+  .wm{font-family:var(--serif);font-size:1.5rem;font-weight:600;letter-spacing:.2px}
+  .wm b{color:var(--gold);font-weight:600}
+  nav .by{margin-left:auto;font-size:.74rem;color:var(--faint);letter-spacing:.3px}
+
+  .hero{padding:5vh 0 3vh;max-width:44rem}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.76rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold2);border:1px solid var(--goldd);background:rgba(245,196,81,.07);border-radius:30px;padding:6px 14px}
+  .eyebrow .spark{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(2.6rem,7vw,4.5rem);line-height:1.04;
+    letter-spacing:-.015em;margin:.5em 0 .3em;text-wrap:balance}
+  h1 em{font-style:italic;color:var(--gold);position:relative}
+  h1 em::after{content:"";position:absolute;left:0;right:0;bottom:.08em;height:.10em;border-radius:2px;
+    background:linear-gradient(90deg,transparent,var(--gold),transparent);opacity:.55}
+  .sub{font-size:clamp(1.05rem,2.3vw,1.28rem);color:var(--mut);max-width:34rem;line-height:1.55}
+  .sub b{color:var(--ink);font-weight:600}
+
+  form{display:flex;gap:10px;margin:2rem 0 .9rem;max-width:30rem;flex-wrap:wrap}
+  input[type=email]{flex:1;min-width:200px;background:rgba(255,255,255,.05);border:1px solid var(--line);
+    border-radius:13px;padding:15px 17px;color:var(--ink);font:inherit;font-size:1rem;outline:none;transition:.15s}
+  input[type=email]::placeholder{color:var(--faint)}
+  input[type=email]:focus{border-color:var(--gold);background:rgba(245,196,81,.06);box-shadow:0 0 0 3px rgba(245,196,81,.12)}
+  button{border:none;border-radius:13px;padding:15px 22px;font:inherit;font-weight:750;font-size:1rem;cursor:pointer;
+    color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold));white-space:nowrap;
+    box-shadow:0 10px 26px -8px rgba(245,196,81,.6);transition:transform .1s, box-shadow .2s}
+  button:hover{transform:translateY(-1px);box-shadow:0 14px 30px -8px rgba(245,196,81,.75)}
+  button:active{transform:translateY(0)}
+  .done{display:none;color:var(--magic);font-weight:600;margin:2rem 0 .9rem}
+  .done.on{display:block} form.on{display:none}
+  .trust{font-size:.9rem;color:var(--faint);display:flex;align-items:center;gap:9px}
+  .trust .seal{width:17px;height:17px;flex:0 0 auto}
+  .trust b{color:var(--mut);font-weight:600}
+
+  .showcase{margin-top:7vh}
+  .lab{font-size:.74rem;letter-spacing:.18em;text-transform:uppercase;color:var(--faint);margin-bottom:14px}
+  .tiles{display:grid;grid-template-columns:repeat(3,1fr);gap:16px}
+  @media(max-width:680px){.tiles{grid-template-columns:1fr}}
+  .tile{position:relative;aspect-ratio:1/1;border-radius:16px;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(135deg,var(--panel),var(--panel2));box-shadow:0 20px 50px -26px rgba(0,0,0,.8)}
+  .tile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;display:block;transition:transform .5s}
+  .tile:hover img{transform:scale(1.05)}
+  .tile .ph{position:absolute;inset:0;display:grid;place-items:center;color:var(--faint);font-size:.8rem;
+    background:conic-gradient(from 210deg at 60% 40%,rgba(245,196,81,.14),rgba(102,227,232,.10),rgba(160,107,255,.14),rgba(245,196,81,.14))}
+  .tile .cert{position:absolute;top:10px;left:10px;display:flex;align-items:center;gap:6px;
+    background:rgba(10,6,22,.72);backdrop-filter:blur(4px);border:1px solid var(--goldd);border-radius:20px;
+    padding:4px 10px;font-size:.68rem;font-weight:700;color:var(--gold2);letter-spacing:.03em}
+  .tile .cap{position:absolute;bottom:0;left:0;right:0;padding:22px 12px 10px;font-size:.8rem;color:var(--mut);
+    background:linear-gradient(transparent,rgba(10,6,22,.82))}
+
+  .why{display:flex;gap:26px;flex-wrap:wrap;margin-top:5vh}
+  .why .b{flex:1;min-width:210px}
+  .why .b .t{font-family:var(--serif);font-size:1.12rem;color:var(--ink);margin-bottom:3px}
+  .why .b .d{font-size:.92rem;color:var(--mut)}
+  .why .b .t span{color:var(--gold)}
+
+  footer{margin-top:7vh;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font-size:.82rem;
+    display:flex;gap:14px;flex-wrap:wrap;align-items:center}
+  footer .dot{opacity:.5}
+  @media(prefers-reduced-motion:reduce){#dust{display:none}}
+</style>
+</head>
+<body>
+<canvas id="dust"></canvas>
+<div class="page">
+  <nav>
+    <div class="brand">
+      <svg class="lamp" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs>
+        <path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/>
+        <ellipse cx="21.5" cy="30" rx="15.5" ry="6.6" fill="none" stroke="#b9832a" stroke-width="1" opacity=".5"/>
+        <circle cx="38" cy="14" r="1.6" fill="#ffe390"/><circle cx="42" cy="19" r="1" fill="#ffe390" opacity=".8"/>
+      </svg>
+      <span class="wm">Genie<b>Made</b></span>
+    </div>
+    <span class="by">a CyberHope AI company</span>
+  </nav>
+
+  <main class="hero">
+    <span class="eyebrow"><span class="spark"></span> The lamp is warming up · early access</span>
+    <h1>Your first three <em>wishes</em> are free.</h1>
+    <p class="sub">Turn a few words into <b>stunning images and video</b> — in a blink. And every creation
+      comes sealed with a certificate of authenticity that's <b>yours to keep</b>.</p>
+
+    <form id="wl">
+      <input type="email" id="em" placeholder="your@email.com" required aria-label="Email">
+      <button type="submit">Claim your 3 wishes</button>
+    </form>
+    <div class="done" id="done">✦ You're on the list — we'll send your three wishes the moment the lamp opens.</div>
+
+    <div class="trust">
+      <svg class="seal" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 1.7 2.9-.2 1 2.7 2.4 1.6-.6 2.9 1 2.7-2 2.1.1 2.9-2.8.9-1.6 2.4-2.8-.7-2.8.7-1.6-2.4-2.8-.9.1-2.9-2-2.1 1-2.7-.6-2.9L4.7 6.2l1-2.7 2.9.2L12 2z" fill="none" stroke="#c88f2c" stroke-width="1.3"/><path d="M8.5 12l2.3 2.3 4.7-4.7" fill="none" stroke="#f5c451" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+      <span>Sealed in your private <b>PrecognitionOS Vault</b> — provably yours, forever.</span>
+    </div>
+  </main>
+
+  <section class="showcase">
+    <div class="lab">Made with GenieMade</div>
+    <div class="tiles">
+      <div class="tile"><div class="ph">your wish, made real</div><img src="assets/sample_1.png" alt="AI creation" onerror="this.style.display='none'"><div class="cert">◈ Certified</div><div class="cap">"a regal fox in a velvet coat"</div></div>
+      <div class="tile"><div class="ph">your wish, made real</div><img src="assets/sample_2.png" alt="AI creation" onerror="this.style.display='none'"><div class="cert">◈ Certified</div><div class="cap">"a glowing perfume bottle on wet stone"</div></div>
+      <div class="tile"><div class="ph">your wish, made real</div><img src="assets/sample_3.png" alt="AI creation" onerror="this.style.display='none'"><div class="cert">◈ Certified</div><div class="cap">"a floating island city at golden hour"</div></div>
+    </div>
+  </section>
+
+  <section class="why">
+    <div class="b"><div class="t">Wish it. <span>See it.</span></div><div class="d">Describe anything. GenieMade turns your words into images and video in seconds.</div></div>
+    <div class="b"><div class="t">Provably <span>yours.</span></div><div class="d">Every creation ships with a signed certificate — when, how, and by whom it was made. Real proof for copyright and peace of mind.</div></div>
+    <div class="b"><div class="t">Your <span>Vault.</span></div><div class="d">Everything you make is kept safe, tracked, and exportable in your own PrecognitionOS Vault.</div></div>
+  </section>
+
+  <footer>
+    <span>© 2026 GenieMade</span><span class="dot">·</span>
+    <span>a CyberHope AI company</span><span class="dot">·</span>
+    <span>geniemadeit.com</span>
+  </footer>
+</div>
+
+<script>
+  // waitlist (front-end only for the splash; wired to a Worker/form service at deploy)
+  const f=document.getElementById('wl');
+  f.addEventListener('submit',e=>{e.preventDefault();
+    if(!document.getElementById('em').value) return;
+    f.classList.add('on'); document.getElementById('done').classList.add('on');
+  });
+  // gold dust rising (genie magic) — respects reduced-motion via CSS hiding the canvas
+  const c=document.getElementById('dust'), x=c.getContext('2d');
+  let W,H,P=[];
+  function seed(){W=c.width=innerWidth;H=c.height=innerHeight;
+    const n=Math.min(90,Math.floor(W*H/16000)); P=[];
+    for(let i=0;i<n;i++)P.push({x:Math.random()*W,y:Math.random()*H,r:Math.random()*1.8+.4,
+      s:Math.random()*.5+.15,d:Math.random()*Math.PI*2,h:Math.random()<.22?'#66e3e8':'#f5c451'});}
+  seed(); addEventListener('resize',seed);
+  (function loop(){x.clearRect(0,0,W,H);
+    for(const p of P){p.y-=p.s;p.x+=Math.sin(p.d+=0.01)*.25;if(p.y<-6){p.y=H+6;p.x=Math.random()*W;}
+      x.globalAlpha=.5+Math.sin(p.d*2)*.4;x.fillStyle=p.h;x.shadowBlur=8;x.shadowColor=p.h;
+      x.beginPath();x.arc(p.x,p.y,p.r,0,7);x.fill();}
+    x.globalAlpha=1;x.shadowBlur=0;requestAnimationFrame(loop);})();
+</script>
+</body>
+</html>
