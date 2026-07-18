@@ -244,6 +244,19 @@
       x.globalAlpha = 1; x.shadowBlur = 0; requestAnimationFrame(loop); })();
   }
 
+  // ---- hydrate real credits/plan/session from the engine (source of truth) ----
+  async function hydrate() {
+    try {
+      const r = await fetch("/api/me", { credentials: "same-origin" });
+      const ct = r.headers.get("content-type") || "";
+      if (!r.ok || !ct.includes("application/json")) return;
+      const j = await r.json();
+      if (j && typeof j.credits === "number") { LS.setItem("gm_credits", String(j.credits)); paintCredits(); }
+      if (j && j.email) { LS.setItem("gm_user", j.email); state.signedIn = j.email; paintAccount(); }
+      if (j && j.plan) state.plan = j.plan;
+    } catch (_) { /* offline/mock — keep local */ }
+  }
+
   // ---- init ----
-  paintCredits(); paintAccount(); renderVault(); wire(); dust();
+  paintCredits(); paintAccount(); renderVault(); wire(); dust(); hydrate();
 })();
