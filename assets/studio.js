@@ -12,7 +12,7 @@
 
   // ---- state ----
   const state = {
-    type: "image",
+    capability: "image.text",
     aspect: "1:1",
     get credits() { const v = LS.getItem("gm_credits"); return v === null ? 3 : Number(v); },
     set credits(n) { LS.setItem("gm_credits", String(Math.max(0, n))); paintCredits(); },
@@ -109,9 +109,8 @@
       if (Math.random() < 0.5 && step < SUMMON_STEPS.length - 1) { step++; els.summonSb.textContent = SUMMON_STEPS[step]; }
     }, 520);
 
-    const body = state.type === "voice"
-      ? { capability: "audio.speech", prompt }
-      : { type: state.type, prompt, aspect: state.aspect };
+    const kind = kindOf(state.capability);
+    const body = { capability: state.capability, prompt, ...(kind === "audio" ? {} : { aspect: state.aspect }) };
     const resp = await generate(body);
     clearInterval(timer);
 
@@ -129,7 +128,7 @@
     paintCredits();
 
     // record in vault
-    const item = { id: g.id, type: state.type === "voice" ? "voice" : (g.type || state.type), url: g.url, prompt, model: g.model, ts: Date.parse(g.certificate.issued_at) || Date.now(), certificate: g.certificate };
+    const item = { id: g.id, kind: kindOf(state.capability), type: g.type, url: g.url, prompt, model: g.model, ts: Date.parse(g.certificate.issued_at) || Date.now(), certificate: g.certificate };
     state.vault.unshift(item); saveVault(); renderVault();
 
     setTimeout(() => {
@@ -141,7 +140,7 @@
 
   function isAudio(item) {
     const u = (item.url || "").toLowerCase();
-    return item.type === "voice" || item.type === "audio.speech" || u.endsWith(".wav") || u.endsWith(".mp3");
+    return item.kind === "audio" || item.type === "voice" || item.type === "audio.speech" || u.endsWith(".wav") || u.endsWith(".mp3");
   }
   function mediaEl(item, player) {
     if (isAudio(item)) {
@@ -153,7 +152,7 @@
       }
       return `<div style="position:absolute;inset:0;display:grid;place-items:center;background:conic-gradient(from 210deg at 60% 40%,rgba(245,196,81,.14),rgba(102,227,232,.10),rgba(160,107,255,.14),rgba(245,196,81,.14))"><div style="font-size:2rem">🔊</div></div>`;
     }
-    if (item.type === "video") return `<video src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`;
+    if (item.type === "video" || item.kind === "video") return `<video src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`;
     return `<img src="${item.url}" alt="${escapeHtml(item.prompt)}">`;
   }
   function renderResult(item) {
@@ -241,20 +240,57 @@
     e.textContent = m;
   }
 
+  // ---- data-driven capabilities (phased release straight from /api/capabilities) ----
+  const ICON = { image: "◈", video: "▶", audio: "🔊" };
+  const kindOf = (id) => (id || "").split(".")[0];
+  const DEFAULT_CAPS = [
+    { id: "image.text", name: "Image", status: "live", credits: 1 },
+    { id: "audio.speech", name: "Voice", status: "live", credits: 3 },
+  ];
+  function shortName(it) {
+    const k = kindOf(it.id);
+    if (it.id === "image.text") return "Image";
+    if (it.id === "audio.speech") return "Voice";
+    if (it.id === "audio.music") return "Music";
+    if (k === "video") return "Video";
+    return it.name;
+  }
+  function selectCapability(id) {
+    state.capability = id;
+    $$("#typeSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.cap === id)));
+    const k = kindOf(id);
+    const showAspect = k === "image" || k === "video";
+    const asp = $("#aspectSeg"), lab = $("#shapeLab");
+    if (asp) asp.style.display = showAspect ? "" : "none";
+    if (lab) lab.style.display = showAspect ? "" : "none";
+    els.prompt.placeholder = k === "audio"
+      ? "Type what you want spoken aloud — e.g. Welcome to GenieMade, where your words come to life…"
+      : "a regal fox in a velvet coat, cinematic light, ultra detailed…";
+    $("#makeBtn").textContent = k === "audio" ? "✦ Speak it" : "✦ Make a wish";
+  }
+  async function renderCapabilities() {
+    let cats = null;
+    try {
+      const r = await fetch("/api/capabilities", { headers: { accept: "application/json" } });
+      const ct = r.headers.get("content-type") || "";
+      if (r.ok && ct.includes("application/json")) { const j = await r.json(); cats = j.capabilities || j.categories; }
+    } catch (_) {}
+    const items = cats ? cats.flatMap((c) => c.items || []) : DEFAULT_CAPS;
+    let live = items.filter((it) => it.status === "live");
+    const soon = items.filter((it) => it.status && it.status !== "live");
+    if (!live.length) live = [DEFAULT_CAPS[0]];
+    const seg = $("#typeSeg");
+    seg.innerHTML = live.map((it, i) =>
+      `<button data-cap="${it.id}" aria-pressed="${i === 0}" title="${it.credits || 1} credit${(it.credits || 1) > 1 ? "s" : ""}">${ICON[kindOf(it.id)] || "✦"} ${shortName(it)}</button>`).join("");
+    $$("#typeSeg button").forEach((b) => b.onclick = () => selectCapability(b.dataset.cap));
+    selectCapability(live[0].id);
+    const hint = $("#soonHint");
+    if (hint) hint.textContent = soon.length ? "More coming soon: " + soon.map((s) => s.name).join(" · ") : "";
+  }
+
   // ---- wire up ----
   function wire() {
-    $$("#typeSeg button").forEach((b) => b.onclick = () => {
-      $$("#typeSeg button").forEach((x) => x.setAttribute("aria-pressed", "false"));
-      b.setAttribute("aria-pressed", "true"); state.type = b.dataset.type;
-      const voice = state.type === "voice";
-      const asp = $("#aspectSeg"), lab = $("#shapeLab");
-      if (asp) asp.style.display = voice ? "none" : "";
-      if (lab) lab.style.display = voice ? "none" : "";
-      els.prompt.placeholder = voice
-        ? "Type what you want spoken aloud — e.g. Welcome to GenieMade, where your words come to life…"
-        : "a regal fox in a velvet coat, cinematic light, ultra detailed…";
-      $("#makeBtn").textContent = voice ? "✦ Speak it" : "✦ Make a wish";
-    });
+    renderCapabilities();
     $$("#aspectSeg button").forEach((b) => b.onclick = () => {
       $$("#aspectSeg button").forEach((x) => x.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true"); state.aspect = b.dataset.aspect;
