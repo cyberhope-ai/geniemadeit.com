@@ -20,6 +20,16 @@ export default {
         return new Response(JSON.stringify({ ok:false, error:"server" }), { status:500, headers:{ "content-type":"application/json" }});
       }
     }
+    // API glue (atlas2): proxy the rest of /api/* and generated /asset/* to the
+    // GenieMade engine so the Studio calls same-origin and never touches a provider.
+    if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
+      const target = new URL(request.url);
+      target.protocol = "https:";
+      target.hostname = "geniemade-engine.cyberhopeai.workers.dev";
+      target.port = "";
+      return fetch(new Request(target.toString(), request));
+    }
+
     return env.ASSETS.fetch(request);
   }
 }
