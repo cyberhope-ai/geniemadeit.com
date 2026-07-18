@@ -109,7 +109,10 @@
       if (Math.random() < 0.5 && step < SUMMON_STEPS.length - 1) { step++; els.summonSb.textContent = SUMMON_STEPS[step]; }
     }, 520);
 
-    const resp = await generate({ type: state.type, prompt, aspect: state.aspect });
+    const body = state.type === "voice"
+      ? { capability: "audio.speech", prompt }
+      : { type: state.type, prompt, aspect: state.aspect };
+    const resp = await generate(body);
     clearInterval(timer);
 
     if (!resp.ok && resp.error === "no_credits") {
@@ -126,7 +129,7 @@
     paintCredits();
 
     // record in vault
-    const item = { id: g.id, type: g.type, url: g.url, prompt, model: g.model, ts: Date.parse(g.certificate.issued_at) || Date.now(), certificate: g.certificate };
+    const item = { id: g.id, type: state.type === "voice" ? "voice" : (g.type || state.type), url: g.url, prompt, model: g.model, ts: Date.parse(g.certificate.issued_at) || Date.now(), certificate: g.certificate };
     state.vault.unshift(item); saveVault(); renderVault();
 
     setTimeout(() => {
@@ -136,12 +139,25 @@
     }, 420);
   }
 
-  function mediaEl(item, cls = "") {
-    if (item.type === "video") return `<video class="${cls}" src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`;
-    return `<img class="${cls}" src="${item.url}" alt="${escapeHtml(item.prompt)}">`;
+  function isAudio(item) {
+    const u = (item.url || "").toLowerCase();
+    return item.type === "voice" || item.type === "audio.speech" || u.endsWith(".wav") || u.endsWith(".mp3");
+  }
+  function mediaEl(item, player) {
+    if (isAudio(item)) {
+      if (player) {
+        return `<div style="position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;padding:24px;text-align:center;background:conic-gradient(from 210deg at 55% 40%,rgba(245,196,81,.12),rgba(102,227,232,.08),rgba(160,107,255,.12),rgba(245,196,81,.12))">
+          <div style="font-size:2.8rem">🔊</div>
+          <audio controls src="${item.url}" style="width:90%;max-width:340px"></audio>
+          <div style="font-size:.82rem;color:var(--mut)">"${escapeHtml((item.prompt || "").slice(0, 64))}"</div></div>`;
+      }
+      return `<div style="position:absolute;inset:0;display:grid;place-items:center;background:conic-gradient(from 210deg at 60% 40%,rgba(245,196,81,.14),rgba(102,227,232,.10),rgba(160,107,255,.14),rgba(245,196,81,.14))"><div style="font-size:2rem">🔊</div></div>`;
+    }
+    if (item.type === "video") return `<video src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`;
+    return `<img src="${item.url}" alt="${escapeHtml(item.prompt)}">`;
   }
   function renderResult(item) {
-    els.canvas.innerHTML = mediaEl(item);
+    els.canvas.innerHTML = mediaEl(item, true);
     $("#certTitle").textContent = `“${item.prompt.slice(0, 60)}${item.prompt.length > 60 ? "…" : ""}”`;
     $("#certModel").textContent = item.model;
     $("#certReceipt").textContent = item.certificate.receipt_id;
@@ -157,7 +173,7 @@
     if (!state.vault.length) { els.grid.innerHTML = `<div class="empty">Your Vault is empty — make your first wish above.</div>`; return; }
     els.grid.innerHTML = state.vault.map((g, i) => `
       <div class="card" data-i="${i}">
-        ${mediaEl(g)}
+        ${mediaEl(g, false)}
         <div class="cert">◈ Certified</div>
         <div class="cap">“${escapeHtml(g.prompt.slice(0, 44))}${g.prompt.length > 44 ? "…" : ""}”</div>
       </div>`).join("");
@@ -166,7 +182,7 @@
 
   // ---- lightbox ----
   function openLightbox(item) {
-    $("#lbBig").innerHTML = mediaEl(item);
+    $("#lbBig").innerHTML = mediaEl(item, true);
     $("#lbTitle").textContent = `“${item.prompt}”`;
     $("#lbDesc").textContent = "Sealed in your PrecognitionOS Vault — provably yours.";
     $("#lbModel").textContent = item.model;
@@ -230,6 +246,14 @@
     $$("#typeSeg button").forEach((b) => b.onclick = () => {
       $$("#typeSeg button").forEach((x) => x.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true"); state.type = b.dataset.type;
+      const voice = state.type === "voice";
+      const asp = $("#aspectSeg"), lab = $("#shapeLab");
+      if (asp) asp.style.display = voice ? "none" : "";
+      if (lab) lab.style.display = voice ? "none" : "";
+      els.prompt.placeholder = voice
+        ? "Type what you want spoken aloud — e.g. Welcome to GenieMade, where your words come to life…"
+        : "a regal fox in a velvet coat, cinematic light, ultra detailed…";
+      $("#makeBtn").textContent = voice ? "✦ Speak it" : "✦ Make a wish";
     });
     $$("#aspectSeg button").forEach((b) => b.onclick = () => {
       $$("#aspectSeg button").forEach((x) => x.setAttribute("aria-pressed", "false"));
