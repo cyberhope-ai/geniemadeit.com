@@ -16,19 +16,33 @@
     aspect: "1:1",
     get credits() { const v = LS.getItem("gm_credits"); return v === null ? 3 : Number(v); },
     set credits(n) { LS.setItem("gm_credits", String(Math.max(0, n))); paintCredits(); },
-    vault: JSON.parse(LS.getItem("gm_vault") || "null") || seedVault(),
+    // The Vault is the real user's creations from /api/gallery — never seeded. Empty for new accounts.
+    vault: [],
     signedIn: LS.getItem("gm_user") || "",
   };
-  function seedVault() {
-    // seed with the three showcase creations so the Vault is never empty
-    const seed = [
-      { id: "seed1", type: "image", url: "assets/sample_1.png", prompt: "a regal fox in a velvet coat", model: "GenieMade Vision", ts: Date.now() - 8.6e7 },
-      { id: "seed2", type: "image", url: "assets/sample_2.png", prompt: "a glowing perfume bottle on wet stone", model: "GenieMade Vision", ts: Date.now() - 6.2e7 },
-      { id: "seed3", type: "image", url: "assets/sample_3.png", prompt: "a floating island city at golden hour", model: "GenieMade Vision", ts: Date.now() - 3.1e7 },
-    ].map((g) => ({ ...g, certificate: mockCert(g.prompt, g.ts) }));
-    return seed;
+  const saveVault = () => {}; // no local persistence — /api/gallery is the source of truth
+
+  // Load the signed-in user's real creations from the engine.
+  async function loadGallery() {
+    if (!state.signedIn) { state.vault = []; renderVault(); return; }
+    try {
+      const r = await fetch("/api/gallery", { credentials: "same-origin", headers: { accept: "application/json" } });
+      if (!r.ok) return;
+      const d = await r.json();
+      const gens = d.generations || d.items || d.gallery || [];
+      state.vault = gens.map((g) => ({
+        id: g.id,
+        kind: kindOf(g.capability || "") || g.kind || "image",
+        type: g.type,
+        url: g.url,
+        prompt: g.prompt || "",
+        model: g.model || "GenieMade",
+        ts: Date.parse(g.created_at || (g.certificate && g.certificate.issued_at)) || Date.now(),
+        certificate: g.certificate || {},
+      }));
+      renderVault();
+    } catch (_) { /* keep whatever we have */ }
   }
-  const saveVault = () => LS.setItem("gm_vault", JSON.stringify(state.vault));
 
   // ---- helpers ----
   function mockHash() {
@@ -238,7 +252,7 @@
       const u = j.user || {};
       LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email;
       if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }
-      paintAccount(); paintCredits(); closeModals();
+      paintAccount(); paintCredits(); closeModals(); loadGallery();
     } catch (_) { authErr("Something went wrong. Try again."); }
     finally { btn.textContent = label; btn.disabled = false; }
   }
@@ -310,7 +324,7 @@
     $("#accountBtn").onclick = async () => {
       if (state.signedIn) {
         try { await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {}
-        LS.removeItem("gm_user"); state.signedIn = ""; paintAccount(); hydrate();
+        LS.removeItem("gm_user"); LS.removeItem("gm_vault"); state.signedIn = ""; state.vault = []; renderVault(); paintAccount(); hydrate();
       } else openAuth("signin");
     };
     $("#authSubmit").onclick = doAuth;
@@ -348,6 +362,7 @@
       else { LS.removeItem("gm_user"); state.signedIn = ""; }
       if (u && u.plan) state.plan = u.plan;
       paintAccount();
+      loadGallery();
     } catch (_) { /* engine offline — keep local */ }
   }
 
