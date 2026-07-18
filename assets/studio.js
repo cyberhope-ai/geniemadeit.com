@@ -76,12 +76,16 @@
         body: JSON.stringify(body),
         credentials: "same-origin",
       });
+      if (res.status === 401) {
+        const j = await res.json().catch(() => ({}));
+        return { ok: false, error: j.error || "auth_required" };
+      }
       const ct = res.headers.get("content-type") || "";
       if (res.ok && ct.includes("application/json")) {
         const j = await res.json();
         if (typeof j.ok === "boolean") return j; // real engine answered
       }
-    } catch (_) { /* fall through to mock */ }
+    } catch (_) { /* engine unreachable — fall through to mock */ }
     return mockGenerate(body);
   }
 
@@ -96,6 +100,7 @@
   async function makeWish() {
     const prompt = els.prompt.value.trim();
     if (!prompt) { els.prompt.focus(); return; }
+    if (!state.signedIn) { openAuth("signup"); return; } // registration required before a wish
     if (state.credits <= 0) { openModal("payModal"); return; }
     els.make.disabled = true;
     els.result.classList.remove("on");
@@ -114,6 +119,9 @@
     const resp = await generate(body);
     clearInterval(timer);
 
+    if (!resp.ok && resp.error === "auth_required") {
+      els.summon.classList.remove("on"); els.make.disabled = false; openAuth("signup"); return;
+    }
     if (!resp.ok && resp.error === "no_credits") {
       els.summon.classList.remove("on"); els.make.disabled = false; openModal("payModal"); return;
     }

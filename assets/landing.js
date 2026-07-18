@@ -61,6 +61,7 @@
     el.querySelectorAll("button[data-plan]").forEach((b) => b.onclick = () => checkout(b.dataset.plan, b.dataset.href, b));
   }
   async function checkout(plan, href, btn) {
+    if (!currentUser) { openAuth("signup"); return; } // must register before creating/buying
     if (href) { window.location.href = href; return; }
     const label = btn.textContent; btn.textContent = "Loading…"; btn.disabled = true;
     try {
@@ -68,11 +69,11 @@
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
         body: JSON.stringify({ plan }),
       });
+      if (r.status === 401) { openAuth("signup"); return; }
       const j = await r.json();
       if (j && (j.url || j.checkout_url)) { window.location.href = j.url || j.checkout_url; return; }
       throw new Error("no url");
     } catch (_) {
-      // engine/billing not reachable — send them into the Studio, upgrade prompt lives there too
       window.location.href = "/app";
     } finally { btn.textContent = label; btn.disabled = false; }
   }
@@ -130,6 +131,10 @@
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAuth(); });
     $("#authEmail").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#authPass").focus(); });
     $("#authPass").addEventListener("keydown", (e) => { if (e.key === "Enter") doAuth(); });
+    // gate "Start creating" CTAs: unauthenticated -> signup first (mandatory registration)
+    document.querySelectorAll('a[href="/app"]').forEach((a) => a.addEventListener("click", (e) => {
+      if (!currentUser) { e.preventDefault(); openAuth("signup"); }
+    }));
     fetch("/api/auth/me", { credentials: "same-origin" })
       .then((r) => r.json()).then((j) => { if (j && j.authenticated && j.user) { currentUser = j.user; paintAccount(); } })
       .catch(() => {});
