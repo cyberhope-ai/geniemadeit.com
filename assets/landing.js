@@ -77,10 +77,62 @@
     } finally { btn.textContent = label; btn.disabled = false; }
   }
 
-  // ---- Google sign-in (atlas2's auth contract: redirect to engine, cookie session) ----
+  // ---- auth (real email accounts today; Google when the OAuth client is set) ----
+  let authMode = "signup";
+  let currentUser = null;
+  function openAuth(mode) {
+    authMode = mode;
+    $("#authTitle").textContent = mode === "signup" ? "Create your account" : "Welcome back";
+    $("#authSub").textContent = mode === "signup" ? "Sign up and your three free wishes are waiting." : "Sign in to your GenieMade account.";
+    $("#authSubmit").textContent = mode === "signup" ? "Create account" : "Sign in";
+    $("#authSwap").innerHTML = mode === "signup"
+      ? 'Already have an account? <a href="#" id="swapLink">Sign in</a>'
+      : 'New here? <a href="#" id="swapLink">Create an account</a>';
+    $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth(mode === "signup" ? "login" : "signup"); };
+    $("#authErr").textContent = "";
+    $("#authModal").classList.add("on");
+  }
+  const closeAuth = () => $("#authModal").classList.remove("on");
+  async function doAuth() {
+    const email = $("#authEmail").value.trim();
+    const password = $("#authPass").value;
+    if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $("#authEmail").focus(); return; }
+    if (authMode === "signup" && password.length < 8) { $("#authErr").textContent = "Password must be at least 8 characters."; return; }
+    const btn = $("#authSubmit"); const label = btn.textContent; btn.textContent = "…"; btn.disabled = true;
+    try {
+      const ep = authMode === "signup" ? "/api/auth/signup" : "/api/auth/login";
+      const r = await fetch(ep, { method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email, password }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.ok === false) { $("#authErr").textContent = j.error || "That didn't work — check your details."; return; }
+      currentUser = j.user || { email };
+      closeAuth();
+      window.location.href = "/app"; // straight into the Studio to start creating
+    } catch (_) { $("#authErr").textContent = "Something went wrong. Try again."; }
+    finally { btn.textContent = label; btn.disabled = false; }
+  }
+  function paintAccount() {
+    const s = $("#signinLink"); if (!s) return;
+    if (currentUser) {
+      s.textContent = "◈ " + (currentUser.email || "Account").split("@")[0];
+      s.classList.add("acct"); s.title = "Sign out";
+      s.onclick = async () => { try { await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {} currentUser = null; paintAccount(); };
+    } else {
+      s.textContent = "Sign in"; s.classList.remove("acct"); s.title = "";
+      s.onclick = () => openAuth("login");
+    }
+  }
   function wireSignin() {
-    const s = $("#signinLink");
-    if (s) s.onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
+    paintAccount();
+    $("#authSubmit").onclick = doAuth;
+    $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
+    document.querySelectorAll("[data-close]").forEach((b) => b.onclick = closeAuth);
+    $("#authModal").addEventListener("click", (e) => { if (e.target.id === "authModal") closeAuth(); });
+    document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAuth(); });
+    $("#authEmail").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#authPass").focus(); });
+    $("#authPass").addEventListener("keydown", (e) => { if (e.key === "Enter") doAuth(); });
+    fetch("/api/auth/me", { credentials: "same-origin" })
+      .then((r) => r.json()).then((j) => { if (j && j.authenticated && j.user) { currentUser = j.user; paintAccount(); } })
+      .catch(() => {});
   }
 
   // ---- hero image rotate ----

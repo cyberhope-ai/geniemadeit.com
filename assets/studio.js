@@ -201,10 +201,28 @@
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth(mode === "signin" ? "signup" : "signin"); };
     openModal("authModal");
   }
-  function doAuth() {
+  async function doAuth() {
     const email = $("#authEmail").value.trim();
+    const password = $("#authPass").value;
     if (!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)) { $("#authEmail").focus(); return; }
-    LS.setItem("gm_user", email); state.signedIn = email; paintAccount(); closeModals();
+    if (!password) { $("#authPass").focus(); return; }
+    const btn = $("#authSubmit"); const label = btn.textContent; btn.textContent = "…"; btn.disabled = true;
+    try {
+      const ep = authMode === "signup" ? "/api/auth/signup" : "/api/auth/login";
+      const r = await fetch(ep, { method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email, password }) });
+      const j = await r.json().catch(() => ({}));
+      if (!r.ok || j.ok === false) { authErr(j.error || "That didn't work — check your details."); return; }
+      const u = j.user || {};
+      LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email;
+      if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }
+      paintAccount(); paintCredits(); closeModals();
+    } catch (_) { authErr("Something went wrong. Try again."); }
+    finally { btn.textContent = label; btn.disabled = false; }
+  }
+  function authErr(m) {
+    let e = $("#authErr");
+    if (!e) { e = document.createElement("div"); e.id = "authErr"; e.style.cssText = "color:#ff6b8a;font-size:.85rem;margin-top:10px;text-align:center"; $("#authSubmit").after(e); }
+    e.textContent = m;
   }
 
   // ---- wire up ----
@@ -221,9 +239,14 @@
     els.make.onclick = makeWish;
     els.prompt.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") makeWish(); });
     $("#againBtn").onclick = () => { els.result.classList.remove("on"); els.prompt.focus(); els.prompt.scrollIntoView({ behavior: "smooth", block: "center" }); };
-    $("#accountBtn").onclick = () => state.signedIn ? (LS.removeItem("gm_user"), state.signedIn = "", paintAccount()) : openAuth("signin");
+    $("#accountBtn").onclick = async () => {
+      if (state.signedIn) {
+        try { await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {}
+        LS.removeItem("gm_user"); state.signedIn = ""; paintAccount(); hydrate();
+      } else openAuth("signin");
+    };
     $("#authSubmit").onclick = doAuth;
-    $("#googleBtn").onclick = () => { LS.setItem("gm_user", "you@gmail.com"); state.signedIn = "you@gmail.com"; paintAccount(); closeModals(); };
+    $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth("signup"); };
     $("#checkoutBtn").onclick = () => { alert("Secure Stripe checkout opens here once billing is live."); };
     $$("[data-close]").forEach((b) => b.onclick = closeModals);
@@ -247,14 +270,17 @@
   // ---- hydrate real credits/plan/session from the engine (source of truth) ----
   async function hydrate() {
     try {
-      const r = await fetch("/api/me", { credentials: "same-origin" });
+      const r = await fetch("/api/auth/me", { credentials: "same-origin" });
       const ct = r.headers.get("content-type") || "";
       if (!r.ok || !ct.includes("application/json")) return;
       const j = await r.json();
-      if (j && typeof j.credits === "number") { LS.setItem("gm_credits", String(j.credits)); paintCredits(); }
-      if (j && j.email) { LS.setItem("gm_user", j.email); state.signedIn = j.email; paintAccount(); }
-      if (j && j.plan) state.plan = j.plan;
-    } catch (_) { /* offline/mock — keep local */ }
+      const u = j && j.user;
+      if (u && typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); paintCredits(); }
+      if (j && j.authenticated && u && u.email) { LS.setItem("gm_user", u.email); state.signedIn = u.email; }
+      else { LS.removeItem("gm_user"); state.signedIn = ""; }
+      if (u && u.plan) state.plan = u.plan;
+      paintAccount();
+    } catch (_) { /* engine offline — keep local */ }
   }
 
   // ---- init ----

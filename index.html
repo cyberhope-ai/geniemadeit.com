@@ -135,6 +135,16 @@
   footer{border-top:1px solid var(--line);padding:30px 0 50px;color:var(--faint);font-size:.85rem;margin-top:6vh}
   .fcols{display:flex;gap:26px;flex-wrap:wrap;justify-content:space-between}
   footer a{color:var(--mut)}footer a:hover{color:var(--ink)}
+  /* auth modal + account */
+  .acct{display:flex;align-items:center;gap:6px;color:var(--gold2);font-weight:600;font-size:.9rem;cursor:pointer;border:1px solid var(--goldd);background:rgba(245,196,81,.08);border-radius:30px;padding:6px 12px}
+  .gm-modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;background:rgba(8,4,18,.74);backdrop-filter:blur(6px)}
+  .gm-modal.on{display:flex}
+  .gm-sheet{position:relative;width:100%;max-width:400px;background:linear-gradient(160deg,var(--panel),var(--night2));border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 40px 100px -30px #000}
+  .gm-x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--faint);font-size:1.4rem;cursor:pointer}
+  .gm-oauth{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1a1a1a;border:none;border-radius:12px;padding:12px;font:inherit;font-weight:600;cursor:pointer;margin-bottom:6px}
+  .gm-or{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:.8rem;margin:14px 0}.gm-or::before,.gm-or::after{content:"";flex:1;height:1px;background:var(--line)}
+  .gm-field{width:100%;background:rgba(10,6,22,.5);border:1px solid var(--line);border-radius:12px;padding:13px 15px;color:var(--ink);font:inherit;outline:none;margin-bottom:11px}.gm-field:focus{border-color:var(--gold)}
+  .gm-fine{font-size:.85rem;color:var(--faint);text-align:center;margin-top:14px}.gm-fine a{color:var(--gold2)}
   @media(prefers-reduced-motion:reduce){#dust,.f1,.f2{animation:none}#dust{display:none}}
 </style>
 </head>
@@ -270,6 +280,22 @@
   <div class="wrap" style="margin-top:26px;opacity:.7">© 2026 GenieMade · geniemadeit.com</div>
 </footer>
 
+<!-- auth modal -->
+<div class="gm-modal" id="authModal">
+  <div class="gm-sheet">
+    <button class="gm-x" data-close aria-label="Close">×</button>
+    <div class="wm" style="font-size:1.15rem">Genie<b>Made</b></div>
+    <h3 id="authTitle" style="font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:.35em 0 .15em">Create your account</h3>
+    <p id="authSub" style="color:var(--mut);font-size:.92rem;margin:0 0 16px">Sign up and your three free wishes are waiting.</p>
+    <button class="gm-oauth" id="googleBtn"><svg width="17" height="17" viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.8-.4-4H24v7.5h12c-.2 2-1.7 5-5 7l7.7 6c4.5-4.2 6.3-10.4 6.3-16.5z"/><path fill="#34A853" d="M24 46c6.5 0 11.9-2.1 15.9-5.9l-7.7-6c-2.1 1.4-4.9 2.4-8.2 2.4-6.3 0-11.6-4.2-13.5-9.9l-8 6.1C8.5 40.9 15.6 46 24 46z"/><path fill="#FBBC05" d="M10.5 26.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-8-6.1C1 14.3 0 18 0 22s1 7.7 2.5 10.7l8-6.1z"/><path fill="#EA4335" d="M24 9.5c3.5 0 6 1.5 7.4 2.8l6.8-6.6C34 2 28.6 0 24 0 15.6 0 8.5 5.1 5.5 12.3l8 6.1C15.4 12.7 20.7 9.5 24 9.5z"/></svg> Continue with Google</button>
+    <div class="gm-or">or</div>
+    <input class="gm-field" id="authEmail" type="email" placeholder="your@email.com" autocomplete="email">
+    <input class="gm-field" id="authPass" type="password" placeholder="Password (8+ characters)" autocomplete="current-password">
+    <button class="btn gold" id="authSubmit" style="width:100%;justify-content:center;margin-top:2px">Create account</button>
+    <div id="authErr" style="color:#ff6b8a;font-size:.85rem;margin-top:10px;text-align:center"></div>
+    <div class="gm-fine" id="authSwap">Already have an account? <a href="#" id="swapLink">Sign in</a></div>
+  </div>
+</div>
 <script src="assets/landing.js"></script>
 </body>
 </html>
