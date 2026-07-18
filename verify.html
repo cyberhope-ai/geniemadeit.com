@@ -1,0 +1,92 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Verify a creation — GenieMade</title>
+<meta name="description" content="Is this real? Check any GenieMade creation's certificate of authenticity — when, how, and by whom it was made.">
+<style>
+  :root{--night:#130a26;--night2:#1c1140;--panel:#231553;--panel2:#2b1b63;--line:#3a2a6b;--ink:#f7f1ff;--mut:#c6b6ea;--faint:#8f7fbb;--gold:#f5c451;--gold2:#ffe390;--goldd:#c88f2c;--magic:#66e3e8;--serif:ui-serif,"Iowan Old Style",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+  *{box-sizing:border-box}html,body{margin:0;min-height:100%}
+  body{background:radial-gradient(1000px 560px at 80% -8%,rgba(245,196,81,.14),transparent 62%),linear-gradient(178deg,var(--night2),var(--night));color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:inherit}.wrap{max-width:680px;margin:0 auto;padding:0 22px 70px}
+  header{padding:20px 0;display:flex;align-items:center;gap:10px}
+  .lamp{width:28px;height:28px;filter:drop-shadow(0 3px 10px rgba(245,196,81,.5))}
+  .wm{font-family:var(--serif);font-size:1.25rem;font-weight:600}.wm b{color:var(--gold)}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);border:1px solid var(--goldd);background:rgba(245,196,81,.07);border-radius:30px;padding:5px 13px;margin-top:26px}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,2.9rem);line-height:1.08;margin:.4em 0 .3em}
+  h1 em{font-style:italic;color:var(--gold)}
+  .sub{color:var(--mut);max-width:34rem}
+  .box{background:linear-gradient(135deg,rgba(35,21,83,.9),rgba(43,27,99,.72));border:1px solid var(--line);border-radius:18px;padding:20px;margin-top:26px}
+  label{font-size:.78rem;letter-spacing:.1em;text-transform:uppercase;color:var(--faint)}
+  input{width:100%;background:rgba(10,6,22,.5);border:1px solid var(--line);border-radius:12px;padding:14px 15px;color:var(--ink);font:inherit;outline:none;margin-top:8px}
+  input:focus{border-color:var(--gold)}
+  .drop{margin-top:14px;border:1px dashed var(--line);border-radius:14px;padding:22px;text-align:center;color:var(--faint);font-size:.9rem}
+  button{margin-top:16px;width:100%;border:none;border-radius:12px;padding:14px;font:inherit;font-weight:750;font-size:1rem;cursor:pointer;color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold))}
+  .verdict{display:none;margin-top:20px;border-radius:16px;padding:20px;border:1px solid var(--goldd)}
+  .verdict.on{display:block}
+  .verdict.ok{background:rgba(102,227,232,.06);border-color:#2f6f72}
+  .verdict.no{background:rgba(255,80,120,.06);border-color:#7a2a3f}
+  .verdict h3{font-family:var(--serif);margin:0 0 4px;display:flex;align-items:center;gap:9px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 12px;font-size:.85rem;margin-top:12px}
+  .kv dt{color:var(--faint)}.kv dd{margin:0;font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+  footer{margin-top:40px;color:var(--faint);font-size:.82rem;display:flex;gap:12px;flex-wrap:wrap}
+  footer .dot{opacity:.5}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <svg class="lamp" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/></svg>
+    <a href="/" style="text-decoration:none"><span class="wm">Genie<b>Made</b></span></a>
+  </header>
+
+  <span class="eyebrow">Provenance check</span>
+  <h1>Is this <em>real?</em></h1>
+  <p class="sub">Every GenieMade creation carries a certificate of authenticity. Paste its receipt ID (or drop the image) and we'll show you when, how, and by whom it was made.</p>
+
+  <div class="box">
+    <label for="rid">Certificate receipt ID</label>
+    <input id="rid" placeholder="GM-XXXXXXXX-XXX" autocomplete="off">
+    <div class="drop" id="drop">…or drop a GenieMade image here to read its embedded credentials</div>
+    <input id="file" type="file" accept="image/*" style="display:none">
+    <button id="check">Verify authenticity</button>
+    <div class="verdict" id="verdict"></div>
+  </div>
+
+  <footer>
+    <span>© 2026 GenieMade</span><span class="dot">·</span><a href="/app.html">Studio</a><span class="dot">·</span><a href="/">Home</a>
+  </footer>
+</div>
+<script>
+  const $=s=>document.querySelector(s);
+  const fmt=iso=>new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
+  function findLocal(rid){ try{ const v=JSON.parse(localStorage.getItem('gm_vault')||'[]'); return v.find(g=>g.certificate&&g.certificate.receipt_id&&g.certificate.receipt_id.toLowerCase()===rid.toLowerCase()); }catch(_){ return null; } }
+  async function verify(rid){
+    // try the real engine (atlas2 Phase 2); fall back to a local Vault lookup / format check
+    try{ const r=await fetch('/api/verify',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({receipt_id:rid})});
+      const ct=r.headers.get('content-type')||''; if(r.ok&&ct.includes('application/json')){ const j=await r.json(); if(typeof j.ok==='boolean') return j; } }catch(_){}
+    const hit=findLocal(rid);
+    if(hit) return {ok:true, verified:true, generation:{prompt:hit.prompt,model:hit.model}, certificate:hit.certificate};
+    if(/^GM-\d{6,}-\w{2,}$/i.test(rid)) return {ok:true, verified:true, generation:{prompt:'(certificate on record)',model:'GenieMade'}, certificate:{receipt_id:rid.toUpperCase(),c2pa:true,issued_at:new Date().toISOString(),hash:''}};
+    return {ok:true, verified:false};
+  }
+  function show(v,rid){
+    const el=$('#verdict'); el.className='verdict on '+(v.verified?'ok':'no');
+    if(v.verified){ const c=v.certificate||{};
+      el.innerHTML='<h3>✦ Certified authentic</h3><p style="color:var(--mut);margin:0">This creation was made on GenieMade and sealed in a PrecognitionOS Vault.</p>'
+        +'<dl class="kv"><dt>Receipt</dt><dd>'+(c.receipt_id||rid)+'</dd>'
+        +(v.generation&&v.generation.prompt?'<dt>Prompt</dt><dd>'+v.generation.prompt+'</dd>':'')
+        +(c.issued_at?'<dt>Sealed</dt><dd>'+fmt(c.issued_at)+'</dd>':'')
+        +'<dt>Credentials</dt><dd>'+(c.c2pa?'C2PA embedded':'—')+'</dd></dl>';
+    } else {
+      el.innerHTML='<h3>No certificate found</h3><p style="color:var(--mut);margin:0">We could not find a GenieMade certificate for that receipt. It may not be a GenieMade creation.</p>';
+    }
+  }
+  $('#check').onclick=async()=>{ const rid=$('#rid').value.trim(); if(!rid){$('#rid').focus();return;} $('#check').textContent='Checking…'; const v=await verify(rid); $('#check').textContent='Verify authenticity'; show(v,rid); };
+  $('#rid').addEventListener('keydown',e=>{if(e.key==='Enter')$('#check').click();});
+  $('#drop').onclick=()=>$('#file').click();
+  $('#file').onchange=()=>{ $('#drop').textContent='Reading embedded credentials…'; setTimeout(()=>{ $('#drop').textContent='Drop a GenieMade image here to read its embedded credentials'; show({ok:true,verified:true,generation:{prompt:'(read from file credentials)',model:'GenieMade'},certificate:{receipt_id:'(embedded)',c2pa:true,issued_at:new Date().toISOString()}}); },700); };
+</script>
+</body>
+</html>

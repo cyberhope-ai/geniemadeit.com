@@ -52,8 +52,12 @@
     box-shadow:0 10px 26px -8px rgba(245,196,81,.6);transition:transform .1s, box-shadow .2s}
   button:hover{transform:translateY(-1px);box-shadow:0 14px 30px -8px rgba(245,196,81,.75)}
   button:active{transform:translateY(0)}
-  .done{display:none;color:var(--magic);font-weight:600;margin:2rem 0 .9rem}
-  .done.on{display:block} form.on{display:none}
+  .cta{display:flex;gap:12px;flex-wrap:wrap;align-items:center;margin:2rem 0 .9rem}
+  .cta .go{display:inline-block;text-decoration:none;border-radius:13px;padding:15px 24px;font-weight:750;font-size:1rem;
+    color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 10px 26px -8px rgba(245,196,81,.6);transition:transform .1s,box-shadow .2s}
+  .cta .go:hover{transform:translateY(-1px);box-shadow:0 14px 30px -8px rgba(245,196,81,.75)}
+  .cta .ghost{text-decoration:none;color:var(--mut);font-weight:600;transition:color .15s}
+  .cta .ghost:hover{color:var(--ink)}
   .trust{font-size:.9rem;color:var(--faint);display:flex;align-items:center;gap:9px}
   .trust .seal{width:17px;height:17px;flex:0 0 auto}
   .trust b{color:var(--mut);font-weight:600}
@@ -102,16 +106,15 @@
   </nav>
 
   <main class="hero">
-    <span class="eyebrow"><span class="spark"></span> The lamp is warming up · early access</span>
+    <span class="eyebrow"><span class="spark"></span> The lamp is lit · your first 3 wishes are free</span>
     <h1>Your first three <em>wishes</em> are free.</h1>
     <p class="sub">Turn a few words into <b>stunning images and video</b> — in a blink. And every creation
       comes sealed with a certificate of authenticity that's <b>yours to keep</b>.</p>
 
-    <form id="wl">
-      <input type="email" id="em" placeholder="your@email.com" required aria-label="Email">
-      <button type="submit">Claim your 3 wishes</button>
-    </form>
-    <div class="done" id="done">✦ You're on the list — we'll send your three wishes the moment the lamp opens.</div>
+    <div class="cta">
+      <a class="go" href="/app.html">✦ Make your first wish</a>
+      <a class="ghost" href="/app.html">Enter the Studio →</a>
+    </div>
 
     <div class="trust">
       <svg class="seal" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 1.7 2.9-.2 1 2.7 2.4 1.6-.6 2.9 1 2.7-2 2.1.1 2.9-2.8.9-1.6 2.4-2.8-.7-2.8.7-1.6-2.4-2.8-.9.1-2.9-2-2.1 1-2.7-.6-2.9L4.7 6.2l1-2.7 2.9.2L12 2z" fill="none" stroke="#c88f2c" stroke-width="1.3"/><path d="M8.5 12l2.3 2.3 4.7-4.7" fill="none" stroke="#f5c451" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
@@ -142,13 +145,7 @@
 </div>
 
 <script>
-  // waitlist (front-end only for the splash; wired to a Worker/form service at deploy)
-  const f=document.getElementById('wl');
-  f.addEventListener('submit',async e=>{e.preventDefault();
-    const em=document.getElementById('em').value.trim(); if(!em) return;
-    try{ await fetch('/api/waitlist',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({email:em})}); }catch(_){}
-    f.classList.add('on'); document.getElementById('done').classList.add('on');
-  });
+  // (waitlist form retired now that the Studio is live — CTA leads straight to /app.html)
   // gold dust rising (genie magic) — respects reduced-motion via CSS hiding the canvas
   const c=document.getElementById('dust'), x=c.getContext('2d');
   let W,H,P=[];

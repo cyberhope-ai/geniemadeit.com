@@ -1,0 +1,302 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenieMade Studio — Make a wish</title>
+<meta name="description" content="Describe anything and GenieMade turns it into stunning images and video — each sealed with a certificate of authenticity in your private Vault.">
+<style>
+  :root{
+    --night:#130a26; --night2:#1c1140; --panel:#231553; --panel2:#2b1b63; --line:#3a2a6b;
+    --ink:#f7f1ff; --mut:#c6b6ea; --faint:#8f7fbb;
+    --gold:#f5c451; --gold2:#ffe390; --goldd:#c88f2c; --magic:#66e3e8; --viol:#a06bff;
+    --serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:
+      radial-gradient(1200px 620px at 82% -10%, rgba(245,196,81,.14), transparent 62%),
+      radial-gradient(900px 640px at 4% 112%, rgba(102,227,232,.09), transparent 60%),
+      linear-gradient(178deg,var(--night2),var(--night));
+    background-attachment:fixed;color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;overflow-x:hidden}
+  #dust{position:fixed;inset:0;z-index:0;pointer-events:none;opacity:.6}
+  a{color:inherit}
+  .wrap{position:relative;z-index:1;max-width:1120px;margin:0 auto;padding:0 22px 80px}
+
+  /* ---- top bar ---- */
+  header{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:linear-gradient(180deg,rgba(19,10,38,.9),rgba(19,10,38,.55));border-bottom:1px solid var(--line)}
+  .bar{max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .lamp{width:30px;height:30px;filter:drop-shadow(0 3px 10px rgba(245,196,81,.5))}
+  .wm{font-family:var(--serif);font-size:1.28rem;font-weight:600}.wm b{color:var(--gold);font-weight:600}
+  .spacer{flex:1}
+  .credits{display:flex;align-items:center;gap:7px;border:1px solid var(--goldd);background:rgba(245,196,81,.08);
+    border-radius:30px;padding:6px 13px;font-size:.84rem;color:var(--gold2);font-weight:600;white-space:nowrap}
+  .credits .n{font-variant-numeric:tabular-nums}
+  .btn{border:none;border-radius:11px;padding:9px 15px;font:inherit;font-weight:700;font-size:.9rem;cursor:pointer;transition:transform .1s,box-shadow .2s,background .2s}
+  .btn.gold{color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 8px 22px -8px rgba(245,196,81,.6)}
+  .btn.gold:hover{transform:translateY(-1px)}
+  .btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink)}
+  .btn.ghost:hover{border-color:var(--gold)}
+  .btn:disabled{opacity:.5;cursor:default;transform:none}
+
+  /* ---- create studio ---- */
+  .studio{margin-top:34px}
+  .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--gold2);border:1px solid var(--goldd);background:rgba(245,196,81,.07);border-radius:30px;padding:5px 13px}
+  .eyebrow .spark{width:6px;height:6px;border-radius:50%;background:var(--gold);box-shadow:0 0 10px var(--gold)}
+  h1{font-family:var(--serif);font-weight:600;font-size:clamp(2rem,5vw,3.1rem);line-height:1.06;letter-spacing:-.015em;margin:.45em 0 .5em;text-wrap:balance}
+  h1 em{font-style:italic;color:var(--gold)}
+
+  .composer{background:linear-gradient(135deg,rgba(35,21,83,.9),rgba(43,27,99,.75));border:1px solid var(--line);
+    border-radius:20px;padding:18px;box-shadow:0 30px 80px -40px rgba(0,0,0,.9)}
+  .composer textarea{width:100%;min-height:96px;resize:vertical;background:rgba(10,6,22,.45);border:1px solid var(--line);
+    border-radius:14px;padding:15px 16px;color:var(--ink);font:inherit;font-size:1.06rem;outline:none;transition:.15s}
+  .composer textarea::placeholder{color:var(--faint)}
+  .composer textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,196,81,.12)}
+  .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:14px}
+  .seg{display:flex;background:rgba(10,6,22,.4);border:1px solid var(--line);border-radius:11px;padding:3px}
+  .seg button{border:none;background:transparent;color:var(--mut);font:inherit;font-weight:600;font-size:.86rem;
+    padding:7px 13px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s}
+  .seg button[aria-pressed=true]{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1a05}
+  .lab{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--faint);margin-right:2px}
+  .make{margin-left:auto}
+  .make button{padding:12px 22px;font-size:1rem}
+  .hint{font-size:.82rem;color:var(--faint);margin-top:11px}
+  .hint b{color:var(--mut)}
+  .chips{display:flex;flex-wrap:wrap;gap:8px;margin-top:12px}
+  .chip{font-size:.82rem;color:var(--mut);border:1px solid var(--line);background:rgba(255,255,255,.03);
+    border-radius:30px;padding:6px 12px;cursor:pointer;transition:.15s}
+  .chip:hover{border-color:var(--gold);color:var(--ink)}
+
+  /* ---- stage (progress + result) ---- */
+  .stage{margin-top:20px}
+  .summon{display:none;text-align:center;padding:44px 20px;border:1px dashed var(--line);border-radius:20px;
+    background:radial-gradient(600px 300px at 50% 0,rgba(245,196,81,.08),transparent 70%)}
+  .summon.on{display:block}
+  .orb{width:74px;height:74px;margin:0 auto 16px;border-radius:50%;
+    background:conic-gradient(from 0deg,var(--gold),var(--magic),var(--viol),var(--gold));
+    filter:blur(.5px);animation:spin 1.4s linear infinite;box-shadow:0 0 44px -6px rgba(245,196,81,.6)}
+  @keyframes spin{to{transform:rotate(360deg)}}
+  .summon .st{font-family:var(--serif);font-size:1.2rem;color:var(--gold2)}
+  .summon .sb{font-size:.9rem;color:var(--faint);margin-top:6px}
+  .prog{height:5px;background:rgba(10,6,22,.5);border-radius:4px;overflow:hidden;max-width:320px;margin:16px auto 0}
+  .prog i{display:block;height:100%;width:0;background:linear-gradient(90deg,var(--gold),var(--magic));transition:width .3s}
+
+  .result{display:none;gap:20px;grid-template-columns:1.3fr 1fr;align-items:start}
+  .result.on{display:grid}@media(max-width:760px){.result.on{grid-template-columns:1fr}}
+  .canvas{position:relative;border-radius:18px;overflow:hidden;border:1px solid var(--line);background:#0c0720;aspect-ratio:1/1}
+  .canvas img,.canvas video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .cert-card{background:linear-gradient(160deg,rgba(35,21,83,.95),rgba(27,17,64,.9));border:1px solid var(--goldd);
+    border-radius:18px;padding:20px;box-shadow:0 24px 60px -34px rgba(0,0,0,.9)}
+  .cert-card .seal-row{display:flex;align-items:center;gap:10px;color:var(--gold2);font-weight:700}
+  .cert-card .seal{width:26px;height:26px}
+  .cert-card h3{font-family:var(--serif);font-weight:600;font-size:1.15rem;margin:14px 0 3px}
+  .cert-card .desc{color:var(--mut);font-size:.9rem;margin-bottom:14px}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:7px 12px;font-size:.84rem;margin-top:6px}
+  .kv dt{color:var(--faint)}.kv dd{margin:0;color:var(--ink);font-family:ui-monospace,Menlo,monospace;word-break:break-all}
+  .kv dd.badge{font-family:var(--sans);color:var(--magic);font-weight:600}
+  .cert-actions{display:flex;gap:9px;margin-top:16px;flex-wrap:wrap}
+
+  /* ---- vault / gallery ---- */
+  .vault{margin-top:52px}
+  .vault h2{font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:0 0 3px}
+  .vault .vsub{color:var(--mut);font-size:.92rem;margin-bottom:18px}
+  .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:16px}
+  .card{position:relative;aspect-ratio:1/1;border-radius:15px;overflow:hidden;border:1px solid var(--line);
+    background:linear-gradient(135deg,var(--panel),var(--panel2));cursor:pointer;transition:transform .2s,border-color .2s}
+  .card:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .card img,.card video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .card .cert{position:absolute;top:9px;left:9px;display:flex;align-items:center;gap:5px;background:rgba(10,6,22,.72);
+    backdrop-filter:blur(4px);border:1px solid var(--goldd);border-radius:20px;padding:3px 9px;font-size:.66rem;font-weight:700;color:var(--gold2)}
+  .card .cap{position:absolute;bottom:0;left:0;right:0;padding:20px 11px 9px;font-size:.78rem;color:var(--mut);
+    background:linear-gradient(transparent,rgba(10,6,22,.85))}
+  .empty{border:1px dashed var(--line);border-radius:16px;padding:34px;text-align:center;color:var(--faint)}
+
+  /* ---- modals ---- */
+  .modal{position:fixed;inset:0;z-index:60;display:none;align-items:center;justify-content:center;padding:20px;
+    background:rgba(8,4,18,.72);backdrop-filter:blur(6px)}
+  .modal.on{display:flex}
+  .sheet{width:100%;max-width:420px;background:linear-gradient(160deg,var(--panel),var(--night2));
+    border:1px solid var(--line);border-radius:20px;padding:26px;box-shadow:0 40px 100px -30px #000}
+  .sheet h3{font-family:var(--serif);font-weight:600;font-size:1.4rem;margin:0 0 5px}
+  .sheet p{color:var(--mut);font-size:.92rem;margin:0 0 18px}
+  .field{width:100%;background:rgba(10,6,22,.5);border:1px solid var(--line);border-radius:12px;padding:13px 15px;
+    color:var(--ink);font:inherit;outline:none;margin-bottom:11px}
+  .field:focus{border-color:var(--gold)}
+  .full{width:100%;justify-content:center;display:flex}
+  .oauth{width:100%;display:flex;align-items:center;justify-content:center;gap:10px;background:#fff;color:#1a1a1a;
+    border:none;border-radius:12px;padding:12px;font:inherit;font-weight:600;cursor:pointer;margin-bottom:11px}
+  .or{display:flex;align-items:center;gap:10px;color:var(--faint);font-size:.8rem;margin:14px 0}
+  .or::before,.or::after{content:"";flex:1;height:1px;background:var(--line)}
+  .x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--faint);font-size:1.4rem;cursor:pointer}
+  .sheet .fine{font-size:.8rem;color:var(--faint);text-align:center;margin-top:14px}
+  .sheet .fine a{color:var(--gold2)}
+  .price{display:flex;gap:12px;margin:16px 0}
+  .plan{flex:1;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
+  .plan.hot{border-color:var(--gold);background:rgba(245,196,81,.06)}
+  .plan .amt{font-family:var(--serif);font-size:1.7rem;color:var(--gold2)}
+  .plan .per{font-size:.78rem;color:var(--faint)}
+  .plan .d{font-size:.82rem;color:var(--mut);margin-top:6px}
+
+  /* ---- lightbox ---- */
+  .lb{position:fixed;inset:0;z-index:70;display:none;align-items:center;justify-content:center;padding:22px;
+    background:rgba(8,4,18,.9);backdrop-filter:blur(8px)}
+  .lb.on{display:flex}
+  .lb .in{max-width:960px;width:100%;display:grid;grid-template-columns:1.3fr 1fr;gap:20px;align-items:center}
+  @media(max-width:760px){.lb .in{grid-template-columns:1fr;overflow:auto;max-height:92vh}}
+  .lb .big{border-radius:16px;overflow:hidden;border:1px solid var(--line);background:#0c0720;aspect-ratio:1/1;position:relative}
+  .lb .big img,.lb .big video{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  footer{margin-top:60px;padding-top:22px;border-top:1px solid var(--line);color:var(--faint);font-size:.82rem;display:flex;gap:12px;flex-wrap:wrap}
+  footer .dot{opacity:.5}
+  @media(prefers-reduced-motion:reduce){#dust,.orb{animation:none}#dust{display:none}}
+</style>
+</head>
+<body>
+<canvas id="dust"></canvas>
+
+<header>
+  <div class="bar">
+    <a class="brand" href="/">
+      <svg class="lamp" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs>
+        <path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/>
+        <ellipse cx="21.5" cy="30" rx="15.5" ry="6.6" fill="none" stroke="#b9832a" stroke-width="1" opacity=".5"/></svg>
+      <span class="wm">Genie<b>Made</b></span>
+    </a>
+    <div class="spacer"></div>
+    <div class="credits" title="Wishes remaining"><span>✦</span> <span class="n" id="creditN">3</span> wishes</div>
+    <button class="btn ghost" id="accountBtn">Sign in</button>
+  </div>
+</header>
+
+<div class="wrap">
+  <section class="studio">
+    <span class="eyebrow"><span class="spark"></span> The lamp is lit · make a wish</span>
+    <h1>Describe it. GenieMade <em>makes it real.</em></h1>
+
+    <div class="composer">
+      <textarea id="prompt" placeholder="a regal fox in a velvet coat, cinematic light, ultra detailed…" aria-label="Describe your creation"></textarea>
+      <div class="controls">
+        <span class="lab">Make</span>
+        <div class="seg" id="typeSeg" role="group" aria-label="Type">
+          <button data-type="image" aria-pressed="true">◈ Image</button>
+          <button data-type="video" aria-pressed="false">▶ Video</button>
+        </div>
+        <span class="lab">Shape</span>
+        <div class="seg" id="aspectSeg" role="group" aria-label="Aspect ratio">
+          <button data-aspect="1:1" aria-pressed="true">1:1</button>
+          <button data-aspect="16:9" aria-pressed="false">16:9</button>
+          <button data-aspect="9:16" aria-pressed="false">9:16</button>
+        </div>
+        <div class="make"><button class="btn gold" id="makeBtn">✦ Make a wish</button></div>
+      </div>
+      <div class="chips" id="chips">
+        <span class="chip">a glowing perfume bottle on wet stone</span>
+        <span class="chip">a floating island city at golden hour</span>
+        <span class="chip">a hummingbird made of stained glass</span>
+        <span class="chip">a cozy bookshop on a rainy Kyoto street</span>
+      </div>
+      <div class="hint">Each wish is <b>sealed with a certificate</b> and kept in your private Vault. <b id="creditHint">3 free wishes</b> to start.</div>
+    </div>
+
+    <div class="stage">
+      <div class="summon" id="summon">
+        <div class="orb"></div>
+        <div class="st" id="summonSt">Summoning your wish…</div>
+        <div class="sb" id="summonSb">warming the lamp</div>
+        <div class="prog"><i id="progBar"></i></div>
+      </div>
+
+      <div class="result" id="result">
+        <div class="canvas" id="resultCanvas"></div>
+        <div class="cert-card">
+          <div class="seal-row">
+            <svg class="seal" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 1.7 2.9-.2 1 2.7 2.4 1.6-.6 2.9 1 2.7-2 2.1.1 2.9-2.8.9-1.6 2.4-2.8-.7-2.8.7-1.6-2.4-2.8-.9.1-2.9-2-2.1 1-2.7-.6-2.9L4.7 6.2l1-2.7 2.9.2L12 2z" fill="none" stroke="#c88f2c" stroke-width="1.3"/><path d="M8.5 12l2.3 2.3 4.7-4.7" fill="none" stroke="#f5c451" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+            Certificate of Authenticity
+          </div>
+          <h3 id="certTitle">Your creation is sealed.</h3>
+          <p class="desc">Provably made by you, on GenieMade — recorded in your PrecognitionOS Vault.</p>
+          <dl class="kv">
+            <dt>Status</dt><dd class="badge">◈ Certified authentic</dd>
+            <dt>Content credentials</dt><dd class="badge" id="certC2pa">C2PA embedded</dd>
+            <dt>Engine</dt><dd id="certModel">—</dd>
+            <dt>Receipt</dt><dd id="certReceipt">—</dd>
+            <dt>Sealed</dt><dd id="certTime">—</dd>
+            <dt>Fingerprint</dt><dd id="certHash">—</dd>
+          </dl>
+          <div class="cert-actions">
+            <button class="btn gold" id="dlBtn">Download</button>
+            <button class="btn ghost" id="againBtn">Make another</button>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <section class="vault">
+    <h2>Your Vault</h2>
+    <div class="vsub">Every creation, sealed and provably yours. Tap any to see its certificate.</div>
+    <div class="grid" id="grid"></div>
+  </section>
+
+  <footer>
+    <span>© 2026 GenieMade</span><span class="dot">·</span><span>a CyberHope AI company</span>
+    <span class="dot">·</span><a href="/verify.html">Verify a creation</a><span class="dot">·</span><a href="/">Home</a>
+  </footer>
+</div>
+
+<!-- auth modal -->
+<div class="modal" id="authModal">
+  <div class="sheet" style="position:relative">
+    <button class="x" data-close>×</button>
+    <h3 id="authTitle">Welcome back</h3>
+    <p id="authSub">Sign in to keep your wishes and your Vault across devices.</p>
+    <button class="oauth" id="googleBtn"><svg width="17" height="17" viewBox="0 0 48 48"><path fill="#4285F4" d="M45 24c0-1.6-.1-2.8-.4-4H24v7.5h12c-.2 2-1.7 5-5 7l7.7 6c4.5-4.2 6.3-10.4 6.3-16.5z"/><path fill="#34A853" d="M24 46c6.5 0 11.9-2.1 15.9-5.9l-7.7-6c-2.1 1.4-4.9 2.4-8.2 2.4-6.3 0-11.6-4.2-13.5-9.9l-8 6.1C8.5 40.9 15.6 46 24 46z"/><path fill="#FBBC05" d="M10.5 26.6c-.5-1.4-.8-3-.8-4.6s.3-3.2.8-4.6l-8-6.1C1 14.3 0 18 0 22s1 7.7 2.5 10.7l8-6.1z"/><path fill="#EA4335" d="M24 9.5c3.5 0 6 1.5 7.4 2.8l6.8-6.6C34 2 28.6 0 24 0 15.6 0 8.5 5.1 5.5 12.3l8 6.1C15.4 12.7 20.7 9.5 24 9.5z"/></svg> Continue with Google</button>
+    <div class="or">or</div>
+    <input class="field" id="authEmail" type="email" placeholder="your@email.com" autocomplete="email">
+    <input class="field" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+    <button class="btn gold full" id="authSubmit">Sign in</button>
+    <div class="fine" id="authSwap">New here? <a href="#" id="swapLink">Create an account</a></div>
+  </div>
+</div>
+
+<!-- paywall modal -->
+<div class="modal" id="payModal">
+  <div class="sheet" style="position:relative">
+    <button class="x" data-close>×</button>
+    <h3>Your three wishes are used up.</h3>
+    <p>Keep creating — pick a plan and the lamp never runs dry. Cancel anytime.</p>
+    <div class="price">
+      <div class="plan"><div class="amt">$9</div><div class="per">/ month</div><div class="d">100 wishes<br>+ full Vault</div></div>
+      <div class="plan hot"><div class="amt">$19</div><div class="per">/ month</div><div class="d">300 wishes<br>video + priority</div></div>
+    </div>
+    <button class="btn gold full" id="checkoutBtn">Continue to checkout</button>
+    <div class="fine">Secure checkout · powered by Stripe</div>
+  </div>
+</div>
+
+<!-- lightbox -->
+<div class="lb" id="lightbox">
+  <div class="in">
+    <div class="big" id="lbBig"></div>
+    <div class="cert-card">
+      <div class="seal-row"><svg class="seal" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 1.7 2.9-.2 1 2.7 2.4 1.6-.6 2.9 1 2.7-2 2.1.1 2.9-2.8.9-1.6 2.4-2.8-.7-2.8.7-1.6-2.4-2.8-.9.1-2.9-2-2.1 1-2.7-.6-2.9L4.7 6.2l1-2.7 2.9.2L12 2z" fill="none" stroke="#c88f2c" stroke-width="1.3"/><path d="M8.5 12l2.3 2.3 4.7-4.7" fill="none" stroke="#f5c451" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg> Certificate</div>
+      <h3 id="lbTitle" style="font-family:var(--serif);font-weight:600;margin:12px 0 3px"></h3>
+      <p class="desc" id="lbDesc" style="color:var(--mut);font-size:.9rem"></p>
+      <dl class="kv">
+        <dt>Status</dt><dd class="badge">◈ Certified authentic</dd>
+        <dt>Engine</dt><dd id="lbModel"></dd>
+        <dt>Receipt</dt><dd id="lbReceipt"></dd>
+        <dt>Sealed</dt><dd id="lbTime"></dd>
+        <dt>Fingerprint</dt><dd id="lbHash"></dd>
+      </dl>
+      <div class="cert-actions"><button class="btn ghost" data-close>Close</button></div>
+    </div>
+  </div>
+</div>
+
+<script src="assets/studio.js"></script>
+</body>
+</html>
