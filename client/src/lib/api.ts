@@ -258,6 +258,7 @@ export const api = {
   registryRecent: () => req<{ ok: boolean; count: number; registrations: { receipt_id: string; owner: string; title: string | null; hash_short: string; thumb_url: string | null; created_at: string; verify_url: string }[] }>("/api/registry/recent"),
   anchor: (hash: string) =>
     req<{ ok: boolean; already?: boolean; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string }; cost?: number; credits_remaining?: number; error?: string; message?: string }>("/api/anchor", { method: "POST", body: JSON.stringify({ hash }) }),
+  removeBg: (image: string) => req<GenerateResult>("/api/removebg", { method: "POST", body: JSON.stringify({ image }) }),
 
   /** QSeal public signing keys — anyone can verify our seals against these. */
   qsealPubkeys: () =>

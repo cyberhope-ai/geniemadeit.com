@@ -8,6 +8,7 @@ import { Menu, X } from "lucide-react";
 
 const LINKS = [
   { href: "/app", label: "Studio" },
+  { href: "/remove-bg", label: "Remove BG" },
   { href: "/pricing", label: "Pricing" },
   { href: "/verify", label: "Verify" },
   { href: "/triple-seal", label: "Triple Seal" },
