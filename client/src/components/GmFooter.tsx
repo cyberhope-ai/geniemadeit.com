@@ -28,6 +28,8 @@ export function GmFooter() {
             <a href="https://cyberhopeai.com" target="_blank" rel="noopener" className="hover:text-foreground no-underline">CyberHope AI</a>
             <Link href="/qseal" className="hover:text-foreground no-underline">QSeal™ technology</Link>
             <Link href="/#how" className="hover:text-foreground no-underline">How it works</Link>
+            <a href="tel:+13179613077" className="hover:text-foreground no-underline">Call (317) 961-3077</a>
+            <a href="mailto:hello@geniemadeit.com" className="hover:text-foreground no-underline">hello@geniemadeit.com</a>
           </div>
         </div>
       </div>
