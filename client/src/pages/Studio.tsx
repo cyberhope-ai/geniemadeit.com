@@ -46,6 +46,7 @@ export default function Studio() {
   const [busy, setBusy] = useState(false);
   const [result, setResult] = useState<Generation | null>(null);
   const [genError, setGenError] = useState("");
+  const [progress, setProgress] = useState("");
   const [vault, setVault] = useState<Generation[]>([]);
   const [vaultLoaded, setVaultLoaded] = useState(false);
   const [authOpen, setAuthOpen] = useState(false);
@@ -92,7 +93,17 @@ export default function Studio() {
       if (!isAudio) payload.aspect = aspect;
       if (isVideoFromImage) payload.image_url = sourceImg;
       const j = await api.generate(payload);
-      if (j.generation) {
+      // Async (video): the engine hands back a job to poll rather than an immediate creation.
+      if (j.status === "processing" && j.job_id) {
+        if (typeof j.credits_remaining === "number" && user) setUser({ ...user, credits: j.credits_remaining });
+        setProgress("Summoning your video from the aether — this usually takes about a minute…");
+        const gen = await pollJob(j.job_id);
+        if (gen) {
+          setResult({ ...gen, prompt: prompt.trim() });
+          loadVault();
+          setTimeout(() => resultRef.current?.scrollIntoView({ behavior: "smooth", block: "center" }), 60);
+        }
+      } else if (j.generation) {
         setResult({ ...j.generation, prompt: prompt.trim() });
         if (typeof j.credits_remaining === "number" && user) setUser({ ...user, credits: j.credits_remaining });
         loadVault();
@@ -112,7 +123,34 @@ export default function Studio() {
       }
     } finally {
       setBusy(false);
+      setProgress("");
     }
+  }
+
+  // Poll an async job (video) to completion. Returns the finished Generation, or null on failure/
+  // timeout (genError is set; credits are refunded server-side on failure).
+  async function pollJob(jobId: string): Promise<Generation | null> {
+    const started = Date.now();
+    for (let i = 0; i < 60; i++) {
+      await new Promise((r) => setTimeout(r, i < 3 ? 4000 : 6000));
+      let j: Awaited<ReturnType<typeof api.job>>;
+      try { j = await api.job(jobId); }
+      catch { continue; } // transient network blip — keep polling
+      if (typeof j.credits_remaining === "number" && user) setUser({ ...user, credits: j.credits_remaining });
+      if (j.status === "completed" && j.generation) return j.generation;
+      if (j.status === "failed") {
+        setGenError(j.error || "The video couldn't be generated — your wishes were refunded.");
+        return null;
+      }
+      const secs = Math.round((Date.now() - started) / 1000);
+      setProgress(
+        j.queue_position != null && j.queue_position > 0
+          ? `In the genie's queue (position ${j.queue_position})… ${secs}s`
+          : `Conjuring your video… ${secs}s (usually about a minute)`
+      );
+    }
+    setGenError("Your video is taking longer than expected — check your Vault shortly. If it rendered it's there, and you were only charged once.");
+    return null;
   }
 
   async function download(g: Generation) {
@@ -314,7 +352,8 @@ export default function Studio() {
                     <div className="absolute inset-0 rounded-full gm-lamp-glow" style={{ background: "radial-gradient(circle, rgba(245,196,81,.5), transparent 70%)" }} />
                     <img src="/brand/gm_logo_lamp.png" alt="" className="relative h-24 w-24 object-contain" />
                   </div>
-                  <p className="mt-6 text-sm text-muted-foreground">The genie is conjuring your wish… {isVideoFromImage ? "video can take a minute or two." : "usually a few seconds."}</p>
+                  <p className="mt-6 text-sm text-muted-foreground">The genie is conjuring your wish… {cap.startsWith("video") ? "video can take a minute or two." : "usually a few seconds."}</p>
+                  {progress && <p className="mt-2 text-xs" style={{ color: "#ffe390" }}>{progress}</p>}
                 </div>
               </div>
             )}

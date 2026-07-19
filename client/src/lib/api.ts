@@ -71,6 +71,38 @@ export interface GenerateResult {
   credits_remaining?: number;
   error?: string;
   message?: string;
+  // async video: the engine returns a job to poll instead of an immediate creation
+  status?: "processing" | "completed" | "failed";
+  job_id?: string;
+  poll_url?: string;
+}
+
+export interface JobResult {
+  ok: boolean;
+  status: "processing" | "completed" | "failed";
+  generation?: Generation;
+  error?: string;
+  credits_remaining?: number;
+  queue_position?: number | null;
+}
+
+export interface RegisterResult {
+  ok: boolean;
+  receipt_id?: string;
+  owner?: string;
+  title?: string | null;
+  registered_at?: string;
+  signature?: string | null;
+  signer?: string;
+  verify_url?: string;
+  thumb_url?: string | null;
+  is_public?: boolean;
+  credits_remaining?: number;
+  already_registered?: boolean;
+  mine?: boolean;
+  registration?: { receipt_id?: string; owner?: string; registered_at?: string; verify_url?: string };
+  error?: string;
+  message?: string;
 }
 
 export class ApiError extends Error {
@@ -208,6 +240,7 @@ export const api = {
   logout: () => req<{ ok: boolean }>("/api/auth/logout", { method: "POST" }),
   generate: (payload: { capability: string; prompt: string; aspect?: string; image_url?: string }) =>
     req<GenerateResult>("/api/generate", { method: "POST", body: JSON.stringify(payload) }),
+  job: (id: string) => req<JobResult>(`/api/jobs/${encodeURIComponent(id)}`),
   gallery: () => req<{ ok: boolean; generations: Generation[] }>("/api/gallery"),
   examples: () => req<{ ok: boolean; examples: { url: string; prompt: string }[] }>("/api/examples"),
   checkout: (pack: string) =>
@@ -215,11 +248,14 @@ export const api = {
       method: "POST",
       body: JSON.stringify({ pack, plan: pack }),
     }),
-  verify: (receipt_id: string) =>
-    req<{ ok: boolean; verdict?: "authentic" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: Certificate }>(
+  verify: (receipt_id: string, hash?: string) =>
+    req<{ ok: boolean; verdict?: "authentic" | "registered" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: (Certificate & { type?: string }); registration?: { owner?: string; registered_at?: string; title?: string | null; thumb_url?: string | null; is_public?: boolean } }>(
       "/api/verify",
-      { method: "POST", body: JSON.stringify({ receipt_id }) }
+      { method: "POST", body: JSON.stringify({ receipt_id, hash }) }
     ),
+  register: (payload: { hash: string; title?: string; owner_name?: string; note?: string; is_public?: boolean; thumbnail?: string }) =>
+    req<RegisterResult>("/api/register", { method: "POST", body: JSON.stringify(payload) }),
+  registryRecent: () => req<{ ok: boolean; count: number; registrations: { receipt_id: string; owner: string; title: string | null; hash_short: string; thumb_url: string | null; created_at: string; verify_url: string }[] }>("/api/registry/recent"),
 
   /** QSeal public signing keys — anyone can verify our seals against these. */
   qsealPubkeys: () =>

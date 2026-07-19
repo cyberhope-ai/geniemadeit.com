@@ -16,15 +16,17 @@ import { toast } from "sonner";
 import { Input } from "@/components/ui/input";
 import {
   UserRound, BellRing, BarChart3, MapPin, Sparkles, Gauge, CreditCard, ReceiptText,
-  History, CircleAlert, KeyRound, Webhook, LogOut, LayoutDashboard, Loader2, Search,
+  History, CircleAlert, KeyRound, Webhook, LogOut, LayoutDashboard, Loader2, Search, Images,
 } from "lucide-react";
 import { AccountPanel, NotificationsPanel } from "@/components/settings/GeneralPanels";
 import {
   UsagePanel, AddressPanel, CreditsPanel, ConcurrencyPanel, BillingPanel, InvoicesPanel,
 } from "@/components/settings/BillingPanels";
 import { HistoryPanel, ErrorsPanel, DeveloperPanel } from "@/components/settings/AnalyticsPanels";
+import { VaultPanel } from "@/components/settings/VaultPanel";
 
 type SectionId =
+  | "vault"
   | "account" | "notifications"
   | "usage" | "address" | "credits" | "concurrency" | "billing" | "invoices"
   | "history" | "errors"
@@ -34,6 +36,12 @@ interface NavItem { id: SectionId; label: string; icon: typeof UserRound; coming
 interface NavGroup { label: string; items: NavItem[] }
 
 const GROUPS: NavGroup[] = [
+  {
+    label: "Creations",
+    items: [
+      { id: "vault", label: "Vault", icon: Images },
+    ],
+  },
   {
     label: "General",
     items: [
@@ -245,6 +253,7 @@ export default function Account() {
                 wish you make is sealed with a QSeal certificate the moment it lands.
               </div>
             )}
+            {section === "vault" && <VaultPanel />}
             {section === "account" && <AccountPanel />}
             {section === "notifications" && <NotificationsPanel />}
             {section === "usage" && <UsagePanel />}

@@ -11,6 +11,9 @@ importers:
 
   .:
     dependencies:
+      '@contentauth/c2pa-web':
+        specifier: ^0.12.3
+        version: 0.12.3
       '@hookform/resolvers':
         specifier: ^5.2.2
         version: 5.4.0(react-hook-form@7.82.0(react@19.2.7))
@@ -323,6 +326,15 @@ packages:
 
   '@chevrotain/types@11.1.2':
     resolution: {integrity: sha512-U+HFai5+zmJCkK86QsaJtoITlboZHBqrVketcO2ROv865xfCMSFpELQoz1GkX5GzME8pTa+3kbKrZHQtI0gdbw==}
+
+  '@contentauth/c2pa-types@0.7.2':
+    resolution: {integrity: sha512-SH+q4a6ZS2z2YhlqfTB2GzN1S4M9koLhJETGPxL5J4JVhJEFSyEQK52PnwOhee+ObiZdDZK18NI+s+1IrUSdTQ==}
+
+  '@contentauth/c2pa-wasm@0.9.2':
+    resolution: {integrity: sha512-qNBqUsrFqwEcdYZ+9+pte6YlBBTWakMKSM3+kOVDM15AtMSqvv5NW8IPOCE3axQh4Z9Wmd3+Ng5bGnIDTIYxRg==}
+
+  '@contentauth/c2pa-web@0.12.3':
+    resolution: {integrity: sha512-xLC50gFioWVg0BxC0rq5pIiTccuI1uQK8mf50bjkOv/H8vg8gmuw0HghFFyCe4iYj5/4bkysbV5LEqcjgSaBWQ==}
 
   '@date-fns/tz@1.5.0':
     resolution: {integrity: sha512-lwYN/vDPeNRULcepoE/LO2Pgx+7/RV+S9ARfbc9lr2DtGkOD7pAiruHvbR1RX3Qyf6ja47EWJDMsNK5vK08DJg==}
@@ -2535,6 +2547,9 @@ packages:
   hastscript@9.0.1:
     resolution: {integrity: sha512-g7df9rMFX/SPi34tyGCyUBREQoKkapwdY/T04Qn9TDWfHhAYt4/I0gMVirzK5wEzeUqIjEB+LXC/ypb7Aqno5w==}
 
+  highgain@0.1.0:
+    resolution: {integrity: sha512-Vw/g2upw4MYLZ9e95k79+idMoPFEKvTQVTce9LCDfI+T6AiG+SdiR4WDKszB1grQy0O+uhxd6cqbdi3VhECdbA==}
+
   html-url-attributes@3.0.1:
     resolution: {integrity: sha512-ol6UPyBWqsrO6EJySPz2O7ZSr856WDrEzM5zMqp+FJJLGMW35cLYmmZnl0vztAZxRUoNZJFTCohfjuIJ8I4QBQ==}
 
@@ -3388,6 +3403,10 @@ packages:
     resolution: {integrity: sha512-JfJeIHke7y2egdGGgRAvpCwYFUsHlM2gPcrVOxFkznt/4uzQ7HFmvE63iFHVLBJNDuyDOQgijDK/tXH/f6Msjg==}
     engines: {node: '>=6.10'}
 
+  ts-deepmerge@7.0.3:
+    resolution: {integrity: sha512-Du/ZW2RfwV/D4cmA5rXafYjBQVuvu4qGiEEla4EmEHVHgRdx68Gftx7i66jn2bzHPwSVZY36Ae6OuDn9el4ZKA==}
+    engines: {node: '>=14.13.1'}
+
   tslib@2.8.1:
     resolution: {integrity: sha512-oJFu94HQb+KVduSUQL7wnpmqnfmLsOA/nAh6b6EH0wCEoK0/mPeXU6c3wKDV83MkOuHPRHtSXKKU99IBazS/2w==}
 
@@ -3750,6 +3769,17 @@ snapshots:
   '@braintree/sanitize-url@7.1.2': {}
 
   '@chevrotain/types@11.1.2': {}
+
+  '@contentauth/c2pa-types@0.7.2': {}
+
+  '@contentauth/c2pa-wasm@0.9.2': {}
+
+  '@contentauth/c2pa-web@0.12.3':
+    dependencies:
+      '@contentauth/c2pa-types': 0.7.2
+      '@contentauth/c2pa-wasm': 0.9.2
+      highgain: 0.1.0
+      ts-deepmerge: 7.0.3
 
   '@date-fns/tz@1.5.0': {}
 
@@ -5943,6 +5973,8 @@ snapshots:
       property-information: 7.2.0
       space-separated-tokens: 2.0.2
 
+  highgain@0.1.0: {}
+
   html-url-attributes@3.0.1: {}
 
   html-void-elements@3.0.0: {}
@@ -7072,6 +7104,8 @@ snapshots:
   trough@2.2.0: {}
 
   ts-dedent@2.3.0: {}
+
+  ts-deepmerge@7.0.3: {}
 
   tslib@2.8.1: {}
 

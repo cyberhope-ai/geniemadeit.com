@@ -10,6 +10,7 @@ const LINKS = [
   { href: "/app", label: "Studio" },
   { href: "/pricing", label: "Pricing" },
   { href: "/verify", label: "Verify" },
+  { href: "/triple-seal", label: "Triple Seal" },
   { href: "/qseal", label: "QSeal™" },
 ];
 
