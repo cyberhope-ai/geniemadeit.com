@@ -9,7 +9,8 @@ export function GmFooter() {
         <div>
           <Wordmark className="text-lg" />
           <p className="mt-3 max-w-xs text-sm text-muted-foreground">
-            AI images &amp; video, sealed and provably yours. A CyberHope AI company.
+            AI images &amp; video, sealed and provably yours. Powered by QSeal™ and QSurfaces™
+            provenance technology (patent pending). A CyberHope AI company.
           </p>
         </div>
         <div className="text-sm">
@@ -25,14 +26,14 @@ export function GmFooter() {
           <div className="font-semibold mb-3 text-foreground">Company</div>
           <div className="grid gap-2 text-muted-foreground">
             <a href="https://cyberhopeai.com" target="_blank" rel="noopener" className="hover:text-foreground no-underline">CyberHope AI</a>
+            <Link href="/#qseal" className="hover:text-foreground no-underline">QSeal™ technology</Link>
             <Link href="/#how" className="hover:text-foreground no-underline">How it works</Link>
           </div>
         </div>
       </div>
       <div className="container pb-8 text-xs text-muted-foreground/70">
-        © 2026 GenieMade · geniemadeit.com · Certificates built on the open C2PA content-credentials standard
+        © 2026 GenieMade · geniemadeit.com · QSeal™ &amp; QSurfaces™ are trademarks of CyberHope AI (patent pending) · Certificates built on the open C2PA content-credentials standard
       </div>
     </footer>
   );
 }
-

@@ -108,7 +108,7 @@ export default function Verify() {
         <span className="eyebrow">Provenance check</span>
         <h1 className="mt-4 font-display text-5xl font-semibold">Is this <em className="gold-text italic">real?</em></h1>
         <p className="mt-4 text-muted-foreground">
-          Every GenieMade creation carries a certificate: a receipt ID and the file's SHA-256
+          Every GenieMade creation is sealed by <b className="text-foreground">QSeal™</b>: a receipt ID and the file's SHA-256
           fingerprint, sealed the moment it was made. Paste a receipt — and optionally drop the
           file itself, which we fingerprint <b className="text-foreground">right here in your browser</b> — and we'll
           tell you exactly what we can and cannot prove.
@@ -200,6 +200,26 @@ export default function Verify() {
             device — and compares it against the sealed record. Public registry lookup is rolling
             out; where it isn't live yet, we say so instead of guessing.
           </p>
+          <h2 className="mt-6 font-display text-xl font-semibold text-foreground">Four ways a seal can be found</h2>
+          <p className="mt-2">
+            QSeal verification tries every recovery route in order, and tells you which one answered.
+          </p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            {[
+              { t: "1 · Receipt + file", s: "Live today", d: "The full check: your receipt against the signed chain, your file's fingerprint against the sealed bytes." },
+              { t: "2 · Content Credentials", s: "Live today", d: "If the file still carries its C2PA manifest, the certificate is read straight out of the metadata." },
+              { t: "3 · The Invisible Thread", s: "Rolling out", d: "Metadata stripped? Screenshot? The receipt is decoded from an imperceptible code woven into the pixels at generation." },
+              { t: "4 · Lineage", s: "Rolling out", d: "Even a heavily edited copy can be matched to its sealed original by perceptual fingerprint — flagged honestly as a likely derivative." },
+            ].map((r) => (
+              <div key={r.t} className="cert-panel p-4">
+                <div className="flex items-center justify-between">
+                  <span className="font-semibold text-foreground text-sm">{r.t}</span>
+                  <span className="text-[10px] uppercase tracking-widest" style={{ color: r.s === "Live today" ? "#66e3e8" : "#f5c451" }}>{r.s}</span>
+                </div>
+                <p className="mt-2 text-xs">{r.d}</p>
+              </div>
+            ))}
+          </div>
         </div>
       </main>
       <GmFooter />

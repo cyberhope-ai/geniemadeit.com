@@ -153,12 +153,13 @@ export default function Home() {
       {/* PROVENANCE band */}
       <section className="container relative z-10 grid items-center gap-12 pt-24 lg:grid-cols-2">
         <div>
-          <span className="eyebrow">Trackable · Provable · Traceable</span>
+          <span className="eyebrow">Trackable · Provable · Traceable — QSeal™</span>
           <h2 className="mt-4 font-display text-4xl font-semibold">The certificate is <em className="gold-text italic">the point.</em></h2>
           <p className="mt-4 text-muted-foreground">
-            The moment a creation is made, GenieMade computes its SHA-256 fingerprint, issues a
-            receipt ID, and seals both into a certificate stored with the work in your
-            PrecognitionOS Vault. Anyone can check a receipt on the <Link href="/verify" className="underline" style={{ color: "#ffe390" }}>Verify page</Link> —
+            The moment a creation is made, GenieMade's <b className="text-foreground">QSeal™</b> technology
+            computes its SHA-256 fingerprint, issues a receipt ID, and seals both into a certificate
+            stored with the work in your PrecognitionOS Vault. Anyone can check a receipt on
+            the <Link href="/verify" className="underline" style={{ color: "#ffe390" }}>Verify page</Link> —
             when it was made, by which engine, and that the file hasn't been altered.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
@@ -177,6 +178,50 @@ export default function Home() {
         <div className="deco-corners overflow-hidden rounded-3xl border border-border shadow-2xl">
           <img src={VAULT_IMG} alt="The PrecognitionOS Vault — sealed artworks in a crystal archive" className="w-full" />
         </div>
+      </section>
+
+      {/* QSEAL — Triple Binding technology section */}
+      <section id="qseal" className="container relative z-10 pt-24">
+        <div className="deco-divider mb-16 text-xs"><span>✦</span></div>
+        <div className="mx-auto max-w-3xl text-center">
+          <span className="eyebrow justify-center">QSeal™ · patent pending · built on QSurfaces™</span>
+          <h2 className="mt-4 font-display text-4xl font-semibold">Sealed at birth. <em className="gold-text italic">Proof woven in.</em></h2>
+          <p className="mt-4 text-muted-foreground">
+            Most tools stamp a certificate on a file after the fact — and lose it the moment someone
+            screenshots or re-uploads. QSeal binds proof <b className="text-foreground">three ways, at the
+            moment of generation</b>, so your creation can testify for itself.
+          </p>
+        </div>
+        <div className="mt-12 grid gap-4 md:grid-cols-3">
+          {[
+            {
+              t: "The Fingerprint",
+              tag: "Hard binding — live today",
+              d: "A SHA-256 hash of the exact bytes, signed into a receipt on an append-only, hash-linked chain. Change one pixel and the seal breaks. Forge a receipt and six independent checks reject it.",
+            },
+            {
+              t: "The Lineage",
+              tag: "Passive binding — live today",
+              d: "A perceptual fingerprint that survives re-encodes and resizes, tying edited or derivative copies back to the sealed original — the genealogy of your creation.",
+            },
+            {
+              t: "The Invisible Thread",
+              tag: "Active binding — rolling out",
+              d: "An imperceptible code woven into the pixels themselves during generation. Screenshot it, crop it, strip every byte of metadata — the receipt can still be read back out of the image.",
+            },
+          ].map((f) => (
+            <div key={f.t} className="cert-panel p-6">
+              <div className="flex items-center gap-2 font-display text-xl font-semibold"><span style={{ color: "#f5c451" }}><Seal className="w-5 h-5" /></span>{f.t}</div>
+              <div className="mt-1 text-[11px] uppercase tracking-widest" style={{ color: "#66e3e8" }}>{f.tag}</div>
+              <p className="mt-3 text-sm text-muted-foreground">{f.d}</p>
+            </div>
+          ))}
+        </div>
+        <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-muted-foreground">
+          Honest by design: no watermark is unremovable — the pixels carry durability, the signed chain
+          carries proof. A forger can strip provenance from a copy, but can never fake it: forging a
+          GenieMade seal requires a private key that never leaves the signing hardware.
+        </p>
       </section>
 
       {/* HOW IT WORKS */}
@@ -247,6 +292,7 @@ export default function Home() {
         <div className="mt-8 grid gap-3">
           {[
             ["What makes GenieMade different?", "Every creation is sealed with a certificate of authenticity — a SHA-256 fingerprint and receipt ID issued the instant it's made, built on the open C2PA content-credentials standard. Most tools give you an image; we give you an image you can prove is yours."],
+            ["What is QSeal?", "QSeal is our patent-pending sealing technology, built on the QSurfaces provable-receipt substrate. It binds proof to your creation three ways: a SHA-256 fingerprint on a signed, tamper-evident chain (live today), a perceptual lineage fingerprint that ties derivatives back to the original (live today), and the Invisible Thread — a code woven into the pixels during generation that survives screenshots and metadata stripping (rolling out)."],
             ["Do I really get three free wishes?", "Yes. Your first three creations are free, no credit card required. After that, top up with a one-time wish pack — wishes never expire."],
             ["Does it make video too?", "Yes — image → video is in the Studio: pick any image you've made and describe the motion. Text → video is on the roadmap and clearly marked in the Studio until it's live."],
             ["Can I use my creations commercially?", "You can download everything you make in full resolution with its certificate. For commercial use, check the licence terms of the underlying model shown on each creation's certificate."],
