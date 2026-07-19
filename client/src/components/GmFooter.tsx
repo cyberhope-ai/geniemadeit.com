@@ -26,7 +26,7 @@ export function GmFooter() {
           <div className="font-semibold mb-3 text-foreground">Company</div>
           <div className="grid gap-2 text-muted-foreground">
             <a href="https://cyberhopeai.com" target="_blank" rel="noopener" className="hover:text-foreground no-underline">CyberHope AI</a>
-            <Link href="/#qseal" className="hover:text-foreground no-underline">QSeal™ technology</Link>
+            <Link href="/qseal" className="hover:text-foreground no-underline">QSeal™ technology</Link>
             <Link href="/#how" className="hover:text-foreground no-underline">How it works</Link>
           </div>
         </div>

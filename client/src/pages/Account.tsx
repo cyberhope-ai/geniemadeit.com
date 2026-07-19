@@ -6,7 +6,7 @@
  * real data, an honest empty state, or an explicit "rolling out" notice — never faked.
  */
 import { useEffect, useMemo, useState } from "react";
-import { useLocation } from "wouter";
+import { useLocation, useSearchParams } from "wouter";
 import { GmNav } from "@/components/GmNav";
 import { GmFooter } from "@/components/GmFooter";
 import { GoldDust } from "@/components/brand/GoldDust";
@@ -81,10 +81,40 @@ export default function Account() {
   const [section, setSection] = useState<SectionId>(() => sectionFromHash());
   const [query, setQuery] = useState("");
   const [portalBusy, setPortalBusy] = useState(false);
+  const [searchParams] = useSearchParams();
+  const purchase = searchParams.get("purchase");
+  const [purchaseState, setPurchaseState] = useState<null | { balance: number } | "checking">(
+    purchase === "success" ? "checking" : null,
+  );
 
   useEffect(() => {
     if (!loading && !user) navigate("/");
   }, [loading, user, navigate]);
+
+  // Stripe top-up return: confirm the credits actually arrived by re-fetching the live balance.
+  useEffect(() => {
+    if (purchase !== "success" || loading || !user) return;
+    let cancelled = false;
+    (async () => {
+      try {
+        const { api } = await import("@/lib/api");
+        const c = await api.credits();
+        if (cancelled) return;
+        setPurchaseState({ balance: c.balance });
+        go("credits");
+        toast.success(`Top-up confirmed — your balance is now ✦${c.balance}.`);
+      } catch {
+        if (cancelled) return;
+        setPurchaseState(null);
+        toast.info("Payment received — your credits may take a moment to appear. Refresh Credits shortly.");
+        go("credits");
+      }
+      // Clean the query param so refreshes don't re-trigger the banner.
+      window.history.replaceState(null, "", `/account#credits`);
+    })();
+    return () => { cancelled = true; };
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [purchase, loading, user]);
 
   useEffect(() => {
     const onHash = () => setSection(sectionFromHash());
@@ -201,6 +231,20 @@ export default function Account() {
 
           {/* Active panel */}
           <section className="min-w-0">
+            {purchaseState === "checking" && (
+              <div className="mb-4 flex items-center gap-2 rounded-xl border border-border bg-card/60 px-4 py-3 text-sm text-muted-foreground">
+                <Loader2 className="h-4 w-4 animate-spin" /> Confirming your top-up with the registry…
+              </div>
+            )}
+            {purchaseState && purchaseState !== "checking" && (
+              <div
+                className="mb-4 rounded-xl border px-4 py-3 text-sm"
+                style={{ borderColor: "rgba(102,227,232,.4)", background: "rgba(102,227,232,.06)", color: "#66e3e8" }}
+              >
+                <b>Top-up confirmed.</b> Your credits arrived — current balance ✦{purchaseState.balance}. Every
+                wish you make is sealed with a QSeal certificate the moment it lands.
+              </div>
+            )}
             {section === "account" && <AccountPanel />}
             {section === "notifications" && <NotificationsPanel />}
             {section === "usage" && <UsagePanel />}

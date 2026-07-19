@@ -13,9 +13,9 @@ import { useSession } from "@/contexts/SessionContext";
 import { api, Pack } from "@/lib/api";
 import { Wand2, Film, ShieldCheck, Vault, Download, ArrowRight } from "lucide-react";
 
-const HERO_IMG = "/manus-storage/gm_hero_lamp_abe4e1d4.png";
-const VIDEO_STILL = "/manus-storage/gm_video_still_09d15b8e.png";
-const VAULT_IMG = "/manus-storage/gm_vault_illustration_d11dbf00.png";
+const HERO_IMG = "/brand/gm_hero_lamp.jpg";
+const VIDEO_STILL = "/brand/gm_video_still.jpg";
+const VAULT_IMG = "/brand/gm_vault_illustration.jpg";
 
 interface Example { url: string; prompt: string }
 
@@ -222,6 +222,11 @@ export default function Home() {
           proof itself. A forger can strip provenance from a copy, but can never fake it: forging a
           GenieMade seal requires our private signing key. Every seal is linked into a tamper-evident chain.
         </p>
+        <div className="mt-6 text-center">
+          <Link href="/qseal" className="inline-flex items-center gap-1.5 text-sm font-semibold underline-offset-4 hover:underline" style={{ color: "#f5c451" }}>
+            Explore the QSeal™ technology — live demo &amp; API waitlist →
+          </Link>
+        </div>
       </section>
 
       {/* HOW IT WORKS */}

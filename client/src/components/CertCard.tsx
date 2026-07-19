@@ -4,7 +4,7 @@ import { Certificate, fmtDate, shortHash } from "@/lib/api";
 import { toast } from "sonner";
 import { Copy } from "lucide-react";
 
-const CERT_BG = "/manus-storage/gm_certificate_texture_c49c5c28.png";
+const CERT_BG = "/brand/gm_certificate_texture.jpg";
 
 interface Props {
   cert?: Certificate | null;
@@ -50,6 +50,24 @@ export function CertCard({ cert, model, prompt, capability, compact }: Props) {
     >
       <div className="flex items-center gap-2 text-sm font-semibold" style={{ color: "#ffe390" }}>
         <Seal className="w-5 h-5" /> Certificate of authenticity
+        {cert?.signed && cert?.signature_valid && (
+          <span
+            className="ml-auto rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider"
+            style={{ borderColor: "rgba(102,227,232,.5)", color: "#66e3e8", background: "rgba(102,227,232,.08)" }}
+            title={`Ed25519-signed by GenieMade (${cert.signer ?? "QSeal"}) — verify against our public key at /api/qseal/pubkeys`}
+          >
+            Signed ✓
+          </span>
+        )}
+        {cert?.watermarked && (
+          <span
+            className={`${cert?.signed && cert?.signature_valid ? "" : "ml-auto "}rounded-full border px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wider`}
+            style={{ borderColor: "rgba(245,196,81,.5)", color: "#f5c451", background: "rgba(245,196,81,.08)" }}
+            title="QSeal Invisible Thread — an imperceptible in-pixel mark carrying this receipt was woven into the pixels at creation"
+          >
+            Thread ✓
+          </span>
+        )}
       </div>
       {prompt && !compact && (
         <p className="mt-2 text-sm text-muted-foreground italic line-clamp-2">“{prompt}”</p>
@@ -60,6 +78,8 @@ export function CertCard({ cert, model, prompt, capability, compact }: Props) {
         <Row k="SHA-256" v={compact ? shortHash(cert?.hash, 24) : cert?.hash || "—"} copyable />
         {model && <Row k="Engine" v={model} />}
         {capability && <Row k="Type" v={capability} />}
+        {cert?.signed && cert?.signature_valid && <Row k="Signature" v={`Ed25519 · ${cert.signer ?? "QSeal"}`} />}
+        {cert?.watermarked && <Row k="In-pixel" v="QSeal Invisible Thread active" />}
         <Row k="Credentials" v={cert ? (cert.c2pa ? "C2PA embedded" : "SHA-256 sealed · C2PA embedding coming") : "—"} />
       </dl>
     </div>

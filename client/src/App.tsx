@@ -10,6 +10,7 @@ import Studio from "./pages/Studio";
 import Account from "./pages/Account";
 import Pricing from "./pages/Pricing";
 import Verify from "./pages/Verify";
+import QSeal from "./pages/QSeal";
 
 
 function Router() {
@@ -20,6 +21,7 @@ function Router() {
       <Route path={"/account"} component={Account} />
       <Route path={"/pricing"} component={Pricing} />
       <Route path={"/verify"} component={Verify} />
+      <Route path={"/qseal"} component={QSeal} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
