@@ -11,7 +11,7 @@ import { GmNav } from "@/components/GmNav";
 import { GmFooter } from "@/components/GmFooter";
 import { GoldDust } from "@/components/brand/GoldDust";
 import { Seal } from "@/components/brand/Seal";
-import { Anchor, ShieldCheck, Fingerprint, Infinity as InfinityIcon, ArrowRight, Check, X, Sparkles, Share2, Layers } from "lucide-react";
+import { Anchor, ShieldCheck, Fingerprint, ArrowRight, Check, X, Sparkles, Share2, Layers } from "lucide-react";
 
 const TIERS = [
   {
@@ -89,19 +89,13 @@ export default function TripleSeal() {
               </p>
             </div>
 
-            {/* hero visual — the stacked seal */}
-            <div className="relative mx-auto hidden aspect-square w-full max-w-sm lg:block">
-              <div className="absolute inset-0 rounded-full ts-glow" style={{ background: "radial-gradient(circle, rgba(245,196,81,.28), transparent 68%)" }} />
-              <div className="ts-float absolute inset-0 grid place-items-center">
-                <div className="relative grid place-items-center">
-                  <Seal className="h-56 w-56" />
-                  <div className="absolute grid place-items-center text-center">
-                    <InfinityIcon className="h-10 w-10" style={{ color: "#66e3e8" }} />
-                    <div className="mt-1 ts-chip text-sm tracking-widest" style={{ color: "#f5c451" }}>ETERNAL</div>
-                  </div>
-                </div>
+            {/* hero visual — the Triple Seal certification mark on a light plaque */}
+            <div className="relative mx-auto hidden w-full max-w-sm lg:block">
+              <div className="absolute -inset-6 rounded-[2.2rem] ts-glow" style={{ background: "radial-gradient(circle, rgba(245,196,81,.30), transparent 70%)" }} />
+              <div className="ts-float relative rounded-[1.7rem] border p-8" style={{ background: "linear-gradient(180deg,#fcfbf7,#eceef1)", borderColor: "rgba(200,143,44,.55)", boxShadow: "0 34px 80px -34px rgba(0,0,0,.65)" }}>
+                <img src="/brand/triple_seal_logo.png" alt="GenieMade Triple Seal — Certified Trust · Premium Security" className="mx-auto w-full max-w-[320px]" />
               </div>
-              <div className="absolute bottom-2 left-1/2 flex -translate-x-1/2 gap-3 text-2xl">
+              <div className="mt-5 flex items-center justify-center gap-4 text-2xl">
                 <span className="ts-chip" style={{ color: "#66e3e8" }} title="QSurface">Q</span>
                 <span className="ts-chip" style={{ color: "#f7931a" }} title="Bitcoin">₿</span>
                 <span className="ts-chip" style={{ color: "#8ea2f0" }} title="Ethereum">Ξ</span>

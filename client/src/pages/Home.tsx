@@ -94,6 +94,20 @@ export default function Home() {
         </div>
       </div>
 
+      {/* TRIPLE SEAL badge band */}
+      <section className="container relative z-10 pt-16">
+        <a href="/triple-seal" className="mx-auto flex max-w-3xl flex-col items-center gap-6 rounded-3xl border p-7 text-center no-underline transition-colors hover:border-[color:rgba(200,143,44,.7)] sm:flex-row sm:text-left" style={{ borderColor: "rgba(200,143,44,.4)", background: "linear-gradient(180deg, rgba(245,196,81,.06), transparent)" }}>
+          <div className="shrink-0 rounded-2xl border p-4" style={{ background: "linear-gradient(180deg,#fcfbf7,#eceef1)", borderColor: "rgba(200,143,44,.5)" }}>
+            <img src="/brand/triple_seal_logo.png" alt="GenieMade Triple Seal — Certified Trust" className="h-24 w-auto" />
+          </div>
+          <div>
+            <div className="eyebrow" style={{ color: "#f5c451" }}>New · Triple Seal</div>
+            <h2 className="mt-2 font-display text-2xl font-semibold text-foreground">Proof that outlives us.</h2>
+            <p className="mt-2 text-sm text-muted-foreground">Every creation can be sealed, then <b className="text-foreground">anchored to Bitcoin</b> — so its authenticity survives even if GenieMade disappears. <span style={{ color: "#66e3e8" }}>Explore the tiers →</span></p>
+          </div>
+        </a>
+      </section>
+
       {/* EXAMPLES — live from the engine */}
       <section id="examples" className="container relative z-10 pt-20">
         <div className="deco-divider mb-16 text-xs tracking-[0.3em] uppercase"><span>✦</span></div>
