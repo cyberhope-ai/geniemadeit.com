@@ -42,10 +42,18 @@ export default {
     // SPA fallback: the front-end is a single-page React app with client routing.
     // Serve static assets when they exist; otherwise return index.html for
     // navigation routes like /app, /pricing, /verify, /account.
-    const res = await env.ASSETS.fetch(request);
+    let res = await env.ASSETS.fetch(request);
     if (res.status === 404 && request.method === "GET" && (request.headers.get("accept") || "").includes("text/html")) {
       const index = new URL("/index.html", request.url);
-      return env.ASSETS.fetch(new Request(index.toString(), request));
+      res = await env.ASSETS.fetch(new Request(index.toString(), request));
+    }
+    // Never let the SPA shell (index.html) be served stale from a per-URL cache — a cached
+    // index.html pins an OLD hashed bundle to that URL (e.g. /app?auth=ok after Google sign-in),
+    // which shows old UI even on refresh. Force revalidation on HTML; hashed /assets/* stay immutable.
+    if ((res.headers.get("content-type") || "").includes("text/html")) {
+      res = new Response(res.body, res);
+      res.headers.set("Cache-Control", "no-cache, must-revalidate");
+      res.headers.set("CDN-Cache-Control", "no-cache");
     }
     return res;
   }

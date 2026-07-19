@@ -168,6 +168,7 @@ export default function Studio() {
           {/* Composer */}
           <div className="cert-panel p-6">
             {/* Capability picker — live from the engine, honest statuses */}
+            <div className="mb-2 text-xs font-semibold uppercase tracking-wider text-muted-foreground">Choose your genie</div>
             <div className="flex flex-wrap gap-2">
               {caps.map((c) => {
                 const Icon = iconFor(c.id);
@@ -287,7 +288,7 @@ export default function Studio() {
 
             {/* Generate */}
             <button className="btn-gold mt-6 w-full py-3.5 text-base" onClick={makeWish} disabled={busy} data-testid="make-wish">
-              {busy ? "The lamp is working…" : `✦ Make it real${selected ? ` · ${selected.credits} ${selected.credits === 1 ? "wish" : "wishes"}` : ""}`}
+              {busy ? "The genie is conjuring…" : `✦ Make my wish${selected ? ` · ${selected.credits} ${selected.credits === 1 ? "wish" : "wishes"}` : ""}`}
             </button>
             {selected?.status === "next" && (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -304,10 +305,16 @@ export default function Studio() {
           {/* Result + certificate */}
           <div ref={resultRef}>
             {busy && (
-              <div className="gm-panel grid place-items-center p-10 h-full min-h-72">
-                <div className="text-center">
-                  <div className="mx-auto h-16 w-16 rounded-full animate-spin" style={{ background: "conic-gradient(from 0deg, transparent, #f5c451)", maskImage: "radial-gradient(farthest-side, transparent 62%, black 64%)", WebkitMaskImage: "radial-gradient(farthest-side, transparent 62%, black 64%)" }} />
-                  <p className="mt-5 text-sm text-muted-foreground">Summoning… {isVideoFromImage ? "video can take a minute or two." : "usually a few seconds."}</p>
+              <div className="cert-panel relative grid place-items-center overflow-hidden p-10 h-full min-h-72">
+                <div className="relative text-center">
+                  <div className="gm-smoke" style={{ animationDelay: "0s" }} />
+                  <div className="gm-smoke" style={{ animationDelay: ".9s", marginLeft: "-16px" }} />
+                  <div className="gm-smoke" style={{ animationDelay: "1.8s", marginLeft: "14px" }} />
+                  <div className="relative mx-auto h-24 w-24 gm-lamp-float">
+                    <div className="absolute inset-0 rounded-full gm-lamp-glow" style={{ background: "radial-gradient(circle, rgba(245,196,81,.5), transparent 70%)" }} />
+                    <img src="/brand/gm_logo_lamp.png" alt="" className="relative h-24 w-24 object-contain" />
+                  </div>
+                  <p className="mt-6 text-sm text-muted-foreground">The genie is conjuring your wish… {isVideoFromImage ? "video can take a minute or two." : "usually a few seconds."}</p>
                 </div>
               </div>
             )}
@@ -336,9 +343,13 @@ export default function Studio() {
             {!busy && !result && (
               <div className="cert-panel grid place-items-center p-10 h-full min-h-72 text-center">
                 <div>
-                  <Seal className="mx-auto h-10 w-10 opacity-50" />
-                  <p className="mt-4 text-sm text-muted-foreground max-w-56 mx-auto">
-                    Your creation appears here — sealed with its certificate the moment it's made.
+                  <div className="relative mx-auto h-24 w-24 gm-lamp-float">
+                    <div className="absolute inset-0 rounded-full gm-lamp-glow" style={{ background: "radial-gradient(circle, rgba(245,196,81,.32), transparent 70%)" }} />
+                    <img src="/brand/gm_logo_lamp.png" alt="The GenieMade lamp" className="relative h-24 w-24 object-contain opacity-90" />
+                  </div>
+                  <p className="mt-5 font-display text-lg">Rub the lamp<em className="gold-text">.</em></p>
+                  <p className="mt-1 text-sm text-muted-foreground max-w-64 mx-auto">
+                    Describe your wish and it appears here — sealed with its certificate the moment it's made.
                   </p>
                 </div>
               </div>
