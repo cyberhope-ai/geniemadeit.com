@@ -47,13 +47,21 @@ export default {
       const index = new URL("/index.html", request.url);
       res = await env.ASSETS.fetch(new Request(index.toString(), request));
     }
-    // Never let the SPA shell (index.html) be served stale from a per-URL cache — a cached
-    // index.html pins an OLD hashed bundle to that URL (e.g. /app?auth=ok after Google sign-in),
-    // which shows old UI even on refresh. Force revalidation on HTML; hashed /assets/* stay immutable.
+    // The SPA shell (index.html) must NEVER be served stale — a cached shell pins an OLD hashed
+    // bundle to that URL (e.g. /app?auth=ok after Google sign-in), showing old UI even on refresh.
+    // Return it as a fresh, no-store SYNTHETIC response (CF Pages overrides Cache-Control on raw
+    // asset responses, so we detach from the asset). Hashed /assets/* keep their immutable caching.
     if ((res.headers.get("content-type") || "").includes("text/html")) {
-      res = new Response(res.body, res);
-      res.headers.set("Cache-Control", "no-cache, must-revalidate");
-      res.headers.set("CDN-Cache-Control", "no-cache");
+      const body = await res.text();
+      return new Response(body, {
+        status: res.status,
+        headers: {
+          "content-type": "text/html; charset=utf-8",
+          "cache-control": "no-store, must-revalidate",
+          "cdn-cache-control": "no-store",
+          "x-content-type-options": "nosniff",
+        },
+      });
     }
     return res;
   }
