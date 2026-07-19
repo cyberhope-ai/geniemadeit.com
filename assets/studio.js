@@ -1,8 +1,7 @@
 /* GenieMade Studio — front-end logic.
- * Calls the /api/generate contract (atlas2's engine). Until that engine is live,
- * a client-side MOCK returns contract-shaped responses so the full UX works; it
- * auto-flips to the real engine the moment /api/generate answers with ok JSON.
- * The site NEVER calls a provider directly — only /api/generate.
+ * Calls the /api/generate contract (the PrecognitionOS engine). Real result or an
+ * honest error — the site NEVER fabricates a result and NEVER calls a provider
+ * directly; every creation goes through /api/generate.
  */
 (() => {
   "use strict";

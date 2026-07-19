@@ -63,12 +63,11 @@
   const fmt=iso=>new Date(iso).toLocaleString('en-US',{month:'short',day:'numeric',year:'numeric',hour:'numeric',minute:'2-digit'});
   function findLocal(rid){ try{ const v=JSON.parse(localStorage.getItem('gm_vault')||'[]'); return v.find(g=>g.certificate&&g.certificate.receipt_id&&g.certificate.receipt_id.toLowerCase()===rid.toLowerCase()); }catch(_){ return null; } }
   async function verify(rid){
-    // try the real engine (atlas2 Phase 2); fall back to a local Vault lookup / format check
+    // real engine is the source of truth; else a local Vault match. NEVER fabricate a pass.
     try{ const r=await fetch('/api/verify',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({receipt_id:rid})});
       const ct=r.headers.get('content-type')||''; if(r.ok&&ct.includes('application/json')){ const j=await r.json(); if(typeof j.ok==='boolean') return j; } }catch(_){}
     const hit=findLocal(rid);
     if(hit) return {ok:true, verified:true, generation:{prompt:hit.prompt,model:hit.model}, certificate:hit.certificate};
-    if(/^GM-\d{6,}-\w{2,}$/i.test(rid)) return {ok:true, verified:true, generation:{prompt:'(certificate on record)',model:'GenieMade'}, certificate:{receipt_id:rid.toUpperCase(),c2pa:true,issued_at:new Date().toISOString(),hash:''}};
     return {ok:true, verified:false};
   }
   function show(v,rid){
@@ -86,7 +85,7 @@
   $('#check').onclick=async()=>{ const rid=$('#rid').value.trim(); if(!rid){$('#rid').focus();return;} $('#check').textContent='Checking…'; const v=await verify(rid); $('#check').textContent='Verify authenticity'; show(v,rid); };
   $('#rid').addEventListener('keydown',e=>{if(e.key==='Enter')$('#check').click();});
   $('#drop').onclick=()=>$('#file').click();
-  $('#file').onchange=()=>{ $('#drop').textContent='Reading embedded credentials…'; setTimeout(()=>{ $('#drop').textContent='Drop a GenieMade image here to read its embedded credentials'; show({ok:true,verified:true,generation:{prompt:'(read from file credentials)',model:'GenieMade'},certificate:{receipt_id:'(embedded)',c2pa:true,issued_at:new Date().toISOString()}}); },700); };
+  $('#file').onchange=()=>{ $('#drop').textContent='Reading embedded credentials in the browser isn\'t available yet — paste the receipt ID above to verify.'; };
 </script>
 </body>
 </html>
