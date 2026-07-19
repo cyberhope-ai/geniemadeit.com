@@ -57,8 +57,8 @@ export default function Home() {
           </h1>
           <p className="mt-5 max-w-xl text-lg text-muted-foreground">
             Turn a few words — or a single photo — into striking images and video in seconds.
-            Every creation is <b className="text-foreground">sealed with a certificate of authenticity</b>,
-            built on the open C2PA content-credentials standard.
+            Every creation is <b className="text-foreground">sealed with a certificate of authenticity</b>
+            — a SHA-256 fingerprint and receipt ID, with open C2PA content credentials on the way.
           </p>
           <div className="mt-8 flex flex-wrap items-center gap-4">
             <button className="btn-gold px-6 py-3.5 text-base" onClick={startCreating} data-testid="hero-cta">
@@ -158,15 +158,15 @@ export default function Home() {
           <p className="mt-4 text-muted-foreground">
             The moment a creation is made, GenieMade's <b className="text-foreground">QSeal™</b> technology
             computes its SHA-256 fingerprint, issues a receipt ID, and seals both into a certificate
-            stored with the work in your PrecognitionOS Vault. Anyone can check a receipt on
+            stored with the work in your PrecognitionOS Vault. Check a creation's receipt on
             the <Link href="/verify" className="underline" style={{ color: "#ffe390" }}>Verify page</Link> —
-            when it was made, by which engine, and that the file hasn't been altered.
+            when it was made, by which engine, and whether the file matches; public verification is rolling out.
           </p>
           <div className="mt-6 grid gap-4 sm:grid-cols-3">
             {[
               { t: "Trackable", d: "Every creation logged to your Vault with time, engine, and cost." },
               { t: "Provable", d: "SHA-256 fingerprint + receipt ID sealed at the moment of creation." },
-              { t: "Traceable", d: "Built on the open C2PA content-credentials standard." },
+              { t: "Traceable", d: "Open C2PA content credentials rolling out." },
             ].map((f) => (
               <div key={f.t} className="cert-panel p-4">
                 <div className="flex items-center gap-2 font-semibold text-sm" style={{ color: "#ffe390" }}><Seal className="w-4 h-4" />{f.t}</div>
@@ -296,7 +296,7 @@ export default function Home() {
         <h2 className="mt-4 font-display text-4xl font-semibold">Good to know</h2>
         <div className="mt-8 grid gap-3">
           {[
-            ["What makes GenieMade different?", "Every creation is sealed with a certificate of authenticity — a SHA-256 fingerprint and receipt ID issued the instant it's made, built on the open C2PA content-credentials standard. Most tools give you an image; we give you an image you can prove is yours."],
+            ["What makes GenieMade different?", "Every creation is sealed with a certificate of authenticity — a SHA-256 fingerprint and receipt ID issued the instant it's made, with open C2PA content credentials on the way. Most tools give you an image; we give you an image you can prove is yours."],
             ["What is QSeal?", "QSeal is our patent-pending sealing technology, built on the QSurfaces provable-receipt substrate. It binds proof to your creation three ways: a SHA-256 fingerprint on a signed, tamper-evident chain (live today), a perceptual lineage fingerprint that ties derivatives back to the original (live today), and the Invisible Thread — a code woven into the pixels during generation that survives screenshots and metadata stripping (rolling out)."],
             ["Do I really get three free wishes?", "Yes. Your first three creations are free, no credit card required. After that, top up with a one-time wish pack — wishes never expire."],
             ["Does it make video too?", "Yes — image → video is in the Studio: pick any image you've made and describe the motion. Text → video is on the roadmap and clearly marked in the Studio until it's live."],

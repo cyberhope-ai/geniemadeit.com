@@ -32,7 +32,7 @@ export function GmFooter() {
         </div>
       </div>
       <div className="container pb-8 text-xs text-muted-foreground/70">
-        © 2026 GenieMade · geniemadeit.com · QSeal™ &amp; QSurfaces™ are trademarks of CyberHope AI (patent pending) · Certificates built on the open C2PA content-credentials standard
+        © 2026 GenieMade · geniemadeit.com · QSeal™ &amp; QSurfaces™ are trademarks of CyberHope AI (patent pending) · SHA-256 certificates · open C2PA content credentials on the way
       </div>
     </footer>
   );

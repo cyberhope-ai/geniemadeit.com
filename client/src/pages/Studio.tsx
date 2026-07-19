@@ -77,6 +77,7 @@ export default function Studio() {
   useEffect(() => { loadVault(); }, [loadVault]);
 
   async function makeWish() {
+    if (busy) return; // re-entrancy guard: block a double-fire (fast Cmd+Enter) from double-charging
     if (!user) { setAuthMode("signup"); setAuthOpen(true); return; }
     if (!prompt.trim()) { toast.error("Describe your wish first."); return; }
     if (isVideoFromImage && !sourceImg) { toast.error("Pick a source image to animate."); setPickerOpen(true); return; }
@@ -102,7 +103,7 @@ export default function Studio() {
     } catch (e) {
       const a = e as ApiError;
       if (a.status === 401) { setAuthMode("signup"); setAuthOpen(true); }
-      else if (a.code === "no_credits") {
+      else if (a.status === 402 || a.code === "no_credits" || a.code === "insufficient_credits") {
         setPayNeed((a.body?.cost as number) ?? selected?.credits);
         setPayOpen(true);
         refresh();
@@ -247,7 +248,7 @@ export default function Studio() {
               <Textarea
                 value={prompt}
                 onChange={(e) => setPrompt(e.target.value)}
-                onKeyDown={(e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") makeWish(); }}
+                onKeyDown={(e) => { if (!busy && (e.metaKey || e.ctrlKey) && e.key === "Enter") makeWish(); }}
                 placeholder={
                   isVideoFromImage
                     ? "Describe the motion — e.g. slow cinematic push-in, mist drifting, light flickering…"

@@ -64,10 +64,16 @@ export default function QSeal() {
     }
   }
 
-  function joinWaitlist(e: React.FormEvent) {
+  async function joinWaitlist(e: React.FormEvent) {
     e.preventDefault();
     if (!email.includes("@")) { toast.error("Enter a valid email address."); return; }
-    // Honest handling: there is no waitlist endpoint yet — store intent locally and via mailto.
+    try {
+      const r = await fetch("/api/qseal/waitlist", {
+        method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" },
+        body: JSON.stringify({ email, company, use_case: "qseal-api" }),
+      });
+      if (r.ok) { setJoined(true); return; }
+    } catch { /* fall through to mailto if the endpoint is unreachable */ }
     const subject = encodeURIComponent("QSeal API waitlist");
     const body = encodeURIComponent(`Please add me to the QSeal API waitlist.\n\nEmail: ${email}\nCompany: ${company || "—"}`);
     window.open(`mailto:hello@geniemadeit.com?subject=${subject}&body=${body}`, "_blank");
