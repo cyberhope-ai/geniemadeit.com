@@ -170,15 +170,24 @@ export default function Studio() {
             <div className="flex flex-wrap gap-2">
               {caps.map((c) => {
                 const Icon = iconFor(c.id);
-                const isSel = cap === c.id;
-                const disabled = c.status === "soon";
+               const isSel = cap === c.id;
+                // Gate both 'soon' (not built) and 'next' (built but not yet confirmed
+                // stable on the engine) so neither can be clicked into a failed/empty
+                // generation — Trust Standard per atlas2 deploy-readiness review.
+                const disabled = c.status === "soon" || c.status === "next";
                 return (
                   <button
                     key={c.id}
                     disabled={disabled}
                     data-testid={`cap-${c.id}`}
                     onClick={() => setCap(c.id)}
-                    title={disabled ? "Coming soon — not yet enabled on the engine" : `${c.credits} wishes`}
+                    title={
+                      c.status === "next"
+                        ? "Coming next — being verified before we open it"
+                        : c.status === "soon"
+                        ? "Coming soon — not yet enabled on the engine"
+                        : `${c.credits} wishes`
+                    }
                     className={`flex items-center gap-2 rounded-xl border px-3.5 py-2 text-sm font-medium transition-colors ${
                       isSel ? "" : "border-border text-muted-foreground hover:text-foreground hover:bg-accent"
                     } ${disabled ? "opacity-40 cursor-not-allowed" : ""}`}
@@ -190,8 +199,8 @@ export default function Studio() {
                       {c.credits}✦
                     </span>
                     {c.status === "next" && (
-                      <span className="rounded-full px-1.5 py-0.5 text-[0.62rem] font-bold uppercase" style={{ background: "rgba(102,227,232,.15)", color: "#66e3e8" }}>
-                        new
+                      <span className="rounded-full px-1.5 py-0.5 text-[0.62rem] font-bold uppercase bg-muted text-muted-foreground">
+                        next
                       </span>
                     )}
                     {c.status === "soon" && (
@@ -280,8 +289,8 @@ export default function Studio() {
               {busy ? "The lamp is working…" : `✦ Make it real${selected ? ` · ${selected.credits} ${selected.credits === 1 ? "wish" : "wishes"}` : ""}`}
             </button>
             {selected?.status === "next" && (
-              <p className="mt-2 text-xs" style={{ color: "#66e3e8" }}>
-                This engine was just added — if it declines your wish, you won't be charged and we'll show the exact reason.
+              <p className="mt-2 text-xs text-muted-foreground">
+                This engine is being verified before it opens — check back soon.
               </p>
             )}
             {genError && (
