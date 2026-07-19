@@ -39,22 +39,18 @@ export default {
       return fetch(new Request(target.toString(), request));
     }
 
-    // SPA fallback: the front-end is a single-page React app with client routing.
-    // Serve static assets when they exist; otherwise return index.html for
-    // navigation routes like /app, /pricing, /verify, /account.
-    let res = await env.ASSETS.fetch(request);
-    if (res.status === 404 && request.method === "GET" && (request.headers.get("accept") || "").includes("text/html")) {
-      const index = new URL("/index.html", request.url);
-      res = await env.ASSETS.fetch(new Request(index.toString(), request));
-    }
-    // The SPA shell (index.html) must NEVER be served stale — a cached shell pins an OLD hashed
-    // bundle to that URL (e.g. /app?auth=ok after Google sign-in), showing old UI even on refresh.
-    // Return it as a fresh, no-store SYNTHETIC response (CF Pages overrides Cache-Control on raw
-    // asset responses, so we detach from the asset). Hashed /assets/* keep their immutable caching.
-    if ((res.headers.get("content-type") || "").includes("text/html")) {
-      const body = await res.text();
-      return new Response(body, {
-        status: res.status,
+    // SPA routing (robust): for an HTML NAVIGATION request that is not a real file, serve the FRESH
+    // index.html shell DIRECTLY — never let env.ASSETS clean-URL matching resolve /app or /verify to a
+    // stale page (a corrupted per-host asset manifest was doing exactly that). Real files (hashed
+    // /assets, /brand, robots.txt, favicon) are served normally; the shell is no-store so it can't pin
+    // an old hashed bundle to a URL (e.g. /app?auth=ok after Google sign-in).
+    const path = url.pathname;
+    const isFile = /\.[a-z0-9]+$/i.test(path);
+    const wantsHtml = request.method === "GET" && (request.headers.get("accept") || "").includes("text/html");
+    const shell = async () => {
+      const idx = await env.ASSETS.fetch(new URL("/index.html", request.url).toString());
+      return new Response(await idx.text(), {
+        status: 200,
         headers: {
           "content-type": "text/html; charset=utf-8",
           "cache-control": "no-store, must-revalidate",
@@ -62,7 +58,10 @@ export default {
           "x-content-type-options": "nosniff",
         },
       });
-    }
+    };
+    if (wantsHtml && !isFile) return shell();
+    const res = await env.ASSETS.fetch(request);
+    if (res.status === 404 && wantsHtml) return shell();
     return res;
   }
 }
