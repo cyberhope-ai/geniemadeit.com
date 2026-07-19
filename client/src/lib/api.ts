@@ -42,6 +42,12 @@ export interface Certificate {
   receipt_id: string;
   issued_at: string;
   c2pa: boolean;
+  /** QSeal proof layer (live 2026-07): Ed25519 server-side signing */
+  signed?: boolean;
+  signature_valid?: boolean;
+  signer?: string | null;
+  watermarked?: boolean;
+  parents?: string[];
 }
 
 export interface Generation {
@@ -207,9 +213,15 @@ export const api = {
       body: JSON.stringify({ pack, plan: pack }),
     }),
   verify: (receipt_id: string) =>
-    req<{ ok: boolean; verdict?: string; verified?: boolean; generation?: Generation; certificate?: Certificate }>(
+    req<{ ok: boolean; verdict?: "authentic" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: Certificate }>(
       "/api/verify",
       { method: "POST", body: JSON.stringify({ receipt_id }) }
+    ),
+
+  /** QSeal public signing keys — anyone can verify our seals against these. */
+  qsealPubkeys: () =>
+    req<{ ok: boolean; keys: { epoch: string; alg: string; public_key_hex: string; active: boolean }[] }>(
+      "/api/qseal/pubkeys"
     ),
 
   /* ---- Settings hub (contract per atlas2 spec; 404 until backend ships) ---- */

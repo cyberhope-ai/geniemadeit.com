@@ -13,10 +13,10 @@ import { Seal } from "@/components/brand/Seal";
 import { useSession } from "@/contexts/SessionContext";
 import { api, sha256OfBlob, Generation, fmtDate } from "@/lib/api";
 import { Input } from "@/components/ui/input";
-import { FileUp } from "lucide-react";
+import { FileUp, ExternalLink } from "lucide-react";
 
 type Verdict =
-  | { kind: "pass"; source: string; gen?: Partial<Generation>; receipt?: string; hash?: string; sealed?: string }
+  | { kind: "pass"; source: string; gen?: Partial<Generation>; receipt?: string; hash?: string; sealed?: string; signed?: boolean; signature_valid?: boolean; signer?: string | null }
   | { kind: "fail"; reason: string }
   | { kind: "unknown"; reason: string };
 
@@ -44,13 +44,23 @@ export default function Verify() {
           const j = await api.verify(rid);
           if (typeof j.verified === "boolean") {
             engineAnswered = true;
-            if (j.verified) {
-              const h = j.certificate?.hash;
-              if (fileHash && h && fileHash !== h) {
-                setVerdict({ kind: "fail", reason: "The receipt is genuine, but the file you dropped does NOT match its sealed fingerprint. The file may have been altered or re-exported." });
-              } else {
-                setVerdict({ kind: "pass", source: "GenieMade registry", gen: j.generation, receipt: j.certificate?.receipt_id || rid, hash: h, sealed: j.certificate?.issued_at });
-              }
+              if (j.verified) {
+                const h = j.certificate?.hash;
+                if (fileHash && h && fileHash !== h) {
+                  setVerdict({ kind: "fail", reason: "The receipt is genuine, but the file you dropped does NOT match its sealed fingerprint. The file may have been altered or re-exported." });
+                } else {
+                  setVerdict({
+                    kind: "pass",
+                    source: "GenieMade registry",
+                    gen: j.generation,
+                    receipt: j.certificate?.receipt_id || rid,
+                    hash: h,
+                    sealed: j.certificate?.issued_at,
+                    signed: j.certificate?.signed,
+                    signature_valid: j.certificate?.signature_valid,
+                    signer: j.certificate?.signer,
+                  });
+                }
             } else {
               setVerdict({ kind: "fail", reason: "No GenieMade certificate exists for that receipt." });
             }
@@ -163,11 +173,33 @@ export default function Verify() {
                   <h3 className="flex items-center gap-2 font-display text-lg font-semibold m-0" style={{ color: "#66e3e8" }}>
                     <Seal className="h-5 w-5" /> Certificate confirmed
                   </h3>
+                  {verdict.signed && verdict.signature_valid ? (
+                    <div className="mt-2 flex flex-wrap items-center gap-2 text-sm font-semibold" style={{ color: "#66e3e8" }}>
+                      ✓ Cryptographically signed by GenieMade
+                      <a
+                        href="/api/qseal/pubkeys"
+                        target="_blank"
+                        rel="noopener"
+                        className="inline-flex items-center gap-1 text-[11px] font-normal opacity-70 hover:opacity-100 no-underline"
+                        style={{ color: "#66e3e8" }}
+                        title="View our public signing key — verify any seal yourself"
+                      >
+                        verify against our public key <ExternalLink className="h-3 w-3" />
+                      </a>
+                    </div>
+                  ) : verdict.signed === false ? (
+                    <p className="mt-2 text-xs text-muted-foreground italic">
+                      Genuine receipt — issued before Ed25519 signing rolled out. The SHA-256 seal is verified; the cryptographic signature is not present on this creation.
+                    </p>
+                  ) : null}
                   <p className="mt-1 text-sm text-muted-foreground">Confirmed against {verdict.source}.</p>
                   <dl className="mt-3 grid grid-cols-[auto_1fr] gap-x-4 gap-y-1.5 text-xs">
                     {verdict.receipt && (<><dt className="text-muted-foreground uppercase tracking-wide">Receipt</dt><dd className="kv-mono break-all m-0">{verdict.receipt}</dd></>)}
                     {verdict.hash && (<><dt className="text-muted-foreground uppercase tracking-wide">SHA-256</dt><dd className="kv-mono break-all m-0">{verdict.hash}</dd></>)}
                     {verdict.sealed && (<><dt className="text-muted-foreground uppercase tracking-wide">Sealed</dt><dd className="m-0">{fmtDate(verdict.sealed)}</dd></>)}
+                    {verdict.signed && verdict.signature_valid && verdict.signer && (
+                      <><dt className="text-muted-foreground uppercase tracking-wide">Signer</dt><dd className="kv-mono m-0">{verdict.signer}</dd></>
+                    )}
                     {fileHash && verdict.hash && (<><dt className="text-muted-foreground uppercase tracking-wide">File match</dt><dd className="m-0" style={{ color: "#66e3e8" }}>✓ dropped file matches the sealed fingerprint</dd></>)}
                   </dl>
                 </>
@@ -194,11 +226,15 @@ export default function Verify() {
         <div className="mt-8 text-sm text-muted-foreground">
           <h2 className="font-display text-xl font-semibold text-foreground">How verification works</h2>
           <p className="mt-2">
-            When a creation is sealed, its exact bytes are hashed with SHA-256 and stored with a
-            receipt ID. If even one pixel changes, the fingerprint changes. Dropping a file here
-            computes the same fingerprint locally in your browser — the file never leaves your
-            device — and compares it against the sealed record. Public registry lookup is rolling
-            out; where it isn't live yet, we say so instead of guessing.
+            When a creation is sealed, its exact bytes are hashed with SHA-256 and the certificate is
+            signed with Ed25519 — server-side, before it ever reaches you. If even one pixel changes,
+            the fingerprint changes. Dropping a file here computes the same fingerprint locally in your
+            browser — the file never leaves your device — and compares it against the sealed record.
+            Signed seals can be verified against our{" "}
+            <a href="/api/qseal/pubkeys" target="_blank" rel="noopener" className="underline hover:opacity-80" style={{ color: "#66e3e8" }}>
+              public key
+            </a>
+            {" "}— you don't have to take our word for it.
           </p>
           <h2 className="mt-6 font-display text-xl font-semibold text-foreground">Four ways a seal can be found</h2>
           <p className="mt-2">

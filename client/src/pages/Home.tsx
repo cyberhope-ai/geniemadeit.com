@@ -185,29 +185,29 @@ export default function Home() {
         <div className="deco-divider mb-16 text-xs"><span>✦</span></div>
         <div className="mx-auto max-w-3xl text-center">
           <span className="eyebrow justify-center">QSeal™ · patent pending · built on QSurfaces™</span>
-          <h2 className="mt-4 font-display text-4xl font-semibold">Sealed at birth. <em className="gold-text italic">Proof woven in.</em></h2>
+          <h2 className="mt-4 font-display text-4xl font-semibold">Every wish is born <em className="gold-text italic">sealed.</em></h2>
           <p className="mt-4 text-muted-foreground">
-            Most tools stamp a certificate on a file after the fact — and lose it the moment someone
-            screenshots or re-uploads. QSeal binds proof <b className="text-foreground">three ways, at the
-            moment of generation</b>, so your creation can testify for itself.
+            A cryptographically signed certificate of authenticity, issued the instant it's made —
+            server-side, before it ever reaches you. Signed with Ed25519. Verify it yourself against
+            our public key — <b className="text-foreground">you don't have to take our word for it.</b>
           </p>
         </div>
         <div className="mt-12 grid gap-4 md:grid-cols-3">
           {[
             {
               t: "The Fingerprint",
-              tag: "Hard binding — live today",
-              d: "A SHA-256 hash of the exact bytes, signed into a receipt on an append-only, hash-linked chain. Change one pixel and the seal breaks. Forge a receipt and six independent checks reject it.",
+              tag: "SHA-256 · live today",
+              d: "The exact bytes of your creation are hashed with SHA-256 and sealed into a tamper-evident chain. Change one pixel and the fingerprint changes. Forge a receipt? You'd need our private signing key.",
             },
             {
-              t: "The Lineage",
-              tag: "Passive binding — live today",
-              d: "A perceptual fingerprint that survives re-encodes and resizes, tying edited or derivative copies back to the sealed original — the genealogy of your creation.",
+              t: "Signed Proof",
+              tag: "Ed25519 · live today",
+              d: "Every seal carries an Ed25519 signature from GenieMade's signing key. Any altered or invented certificate fails verification. Verify any seal yourself against our public key — the check is open.",
             },
             {
               t: "The Invisible Thread",
-              tag: "Active binding — rolling out",
-              d: "An imperceptible code woven into the pixels themselves during generation. Screenshot it, crop it, strip every byte of metadata — the receipt can still be read back out of the image.",
+              tag: "In-pixel mark · rolling out",
+              d: "An imperceptible mark woven into the pixels so the seal survives screenshots and re-encodes — carrying a durable link back to the proof. Rolling out; not yet active on new creations.",
             },
           ].map((f) => (
             <div key={f.t} className="cert-panel p-6">
@@ -218,9 +218,9 @@ export default function Home() {
           ))}
         </div>
         <p className="mx-auto mt-8 max-w-2xl text-center text-xs text-muted-foreground">
-          Honest by design: no watermark is unremovable — the pixels carry durability, the signed chain
-          carries proof. A forger can strip provenance from a copy, but can never fake it: forging a
-          GenieMade seal requires a private key that never leaves the signing hardware.
+          Honest by design: the in-pixel mark carries a durable <em>link</em> back to the proof — not the
+          proof itself. A forger can strip provenance from a copy, but can never fake it: forging a
+          GenieMade seal requires our private signing key. Every seal is linked into a tamper-evident chain.
         </p>
       </section>
 
