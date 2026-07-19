@@ -15,9 +15,10 @@ import { api, sha256OfBlob, Generation, fmtDate, type RegisterResult } from "@/l
 import { Input } from "@/components/ui/input";
 import { FileUp, ExternalLink, FileSearch } from "lucide-react";
 import type { C2paReport } from "@/lib/c2pa";
+import { toast } from "sonner";
 
 type Verdict =
-  | { kind: "pass"; source: string; gen?: Partial<Generation>; receipt?: string; hash?: string; sealed?: string; signed?: boolean; signature_valid?: boolean; signer?: string | null; registered?: boolean; owner?: string; registeredAt?: string }
+  | { kind: "pass"; source: string; gen?: Partial<Generation>; receipt?: string; hash?: string; sealed?: string; signed?: boolean; signature_valid?: boolean; signer?: string | null; registered?: boolean; owner?: string; registeredAt?: string; anchor?: { chain?: string; status?: string; block_height?: number | null } }
   | { kind: "fail"; reason: string }
   | { kind: "unknown"; reason: string };
 
@@ -35,6 +36,7 @@ export default function Verify() {
   const [c2pa, setC2pa] = useState<C2paReport | null>(null);
   const [c2paBusy, setC2paBusy] = useState(false);
   const [registering, setRegistering] = useState(false);
+  const [anchoring, setAnchoring] = useState(false);
   const [regTitle, setRegTitle] = useState("");
   const [regResult, setRegResult] = useState<RegisterResult | null>(null);
   const [showRegForm, setShowRegForm] = useState(false);
@@ -73,6 +75,7 @@ export default function Verify() {
                   registered: isReg,
                   owner: j.registration?.owner,
                   registeredAt: j.registration?.registered_at,
+                  anchor: j.anchor,
                 });
               }
             } else if (rid) {
@@ -171,6 +174,27 @@ export default function Verify() {
       setRegResult({ ok: false, error: "register_failed", message: a?.message || "Registration failed — please try again." });
     } finally {
       setRegistering(false);
+    }
+  }
+
+  async function anchorNow() {
+    if (!user || !verdict || verdict.kind !== "pass" || !verdict.hash || anchoring) return;
+    const h = verdict.hash;
+    setAnchoring(true);
+    try {
+      const r = await api.anchor(h);
+      if (r.ok && r.anchor) {
+        setVerdict((v) => (v && v.kind === "pass" ? { ...v, anchor: r.anchor } : v));
+        refresh();
+      } else if (r.error === "no_credits") {
+        toast.error("Not enough wishes to anchor — add more from Pricing.");
+      } else {
+        toast.error(r.message || "Couldn't anchor right now — please try again.");
+      }
+    } catch {
+      toast.error("Couldn't reach Bitcoin's timestamp network — please try again.");
+    } finally {
+      setAnchoring(false);
     }
   }
 
@@ -281,7 +305,16 @@ export default function Verify() {
                       <><dt className="text-muted-foreground uppercase tracking-wide">Signer</dt><dd className="kv-mono m-0">{verdict.signer}</dd></>
                     )}
                     {fileHash && verdict.hash && (<><dt className="text-muted-foreground uppercase tracking-wide">File match</dt><dd className="m-0" style={{ color: "#66e3e8" }}>✓ dropped file matches the sealed fingerprint</dd></>)}
+                    {verdict.anchor && (<><dt className="text-muted-foreground uppercase tracking-wide">Bitcoin</dt><dd className="m-0" style={{ color: "#f7931a" }}>{verdict.anchor.status === "confirmed" && verdict.anchor.block_height ? `⛓ Anchored · block #${verdict.anchor.block_height}` : "⛓ Anchored · confirming on-chain"}</dd></>)}
                   </dl>
+                  {user && verdict.hash && !verdict.anchor && (
+                    <button className="btn-gold mt-4 w-full py-2.5 text-sm" onClick={anchorNow} disabled={anchoring} data-testid="anchor-btn">
+                      {anchoring ? "Anchoring to Bitcoin…" : "⛓ Anchor to Bitcoin · 3 wishes"}
+                    </button>
+                  )}
+                  {verdict.anchor && (
+                    <p className="mt-3 text-xs text-muted-foreground">Written to Bitcoin via OpenTimestamps — permanent and independently verifiable, even without GenieMade.</p>
+                  )}
                 </>
               )}
               {verdict.kind === "fail" && (

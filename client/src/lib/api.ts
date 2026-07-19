@@ -249,13 +249,15 @@ export const api = {
       body: JSON.stringify({ pack, plan: pack }),
     }),
   verify: (receipt_id: string, hash?: string) =>
-    req<{ ok: boolean; verdict?: "authentic" | "registered" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: (Certificate & { type?: string }); registration?: { owner?: string; registered_at?: string; title?: string | null; thumb_url?: string | null; is_public?: boolean } }>(
+    req<{ ok: boolean; verdict?: "authentic" | "registered" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: (Certificate & { type?: string }); registration?: { owner?: string; registered_at?: string; title?: string | null; thumb_url?: string | null; is_public?: boolean }; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string; confirmed_at?: string | null } }>(
       "/api/verify",
       { method: "POST", body: JSON.stringify({ receipt_id, hash }) }
     ),
   register: (payload: { hash: string; title?: string; owner_name?: string; note?: string; is_public?: boolean; thumbnail?: string }) =>
     req<RegisterResult>("/api/register", { method: "POST", body: JSON.stringify(payload) }),
   registryRecent: () => req<{ ok: boolean; count: number; registrations: { receipt_id: string; owner: string; title: string | null; hash_short: string; thumb_url: string | null; created_at: string; verify_url: string }[] }>("/api/registry/recent"),
+  anchor: (hash: string) =>
+    req<{ ok: boolean; already?: boolean; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string }; cost?: number; credits_remaining?: number; error?: string; message?: string }>("/api/anchor", { method: "POST", body: JSON.stringify({ hash }) }),
 
   /** QSeal public signing keys — anyone can verify our seals against these. */
   qsealPubkeys: () =>

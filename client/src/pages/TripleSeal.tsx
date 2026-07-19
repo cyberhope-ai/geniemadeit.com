@@ -25,7 +25,7 @@ const TIERS = [
     marks: ["Q"],
   },
   {
-    n: 2, name: "Anchored", sub: "+ Bitcoin or Ethereum", price: "~5 wishes", live: false, accent: "#f7931a",
+    n: 2, name: "Anchored", sub: "+ Bitcoin", price: "~5 wishes", live: true, accent: "#f7931a",
     blurb: "Everything in Sealed, plus your fingerprint written onto a public blockchain. From here on, the proof survives us.",
     marks: ["Q", "₿"],
   },
@@ -84,8 +84,8 @@ export default function TripleSeal() {
                 </a>
               </div>
               <p className="mt-5 text-xs text-muted-foreground">
-                <span style={{ color: "#66e3e8" }}>●</span> <b className="text-foreground">Sealed</b> tier is live today ·
-                <span style={{ color: "#f7931a" }}> ●</span> Anchored &amp; Eternal are in build
+                <span style={{ color: "#66e3e8" }}>●</span> <b className="text-foreground">Sealed &amp; Anchored</b> live today ·
+                <span style={{ color: "#f5c451" }}> ●</span> Eternal (Bitcoin + Ethereum) in build
               </p>
             </div>
 
@@ -316,7 +316,7 @@ export default function TripleSeal() {
             <Link href="/verify" className="btn-gold px-7 py-3.5 text-base no-underline"><Seal className="h-5 w-5" /> Seal a creation now</Link>
             <Link href="/app" className="rounded-xl border border-border px-7 py-3.5 text-base text-muted-foreground no-underline transition-colors hover:text-foreground">Make something to seal</Link>
           </div>
-          <p className="mt-6 text-xs text-muted-foreground">Sealed tier live today · Anchored &amp; Eternal in build — <Link href="/verify" className="underline" style={{ color: "#66e3e8" }}>start with a free seal</Link></p>
+          <p className="mt-6 text-xs text-muted-foreground">Sealed &amp; Anchored live today · Eternal in build — <Link href="/verify" className="underline" style={{ color: "#66e3e8" }}>start with a free seal</Link></p>
         </section>
       </main>
 
