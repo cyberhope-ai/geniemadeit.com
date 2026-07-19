@@ -1,26 +1,109 @@
 /*
- * Gilded Night — Account dashboard (/account): profile, live wishes balance,
- * top-up via real Stripe checkout, creation history from the engine, sign out.
+ * Gilded Night — Account & Settings hub (/account), per the atlas2 spec (2026-07-19).
+ * Left-nav Settings shell (fal.ai reference structure, GenieMade skin) with grouped
+ * panels wired to the engine API contract. Section state lives in the URL hash
+ * (#usage, #credits, …) so panels are linkable. Trust Standard: every panel shows
+ * real data, an honest empty state, or an explicit "rolling out" notice — never faked.
  */
-import { useCallback, useEffect, useState } from "react";
-import { useLocation, Link } from "wouter";
+import { useEffect, useMemo, useState } from "react";
+import { useLocation } from "wouter";
 import { GmNav } from "@/components/GmNav";
 import { GmFooter } from "@/components/GmFooter";
 import { GoldDust } from "@/components/brand/GoldDust";
-import { Seal } from "@/components/brand/Seal";
-import { PaywallModal } from "@/components/PaywallModal";
 import { useSession } from "@/contexts/SessionContext";
-import { api, Generation, fmtDate, shortHash } from "@/lib/api";
 import { openClientDashboard, PORTAL_BRAND_HOST } from "@/lib/portal";
 import { toast } from "sonner";
-import { Download, Copy, LogOut, Sparkles, LayoutDashboard, Loader2 } from "lucide-react";
+import { Input } from "@/components/ui/input";
+import {
+  UserRound, BellRing, BarChart3, MapPin, Sparkles, Gauge, CreditCard, ReceiptText,
+  History, CircleAlert, KeyRound, Webhook, LogOut, LayoutDashboard, Loader2, Search,
+} from "lucide-react";
+import { AccountPanel, NotificationsPanel } from "@/components/settings/GeneralPanels";
+import {
+  UsagePanel, AddressPanel, CreditsPanel, ConcurrencyPanel, BillingPanel, InvoicesPanel,
+} from "@/components/settings/BillingPanels";
+import { HistoryPanel, ErrorsPanel, DeveloperPanel } from "@/components/settings/AnalyticsPanels";
+
+type SectionId =
+  | "account" | "notifications"
+  | "usage" | "address" | "credits" | "concurrency" | "billing" | "invoices"
+  | "history" | "errors"
+  | "api-keys" | "webhooks";
+
+interface NavItem { id: SectionId; label: string; icon: typeof UserRound; coming?: boolean }
+interface NavGroup { label: string; items: NavItem[] }
+
+const GROUPS: NavGroup[] = [
+  {
+    label: "General",
+    items: [
+      { id: "account", label: "Account", icon: UserRound },
+      { id: "notifications", label: "Notification Settings", icon: BellRing },
+    ],
+  },
+  {
+    label: "Usage & Billing",
+    items: [
+      { id: "usage", label: "Usage", icon: BarChart3 },
+      { id: "address", label: "Address", icon: MapPin },
+      { id: "credits", label: "Credits", icon: Sparkles },
+      { id: "concurrency", label: "Concurrency Limits", icon: Gauge },
+      { id: "billing", label: "Billing", icon: CreditCard },
+      { id: "invoices", label: "Invoices", icon: ReceiptText },
+    ],
+  },
+  {
+    label: "Analytics & Monitoring",
+    items: [
+      { id: "history", label: "Request History", icon: History },
+      { id: "errors", label: "Errors", icon: CircleAlert },
+    ],
+  },
+  {
+    label: "Developer",
+    items: [
+      { id: "api-keys", label: "API Keys", icon: KeyRound, coming: true },
+      { id: "webhooks", label: "Webhooks", icon: Webhook, coming: true },
+    ],
+  },
+];
+
+const VALID_IDS = new Set(GROUPS.flatMap((g) => g.items.map((i) => i.id)));
+
+function sectionFromHash(): SectionId {
+  const h = window.location.hash.replace("#", "") as SectionId;
+  return VALID_IDS.has(h) ? h : "account";
+}
 
 export default function Account() {
-  const { user, loading, logout, refresh } = useSession();
+  const { user, loading, logout } = useSession();
   const [, navigate] = useLocation();
-  const [gens, setGens] = useState<Generation[]>([]);
-  const [payOpen, setPayOpen] = useState(false);
+  const [section, setSection] = useState<SectionId>(() => sectionFromHash());
+  const [query, setQuery] = useState("");
   const [portalBusy, setPortalBusy] = useState(false);
+
+  useEffect(() => {
+    if (!loading && !user) navigate("/");
+  }, [loading, user, navigate]);
+
+  useEffect(() => {
+    const onHash = () => setSection(sectionFromHash());
+    window.addEventListener("hashchange", onHash);
+    return () => window.removeEventListener("hashchange", onHash);
+  }, []);
+
+  function go(id: SectionId) {
+    setSection(id);
+    window.history.replaceState(null, "", `#${id}`);
+  }
+
+  const filteredGroups = useMemo(() => {
+    const q = query.trim().toLowerCase();
+    if (!q) return GROUPS;
+    return GROUPS
+      .map((g) => ({ ...g, items: g.items.filter((i) => i.label.toLowerCase().includes(q) || g.label.toLowerCase().includes(q)) }))
+      .filter((g) => g.items.length > 0);
+  }, [query]);
 
   async function gotoClientDashboard() {
     if (!user || portalBusy) return;
@@ -28,39 +111,8 @@ export default function Account() {
     const r = await openClientDashboard(user.email);
     if (!r.ok) {
       setPortalBusy(false);
-      if (r.reason === "denied") {
-        toast.error("The portal declined this account — contact support@cyberhopeai.com.");
-      } else {
-        toast.info(`The client dashboard (${PORTAL_BRAND_HOST}) isn't live yet — it's on the way.`);
-      }
-    }
-    // On success the browser navigates away; keep the spinner until then.
-  }
-
-  useEffect(() => {
-    if (!loading && !user) navigate("/");
-  }, [loading, user, navigate]);
-
-  const load = useCallback(() => {
-    if (!user) return;
-    api.gallery().then((j) => setGens(j.generations || [])).catch(() => {});
-  }, [user]);
-
-  useEffect(() => { load(); refresh(); /* also refresh credits after Stripe return */ // eslint-disable-line react-hooks/exhaustive-deps
-  }, [user?.id]);
-
-  async function download(g: Generation) {
-    try {
-      const r = await fetch(g.url);
-      const b = await r.blob();
-      const a = document.createElement("a");
-      const ext = g.capability?.startsWith("video") ? "mp4" : g.capability?.startsWith("audio") ? "wav" : "png";
-      a.href = URL.createObjectURL(b);
-      a.download = `geniemade-${(g.cert_id || g.id || "creation").toString().slice(0, 18)}.${ext}`;
-      a.click();
-      URL.revokeObjectURL(a.href);
-    } catch {
-      toast.error("Download failed — try again.");
+      if (r.reason === "denied") toast.error("The portal declined this account — contact support@cyberhopeai.com.");
+      else toast.info(`The client dashboard (${PORTAL_BRAND_HOST}) isn't live yet — it's on the way.`);
     }
   }
 
@@ -70,7 +122,7 @@ export default function Account() {
         <GoldDust />
         <GmNav />
         <main className="container relative z-10 grid min-h-[50vh] place-items-center pt-10 pb-16 text-muted-foreground">
-          {loading ? "Opening your account…" : "Redirecting…"}
+          {loading ? "Opening your settings…" : "Redirecting…"}
         </main>
         <GmFooter />
       </div>
@@ -82,109 +134,88 @@ export default function Account() {
       <GoldDust />
       <GmNav />
       <main className="container relative z-10 pt-10 pb-16">
-        <span className="eyebrow">Your account</span>
-        <h1 className="mt-3 font-display text-4xl font-semibold">Welcome back<em className="gold-text italic">.</em></h1>
-
-        <div className="mt-8 grid gap-5 md:grid-cols-3">
-          <div className="gm-panel p-6">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Signed in as</div>
-            <div className="mt-2 font-medium break-all">{user.email}</div>
-            <div className="mt-1 text-xs text-muted-foreground kv-mono">{user.id}</div>
-            <button className="btn-ghost-gold mt-5 px-4 py-2 text-sm" onClick={async () => { await logout(); navigate("/"); }} data-testid="sign-out">
+        <div className="flex flex-wrap items-end justify-between gap-4">
+          <div>
+            <span className="eyebrow">Your account</span>
+            <h1 className="mt-3 font-display text-4xl font-semibold">Settings<em className="gold-text italic">.</em></h1>
+            <p className="mt-2 text-sm text-muted-foreground">Everything for your account, usage, and billing.</p>
+          </div>
+          <div className="flex flex-wrap gap-2.5">
+            <button className="btn-ghost-gold px-4 py-2 text-sm" onClick={gotoClientDashboard} disabled={portalBusy} data-testid="open-client-dashboard">
+              {portalBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LayoutDashboard className="h-4 w-4" />}
+              {portalBusy ? "Opening…" : "Client dashboard"}
+            </button>
+            <button className="btn-ghost-gold px-4 py-2 text-sm" onClick={async () => { await logout(); navigate("/"); }} data-testid="sign-out">
               <LogOut className="h-4 w-4" /> Sign out
             </button>
           </div>
-          <div className="gm-panel p-6">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Wishes remaining</div>
-            <div className="mt-2 font-display text-5xl font-semibold" style={{ color: "#ffe390" }}>✦ {user.credits}</div>
-            <button className="btn-gold mt-5 px-4 py-2 text-sm" onClick={() => setPayOpen(true)} data-testid="topup">
-              <Sparkles className="h-4 w-4" /> Top up wishes
-            </button>
-          </div>
-          <div className="gm-panel p-6">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Creations sealed</div>
-            <div className="mt-2 font-display text-5xl font-semibold">{gens.length}</div>
-            <Link href="/app" className="btn-ghost-gold mt-5 px-4 py-2 text-sm no-underline inline-flex">Open the Studio</Link>
-          </div>
         </div>
 
-        <div className="gm-panel mt-5 flex flex-wrap items-center justify-between gap-4 p-6">
-          <div>
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Client dashboard</div>
-            <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
-              Projects, proof-backed status, and your scoped AI team live in the GenieMade client
-              portal at <span className="kv-mono text-xs">{PORTAL_BRAND_HOST}</span>. One click signs
-              you in with this account — no second password.
-            </p>
-          </div>
-          <button className="btn-gold px-4 py-2 text-sm" onClick={gotoClientDashboard} disabled={portalBusy} data-testid="open-client-dashboard">
-            {portalBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LayoutDashboard className="h-4 w-4" />}
-            {portalBusy ? "Opening…" : "Open client dashboard"}
-          </button>
-        </div>
+        <div className="mt-8 grid gap-8 lg:grid-cols-[240px_1fr]">
+          {/* Left nav */}
+          <nav aria-label="Settings sections">
+            <div className="relative">
+              <Search className="pointer-events-none absolute left-3 top-1/2 h-3.5 w-3.5 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                value={query}
+                onChange={(e) => setQuery(e.target.value)}
+                placeholder="Search settings…"
+                className="pl-9 text-sm"
+                data-testid="settings-search"
+              />
+            </div>
+            <div className="mt-5 grid gap-5">
+              {filteredGroups.map((g) => (
+                <div key={g.label}>
+                  <div className="px-2 text-[0.68rem] font-bold uppercase tracking-[0.14em] text-muted-foreground">{g.label}</div>
+                  <div className="mt-1.5 grid gap-0.5">
+                    {g.items.map((it) => {
+                      const Icon = it.icon;
+                      const active = section === it.id;
+                      return (
+                        <button
+                          key={it.id}
+                          onClick={() => go(it.id)}
+                          data-testid={`nav-${it.id}`}
+                          className={`flex items-center gap-2.5 rounded-lg px-2.5 py-2 text-left text-sm transition-colors ${
+                            active ? "font-medium" : "text-muted-foreground hover:text-foreground hover:bg-accent"
+                          }`}
+                          style={active ? { background: "rgba(245,196,81,.1)", color: "#ffe390" } : undefined}
+                        >
+                          <Icon className="h-4 w-4 shrink-0" />
+                          <span className="flex-1">{it.label}</span>
+                          {it.coming && (
+                            <span className="rounded-full bg-muted px-1.5 py-0.5 text-[0.6rem] font-bold uppercase text-muted-foreground">soon</span>
+                          )}
+                        </button>
+                      );
+                    })}
+                  </div>
+                </div>
+              ))}
+              {filteredGroups.length === 0 && (
+                <p className="px-2 text-sm text-muted-foreground">Nothing matches “{query}”.</p>
+              )}
+            </div>
+          </nav>
 
-        <section className="mt-12">
-          <h2 className="font-display text-2xl font-semibold">Creation history</h2>
-          <p className="mt-1 text-sm text-muted-foreground">Every wish, tracked: what was made, when, with which engine, and its fingerprint.</p>
-          <div className="gm-panel mt-5 overflow-x-auto p-2">
-            <table className="w-full text-sm">
-              <thead>
-                <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-                  <th className="p-3">Preview</th>
-                  <th className="p-3">Type</th>
-                  <th className="p-3">Engine</th>
-                  <th className="p-3">Receipt</th>
-                  <th className="p-3">SHA-256</th>
-                  <th className="p-3">Sealed</th>
-                  <th className="p-3"></th>
-                </tr>
-              </thead>
-              <tbody>
-                {gens.map((g) => (
-                  <tr key={g.id} className="border-t border-border/60">
-                    <td className="p-3">
-                      {g.capability?.startsWith("image") ? (
-                        <img src={g.url} alt="" className="h-12 w-12 rounded-lg object-cover border border-border" />
-                      ) : (
-                        <div className="grid h-12 w-12 place-items-center rounded-lg border border-border bg-accent text-xs text-muted-foreground">
-                          {g.capability?.split(".")[0]}
-                        </div>
-                      )}
-                    </td>
-                    <td className="p-3 whitespace-nowrap">{g.capability}</td>
-                    <td className="p-3 whitespace-nowrap kv-mono text-xs">{g.model}</td>
-                    <td className="p-3 whitespace-nowrap kv-mono text-xs">
-                      <span className="inline-flex items-center gap-1.5">
-                        {shortHash(g.cert_id, 14)}
-                        {g.cert_id && (
-                          <button aria-label="Copy receipt" className="opacity-50 hover:opacity-100" onClick={() => { navigator.clipboard.writeText(g.cert_id!); toast.success("Receipt copied"); }}>
-                            <Copy className="h-3 w-3" />
-                          </button>
-                        )}
-                      </span>
-                    </td>
-                    <td className="p-3 whitespace-nowrap kv-mono text-xs">
-                      <span className="inline-flex items-center gap-1.5">
-                        <Seal className="h-3.5 w-3.5" /> {shortHash(g.hash, 14)}
-                      </span>
-                    </td>
-                    <td className="p-3 whitespace-nowrap text-xs text-muted-foreground">{fmtDate(g.created_at)}</td>
-                    <td className="p-3">
-                      <button className="btn-ghost-gold px-3 py-1.5 text-xs" onClick={() => download(g)}>
-                        <Download className="h-3.5 w-3.5" /> Download
-                      </button>
-                    </td>
-                  </tr>
-                ))}
-                {gens.length === 0 && (
-                  <tr><td colSpan={7} className="p-8 text-center text-muted-foreground">No creations yet — <Link href="/app" className="underline" style={{ color: "#ffe390" }}>make your first wish</Link>.</td></tr>
-                )}
-              </tbody>
-            </table>
-          </div>
-        </section>
+          {/* Active panel */}
+          <section className="min-w-0">
+            {section === "account" && <AccountPanel />}
+            {section === "notifications" && <NotificationsPanel />}
+            {section === "usage" && <UsagePanel />}
+            {section === "address" && <AddressPanel />}
+            {section === "credits" && <CreditsPanel />}
+            {section === "concurrency" && <ConcurrencyPanel />}
+            {section === "billing" && <BillingPanel />}
+            {section === "invoices" && <InvoicesPanel />}
+            {section === "history" && <HistoryPanel />}
+            {section === "errors" && <ErrorsPanel />}
+            {section === "api-keys" && <DeveloperPanel item="api-keys" />}
+            {section === "webhooks" && <DeveloperPanel item="webhooks" />}
+          </section>
+        </div>
       </main>
-      <PaywallModal open={payOpen} onOpenChange={setPayOpen} remaining={user.credits} />
       <GmFooter />
     </div>
   );

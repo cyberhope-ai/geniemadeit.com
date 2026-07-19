@@ -13,9 +13,9 @@ import { useSession } from "@/contexts/SessionContext";
 import { api, Pack } from "@/lib/api";
 import { Wand2, Film, ShieldCheck, Vault, Download, ArrowRight } from "lucide-react";
 
-const HERO_IMG = "/brand/gm_hero_lamp.jpg";
-const VIDEO_STILL = "/brand/gm_video_still.jpg";
-const VAULT_IMG = "/brand/gm_vault_illustration.jpg";
+const HERO_IMG = "/manus-storage/gm_hero_lamp_abe4e1d4.png";
+const VIDEO_STILL = "/manus-storage/gm_video_still_09d15b8e.png";
+const VAULT_IMG = "/manus-storage/gm_vault_illustration_d11dbf00.png";
 
 interface Example { url: string; prompt: string }
 

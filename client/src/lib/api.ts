@@ -77,6 +77,97 @@ export class ApiError extends Error {
   }
 }
 
+/* ---- Account & Settings hub contract (atlas2 spec, 2026-07-19) ----
+ * These endpoints are being built by the fleet (Cloudflare D1 backend).
+ * Until they ship they return 404 not_found — panels must show an honest
+ * "backend rolling out" state, never fabricated data.
+ */
+
+export interface Account {
+  id: string;
+  email: string;
+  display_name?: string;
+  full_name?: string;
+  username?: string;
+  avatar_url?: string;
+  plan: string;
+  credits: number;
+  concurrency_limit?: number;
+  created_at?: string;
+}
+
+export interface NotificationPrefs {
+  email_product_updates: boolean;
+  email_billing: boolean;
+  email_generation_complete: boolean;
+  email_marketing: boolean;
+}
+
+export interface BillingAddress {
+  line1?: string;
+  line2?: string;
+  city?: string;
+  region?: string;
+  postal_code?: string;
+  country?: string;
+}
+
+export interface UsageDay {
+  date: string;
+  credits: number;
+  cost_usd: number;
+  jobs: number;
+}
+
+export interface UsageByCapability {
+  capability: string;
+  jobs: number;
+  credits: number;
+  cost_usd: number;
+}
+
+export interface UsageSummary {
+  ok: boolean;
+  by_day: UsageDay[];
+  by_capability: UsageByCapability[];
+  totals: { jobs: number; credits: number };
+}
+
+export interface HistoryItem {
+  id: string;
+  ts: string;
+  capability: string;
+  model?: string;
+  credits: number;
+  status: string;
+  cert_id?: string;
+}
+
+export interface LedgerEntry {
+  delta: number;
+  reason: string;
+  ref?: string;
+  balance_after?: number;
+  ts: string;
+}
+
+export interface Invoice {
+  id: string;
+  pack?: string;
+  credits?: number;
+  amount_cents: number;
+  currency: string;
+  receipt_url?: string;
+  ts: string;
+}
+
+export interface ErrorItem {
+  id: string;
+  ts: string;
+  capability: string;
+  error: string;
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const r = await fetch(path, {
     credentials: "same-origin",
@@ -120,6 +211,36 @@ export const api = {
       "/api/verify",
       { method: "POST", body: JSON.stringify({ receipt_id }) }
     ),
+
+  /* ---- Settings hub (contract per atlas2 spec; 404 until backend ships) ---- */
+  account: () => req<{ ok: boolean; account: Account }>("/api/account").then((r) => r.account),
+  updateAccount: (patch: { display_name?: string; username?: string; avatar_url?: string }) =>
+    req<{ ok: boolean; account: Account }>("/api/account", {
+      method: "PATCH",
+      body: JSON.stringify(patch),
+    }).then((r) => r.account),
+  notificationPrefs: () =>
+    req<{ ok: boolean; notifications: NotificationPrefs }>("/api/settings/notifications").then((r) => r.notifications),
+  saveNotificationPrefs: (prefs: NotificationPrefs) =>
+    req<{ ok: boolean; notifications: NotificationPrefs }>("/api/settings/notifications", {
+      method: "PUT",
+      body: JSON.stringify(prefs),
+    }).then((r) => r.notifications),
+  address: () => req<{ ok: boolean; address: BillingAddress }>("/api/settings/address").then((r) => r.address),
+  saveAddress: (addr: BillingAddress) =>
+    req<{ ok: boolean; address: BillingAddress }>("/api/settings/address", {
+      method: "PUT",
+      body: JSON.stringify(addr),
+    }).then((r) => r.address),
+  usage: (range: "7d" | "30d" | "90d" = "30d") => req<UsageSummary>(`/api/usage?range=${range}`),
+  usageHistory: (limit = 50, cursor?: string) =>
+    req<{ ok: boolean; items: HistoryItem[]; next_cursor?: string }>(
+      `/api/usage/history?limit=${limit}${cursor ? `&cursor=${encodeURIComponent(cursor)}` : ""}`
+    ),
+  credits: () => req<{ ok: boolean; balance: number; ledger: LedgerEntry[] }>("/api/credits"),
+  invoices: () => req<{ ok: boolean; invoices: Invoice[] }>("/api/billing/invoices"),
+  billingPortal: () => req<{ ok: boolean; url?: string }>("/api/billing/portal", { method: "POST" }),
+  errors: (limit = 50) => req<{ ok: boolean; items: ErrorItem[] }>(`/api/errors?limit=${limit}`),
 };
 
 /** SHA-256 of a File/Blob in the browser — used by the honest Verify tool. */

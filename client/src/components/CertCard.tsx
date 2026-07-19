@@ -4,7 +4,7 @@ import { Certificate, fmtDate, shortHash } from "@/lib/api";
 import { toast } from "sonner";
 import { Copy } from "lucide-react";
 
-const CERT_BG = "/brand/gm_certificate_texture.jpg";
+const CERT_BG = "/manus-storage/gm_certificate_texture_c49c5c28.png";
 
 interface Props {
   cert?: Certificate | null;
