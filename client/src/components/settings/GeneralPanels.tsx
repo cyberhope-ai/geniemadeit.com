@@ -3,7 +3,7 @@
  * Contract: GET/PATCH /api/account, GET/PUT /api/settings/notifications.
  * Trust Standard: real data, honest 404 "rolling out" state, no fabrication.
  */
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useState, type ChangeEvent } from "react";
 import { toast } from "sonner";
 import { api, Account, NotificationPrefs } from "@/lib/api";
 import { useSession } from "@/contexts/SessionContext";
@@ -17,11 +17,30 @@ import { fmtDate } from "@/lib/api";
 /* ------------------------------- Account ------------------------------- */
 
 export function AccountPanel() {
-  const { user } = useSession();
+  const { user, refresh } = useSession();
   const [state, setState] = useState<PanelState<Account>>({ kind: "loading" });
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
   const [saving, setSaving] = useState(false);
+  const [uploadingAvatar, setUploadingAvatar] = useState(false);
+
+  async function onAvatarPick(e: ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0];
+    e.target.value = "";
+    if (!file) return;
+    setUploadingAvatar(true);
+    try {
+      const { avatar_url } = await api.uploadAvatar(file);
+      setState((s) => (s.kind === "ready" ? { kind: "ready", data: { ...s.data, avatar_url } } : s));
+      await refresh();
+      toast.success("Photo updated.");
+    } catch (er) {
+      const c = classifyError(er);
+      toast.error(c.kind === "not_live" ? "Photo upload isn't available yet." : c.message);
+    } finally {
+      setUploadingAvatar(false);
+    }
+  }
 
   const load = useCallback(() => {
     setState({ kind: "loading" });
@@ -41,6 +60,7 @@ export function AccountPanel() {
     try {
       const updated = await api.updateAccount({ display_name: displayName.trim(), username: username.trim() });
       setState({ kind: "ready", data: updated });
+      await refresh();
       toast.success("Profile saved.");
     } catch (e) {
       const c = classifyError(e);
@@ -87,6 +107,10 @@ export function AccountPanel() {
               <div>
                 <div className="font-medium">{state.data.display_name || state.data.email}</div>
                 <div className="text-xs text-muted-foreground capitalize">{state.data.plan} plan · member since {fmtDate(state.data.created_at)}</div>
+                <label className="mt-1.5 inline-flex cursor-pointer items-center gap-1 text-xs font-semibold" style={{ color: "#ffe390" }}>
+                  {uploadingAvatar ? "Uploading…" : "Upload a photo"}
+                  <input type="file" accept="image/png,image/jpeg,image/webp" className="hidden" onChange={onAvatarPick} disabled={uploadingAvatar} data-testid="avatar-upload" />
+                </label>
               </div>
             </div>
 

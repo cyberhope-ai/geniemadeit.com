@@ -54,7 +54,7 @@ export function GmNav() {
                 ✦ {user.credits} {user.credits === 1 ? "wish" : "wishes"}
               </Link>
               <Link href="/account" className="text-sm text-muted-foreground hover:text-foreground no-underline" data-testid="nav-account">
-                {user.email.split("@")[0]}
+                {user.display_name || user.email.split("@")[0]}
               </Link>
               <button className="btn-gold px-4 py-2 text-sm" onClick={() => navigate("/app")}>Create</button>
             </div>

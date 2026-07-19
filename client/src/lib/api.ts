@@ -10,6 +10,8 @@ export interface GmUser {
   email: string;
   credits: number;
   plan: string;
+  display_name?: string | null;
+  avatar_url?: string | null;
 }
 
 export interface CapabilityItem {
@@ -231,6 +233,15 @@ export const api = {
       method: "PATCH",
       body: JSON.stringify(patch),
     }).then((r) => r.account),
+  uploadAvatar: async (file: File) => {
+    const r = await fetch("/api/account/avatar", {
+      method: "POST", credentials: "same-origin",
+      headers: { "content-type": file.type || "image/jpeg" }, body: file,
+    });
+    const j = await r.json().catch(() => null);
+    if (!r.ok || !j?.ok) throw new ApiError(r.status, j?.error, j?.message || j?.error, j || undefined);
+    return j as { ok: boolean; avatar_url: string };
+  },
   notificationPrefs: () =>
     req<{ ok: boolean; notifications: NotificationPrefs }>("/api/settings/notifications").then((r) => r.notifications),
   saveNotificationPrefs: (prefs: NotificationPrefs) =>
