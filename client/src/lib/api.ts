@@ -1,0 +1,154 @@
+/*
+ * GenieMade engine API client — Gilded Night FE.
+ * All calls are same-origin (/api/*) and proxied to the live engine
+ * (dev: vite proxy; prod: Cloudflare Pages _worker.js). Cookies are HttpOnly.
+ * TRUST STANDARD: never fabricate results — surface real errors verbatim.
+ */
+
+export interface GmUser {
+  id: string;
+  email: string;
+  credits: number;
+  plan: string;
+}
+
+export interface CapabilityItem {
+  id: string;
+  name: string;
+  status: "live" | "next" | "soon";
+  credits: number;
+}
+
+export interface CapabilityCat {
+  cat: string;
+  items: CapabilityItem[];
+}
+
+export interface Pack {
+  key: string;
+  credits: number;
+  usd: number;
+}
+
+export interface Capabilities {
+  ok: boolean;
+  capabilities: CapabilityCat[];
+  packs: Pack[];
+  free_credits: number;
+}
+
+export interface Certificate {
+  hash: string;
+  receipt_id: string;
+  issued_at: string;
+  c2pa: boolean;
+}
+
+export interface Generation {
+  id: string;
+  capability: string;
+  url: string;
+  model: string;
+  prompt?: string;
+  certificate?: Certificate;
+  hash?: string;
+  cert_id?: string;
+  created_at?: string;
+}
+
+export interface GenerateResult {
+  ok: boolean;
+  generation?: Generation;
+  cost?: number;
+  credits_remaining?: number;
+  error?: string;
+  message?: string;
+}
+
+export class ApiError extends Error {
+  status: number;
+  code?: string;
+  body?: Record<string, unknown>;
+  constructor(status: number, code?: string, message?: string, body?: Record<string, unknown>) {
+    super(message || code || `HTTP ${status}`);
+    this.status = status;
+    this.code = code;
+    this.body = body;
+  }
+}
+
+async function req<T>(path: string, init?: RequestInit): Promise<T> {
+  const r = await fetch(path, {
+    credentials: "same-origin",
+    headers: init?.body ? { "content-type": "application/json" } : undefined,
+    ...init,
+  });
+  const ct = r.headers.get("content-type") || "";
+  const j = ct.includes("application/json") ? await r.json().catch(() => null) : null;
+  if (!r.ok || (j && j.ok === false)) {
+    throw new ApiError(r.status, j?.error, j?.message || j?.error, j || undefined);
+  }
+  return j as T;
+}
+
+export const api = {
+  capabilities: () => req<Capabilities>("/api/capabilities"),
+  me: () =>
+    req<{ ok: boolean; authenticated: boolean; user?: GmUser }>("/api/auth/me"),
+  signup: (email: string, password: string) =>
+    req<{ ok: boolean; user: GmUser }>("/api/auth/signup", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  login: (email: string, password: string) =>
+    req<{ ok: boolean; user: GmUser }>("/api/auth/login", {
+      method: "POST",
+      body: JSON.stringify({ email, password }),
+    }),
+  logout: () => req<{ ok: boolean }>("/api/auth/logout", { method: "POST" }),
+  generate: (payload: { capability: string; prompt: string; aspect?: string; image_url?: string }) =>
+    req<GenerateResult>("/api/generate", { method: "POST", body: JSON.stringify(payload) }),
+  gallery: () => req<{ ok: boolean; generations: Generation[] }>("/api/gallery"),
+  examples: () => req<{ ok: boolean; examples: { url: string; prompt: string }[] }>("/api/examples"),
+  checkout: (pack: string) =>
+    req<{ ok: boolean; url?: string }>("/api/billing/checkout", {
+      method: "POST",
+      body: JSON.stringify({ pack, plan: pack }),
+    }),
+  verify: (receipt_id: string) =>
+    req<{ ok: boolean; verdict?: string; verified?: boolean; generation?: Generation; certificate?: Certificate }>(
+      "/api/verify",
+      { method: "POST", body: JSON.stringify({ receipt_id }) }
+    ),
+};
+
+/** SHA-256 of a File/Blob in the browser — used by the honest Verify tool. */
+export async function sha256OfBlob(blob: Blob): Promise<string> {
+  const buf = await blob.arrayBuffer();
+  const digest = await crypto.subtle.digest("SHA-256", buf);
+  return Array.from(new Uint8Array(digest))
+    .map((b) => b.toString(16).padStart(2, "0"))
+    .join("");
+}
+
+export const GOOGLE_START = "/api/auth/google/start?redirect=/app";
+
+export function fmtDate(iso?: string): string {
+  if (!iso) return "—";
+  try {
+    return new Date(iso).toLocaleString("en-US", {
+      month: "short",
+      day: "numeric",
+      year: "numeric",
+      hour: "numeric",
+      minute: "2-digit",
+    });
+  } catch {
+    return iso;
+  }
+}
+
+export function shortHash(h?: string, n = 16): string {
+  if (!h) return "—";
+  return h.length > n ? `${h.slice(0, n)}…` : h;
+}

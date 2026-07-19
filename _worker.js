@@ -30,6 +30,14 @@ export default {
       return fetch(new Request(target.toString(), request));
     }
 
-    return env.ASSETS.fetch(request);
+    // SPA fallback: the front-end is a single-page React app with client routing.
+    // Serve static assets when they exist; otherwise return index.html for
+    // navigation routes like /app, /pricing, /verify, /account.
+    const res = await env.ASSETS.fetch(request);
+    if (res.status === 404 && request.method === "GET" && (request.headers.get("accept") || "").includes("text/html")) {
+      const index = new URL("/index.html", request.url);
+      return env.ASSETS.fetch(new Request(index.toString(), request));
+    }
+    return res;
   }
 }
