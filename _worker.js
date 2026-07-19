@@ -20,6 +20,15 @@ export default {
         return new Response(JSON.stringify({ ok:false, error:"server" }), { status:500, headers:{ "content-type":"application/json" }});
       }
     }
+    // Client-portal glue: /api/portal/* goes to the genie-master-page backend
+    // (owned by nemotron) so the SSO handoff mint is same-origin — no CORS.
+    if (url.pathname.startsWith("/api/portal/")) {
+      const target = new URL(request.url);
+      target.protocol = "https:";
+      target.hostname = env.PORTAL_API_HOST || "genie.cyberhopeai.com";
+      target.port = "";
+      return fetch(new Request(target.toString(), request));
+    }
     // API glue: proxy the rest of /api/* and generated /asset/* to the
     // GenieMade engine so the Studio calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
@@ -30,6 +39,14 @@ export default {
       return fetch(new Request(target.toString(), request));
     }
 
-    return env.ASSETS.fetch(request);
+    // SPA fallback: the front-end is a single-page React app with client routing.
+    // Serve static assets when they exist; otherwise return index.html for
+    // navigation routes like /app, /pricing, /verify, /account.
+    const res = await env.ASSETS.fetch(request);
+    if (res.status === 404 && request.method === "GET" && (request.headers.get("accept") || "").includes("text/html")) {
+      const index = new URL("/index.html", request.url);
+      return env.ASSETS.fetch(new Request(index.toString(), request));
+    }
+    return res;
   }
 }

@@ -1,0 +1,12 @@
+User-agent: *
+# Keep the marketing home, pricing, and verify-public-receipt pages indexed.
+# Disallow the authenticated Studio and account pages — no crawl value, avoids
+# partial-session indexing.
+Disallow: /app
+Disallow: /account
+
+# /verify is a public utility page but has no standalone SEO value; noindex
+# it so crawlers don't index individual receipt-lookup URLs.
+Disallow: /verify
+
+Sitemap: https://geniemadeit.com/sitemap.xml
