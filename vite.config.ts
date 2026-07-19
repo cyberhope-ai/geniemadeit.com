@@ -27,6 +27,12 @@ export default defineConfig({
     port: 3000,
     host: true,
     proxy: {
+      // Client-portal SSO handoff mint (genie-master-page backend)
+      "/api/portal": {
+        target: "https://genie.cyberhopeai.com",
+        changeOrigin: true,
+        secure: true,
+      },
       // Local dev mirror of production _worker.js: same-origin /api + /asset
       // proxied to the GenieMade engine so auth cookies work first-party.
       "/api": {

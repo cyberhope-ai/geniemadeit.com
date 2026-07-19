@@ -11,14 +11,31 @@ import { Seal } from "@/components/brand/Seal";
 import { PaywallModal } from "@/components/PaywallModal";
 import { useSession } from "@/contexts/SessionContext";
 import { api, Generation, fmtDate, shortHash } from "@/lib/api";
+import { openClientDashboard, PORTAL_BRAND_HOST } from "@/lib/portal";
 import { toast } from "sonner";
-import { Download, Copy, LogOut, Sparkles } from "lucide-react";
+import { Download, Copy, LogOut, Sparkles, LayoutDashboard, Loader2 } from "lucide-react";
 
 export default function Account() {
   const { user, loading, logout, refresh } = useSession();
   const [, navigate] = useLocation();
   const [gens, setGens] = useState<Generation[]>([]);
   const [payOpen, setPayOpen] = useState(false);
+  const [portalBusy, setPortalBusy] = useState(false);
+
+  async function gotoClientDashboard() {
+    if (!user || portalBusy) return;
+    setPortalBusy(true);
+    const r = await openClientDashboard(user.email);
+    if (!r.ok) {
+      setPortalBusy(false);
+      if (r.reason === "denied") {
+        toast.error("The portal declined this account — contact support@cyberhopeai.com.");
+      } else {
+        toast.info(`The client dashboard (${PORTAL_BRAND_HOST}) isn't live yet — it's on the way.`);
+      }
+    }
+    // On success the browser navigates away; keep the spinner until then.
+  }
 
   useEffect(() => {
     if (!loading && !user) navigate("/");
@@ -89,6 +106,21 @@ export default function Account() {
             <div className="mt-2 font-display text-5xl font-semibold">{gens.length}</div>
             <Link href="/app" className="btn-ghost-gold mt-5 px-4 py-2 text-sm no-underline inline-flex">Open the Studio</Link>
           </div>
+        </div>
+
+        <div className="gm-panel mt-5 flex flex-wrap items-center justify-between gap-4 p-6">
+          <div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">Client dashboard</div>
+            <p className="mt-1.5 max-w-xl text-sm text-muted-foreground">
+              Projects, proof-backed status, and your scoped AI team live in the GenieMade client
+              portal at <span className="kv-mono text-xs">{PORTAL_BRAND_HOST}</span>. One click signs
+              you in with this account — no second password.
+            </p>
+          </div>
+          <button className="btn-gold px-4 py-2 text-sm" onClick={gotoClientDashboard} disabled={portalBusy} data-testid="open-client-dashboard">
+            {portalBusy ? <Loader2 className="h-4 w-4 animate-spin" /> : <LayoutDashboard className="h-4 w-4" />}
+            {portalBusy ? "Opening…" : "Open client dashboard"}
+          </button>
         </div>
 
         <section className="mt-12">

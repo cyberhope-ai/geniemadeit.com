@@ -79,4 +79,30 @@ like `/app` and `/verify` resolve.
   surfaces them honestly, but worth a look.
 - Consider an account-deletion + email-change endpoint for the dashboard.
 
+## Client-portal SSO handoff (Part B of the GenieMade client integration)
+
+`/account` includes an **"Open client dashboard"** button that hands the signed-in
+user off to the GenieMade-branded client portal (`clients.geniemadeit.com`) on the
+existing multi-brand CyberHope portal backend:
+
+1. `POST /api/portal/mint-handoff { email, genie_host: "clients.geniemadeit.com" }`
+   — same-origin; `_worker.js` proxies `/api/portal/*` to the genie-master-page
+   backend (default `genie.cyberhopeai.com`, overridable with the `PORTAL_API_HOST`
+   Pages env var). No CORS, no local token minting/verification — the portal owns auth.
+2. The response `sso_url` (pinned to the GenieMade brand host) is opened directly;
+   the portal verifies the handoff at `/sso`, sets `chp_session`, and lands the user
+   in the dashboard (auto-provisioning new tenants).
+3. If the backend is unreachable/unconfigured (it currently returns
+   `503 "API not yet configured"`), the UI says the dashboard isn't live yet —
+   it never fakes a login.
+
+**Activation checklist** (outside this repo):
+- [ ] Part A: add the `clients.geniemadeit.com` brand entry to `pcos-client-portal`
+      `apps/api/src/config.ts` + brand theming; deploy on Vercel with
+      `GENIE_BRAND_NAME` / `GENIE_WEB_BASE` env vars.
+- [ ] DNS: **grey-cloud (DNS-only)** CNAME `clients.geniemadeit.com → cname.vercel-dns.com`
+      in the Cloudflare zone (portal is Vercel; do NOT point it at CF Pages).
+- [ ] nemotron: configure the genie-master-page API (DATABASE_URL, JWT_SECRET, …) so
+      `/api/portal/mint-handoff` mints real handoffs.
+
 (c) CyberHope AI
