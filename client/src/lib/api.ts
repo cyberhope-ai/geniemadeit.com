@@ -98,6 +98,7 @@ export interface Account {
   full_name?: string;
   username?: string;
   avatar_url?: string;
+  skilldna_url?: string;
   plan: string;
   credits: number;
   concurrency_limit?: number;
@@ -228,7 +229,7 @@ export const api = {
 
   /* ---- Settings hub (contract per atlas2 spec; 404 until backend ships) ---- */
   account: () => req<{ ok: boolean; account: Account }>("/api/account").then((r) => r.account),
-  updateAccount: (patch: { display_name?: string; username?: string; avatar_url?: string }) =>
+  updateAccount: (patch: { display_name?: string; username?: string; avatar_url?: string; skilldna_url?: string }) =>
     req<{ ok: boolean; account: Account }>("/api/account", {
       method: "PATCH",
       body: JSON.stringify(patch),

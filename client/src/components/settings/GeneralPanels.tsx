@@ -21,6 +21,7 @@ export function AccountPanel() {
   const [state, setState] = useState<PanelState<Account>>({ kind: "loading" });
   const [displayName, setDisplayName] = useState("");
   const [username, setUsername] = useState("");
+  const [skilldnaUrl, setSkilldnaUrl] = useState("");
   const [saving, setSaving] = useState(false);
   const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
@@ -49,6 +50,7 @@ export function AccountPanel() {
         setState({ kind: "ready", data: a });
         setDisplayName(a.display_name || "");
         setUsername(a.username || "");
+        setSkilldnaUrl(a.skilldna_url || "");
       })
       .catch((e) => setState(classifyError(e)));
   }, []);
@@ -58,7 +60,7 @@ export function AccountPanel() {
     if (state.kind !== "ready" || saving) return;
     setSaving(true);
     try {
-      const updated = await api.updateAccount({ display_name: displayName.trim(), username: username.trim() });
+      const updated = await api.updateAccount({ display_name: displayName.trim(), username: username.trim(), skilldna_url: skilldnaUrl.trim() });
       setState({ kind: "ready", data: updated });
       await refresh();
       toast.success("Profile saved.");
@@ -124,6 +126,11 @@ export function AccountPanel() {
                 <Input value={username} onChange={(e) => setUsername(e.target.value)} placeholder="unique-handle" data-testid="username" />
               </label>
             </div>
+            <label className="mt-4 grid gap-1.5 text-sm">
+              <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground">SkillDNA Link</span>
+              <Input value={skilldnaUrl} onChange={(e) => setSkilldnaUrl(e.target.value)} placeholder="https://skilldna.thelannetwork.com/you" data-testid="skilldna-url" />
+              <span className="text-xs text-muted-foreground">Link your SkillDNA profile — your sealed creations can appear there as verifiable proof you made them.</span>
+            </label>
             <button className="btn-gold mt-5 px-5 py-2.5 text-sm" onClick={save} disabled={saving} data-testid="save-profile">
               {saving ? "Saving…" : "Save profile"}
             </button>
