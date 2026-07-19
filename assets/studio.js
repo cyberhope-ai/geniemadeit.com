@@ -90,17 +90,14 @@
         body: JSON.stringify(body),
         credentials: "same-origin",
       });
-      if (res.status === 401) {
-        const j = await res.json().catch(() => ({}));
-        return { ok: false, error: j.error || "auth_required" };
-      }
-      const ct = res.headers.get("content-type") || "";
-      if (res.ok && ct.includes("application/json")) {
-        const j = await res.json();
-        if (typeof j.ok === "boolean") return j; // real engine answered
-      }
-    } catch (_) { /* engine unreachable — fall through to mock */ }
-    return mockGenerate(body);
+      const j = await res.json().catch(() => ({}));
+      if (res.status === 401) return { ok: false, error: j.error || "auth_required" };
+      if (res.ok && typeof j.ok === "boolean") return j; // real engine answered
+      // Real endpoint returned an error — surface it. NEVER fake a result.
+      return { ok: false, error: j.error || "generation_failed", message: j.message || `The engine returned ${res.status}.` };
+    } catch (_) {
+      return { ok: false, error: "network", message: "Couldn't reach the engine. Please try again." };
+    }
   }
 
   // ---- create flow ----
@@ -140,8 +137,8 @@
       els.summon.classList.remove("on"); els.make.disabled = false; openModal("payModal"); return;
     }
     if (!resp.ok) {
-      els.summonSt.textContent = "The lamp flickered — try again.";
-      els.make.disabled = false; setTimeout(() => els.summon.classList.remove("on"), 1600); return;
+      els.summonSt.textContent = resp.message || "That didn't work — please try again.";
+      els.make.disabled = false; setTimeout(() => els.summon.classList.remove("on"), 2600); return;
     }
     els.prog.style.width = "100%";
     const g = resp.generation;
