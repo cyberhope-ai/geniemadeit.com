@@ -223,7 +223,7 @@
     b.textContent = state.signedIn ? state.signedIn.split("@")[0] : "Sign in";
   }
 
-  // ---- auth (mock UI; real session swaps in with atlas2 engine) ----
+  // ---- auth (real email + Google session via the engine) ----
   let authMode = "signin";
   function openAuth(mode) {
     authMode = mode;

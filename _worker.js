@@ -20,7 +20,7 @@ export default {
         return new Response(JSON.stringify({ ok:false, error:"server" }), { status:500, headers:{ "content-type":"application/json" }});
       }
     }
-    // API glue (atlas2): proxy the rest of /api/* and generated /asset/* to the
+    // API glue: proxy the rest of /api/* and generated /asset/* to the
     // GenieMade engine so the Studio calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
       const target = new URL(request.url);
