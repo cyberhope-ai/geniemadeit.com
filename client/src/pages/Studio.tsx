@@ -439,11 +439,11 @@ export default function Studio() {
 
       {/* Vault lightbox with certificate */}
       <Dialog open={!!lightbox} onOpenChange={(v) => !v && setLightbox(null)}>
-        <DialogContent className="gm-panel max-w-3xl border-border max-h-[90vh] overflow-y-auto">
+        <DialogContent className="gm-panel border-border max-h-[90vh] overflow-y-auto" style={{ width: "92vw", maxWidth: "900px" }}>
           {lightbox && (
-            <div className="grid gap-5 md:grid-cols-[1.2fr_1fr]">
-              <div className="overflow-hidden rounded-xl border border-border self-start">
-                {renderMedia(lightbox)}
+            <div className="grid gap-5 md:grid-cols-[0.85fr_1.15fr]">
+              <div className="grid place-items-center overflow-hidden rounded-xl border border-border self-start">
+                {renderMedia(lightbox, "w-full max-h-[400px] object-contain")}
               </div>
               <div className="grid gap-3 self-start">
                 <DialogTitle className="font-display text-xl font-semibold m-0">Sealed creation</DialogTitle>
