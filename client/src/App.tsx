@@ -4,6 +4,7 @@ import NotFound from "@/pages/NotFound";
 import { Route, Switch } from "wouter";
 import { useEffect } from "react";
 import { captureAwin } from "./lib/awin";
+import { captureRef } from "./lib/ref";
 import ErrorBoundary from "./components/ErrorBoundary";
 import { ThemeProvider } from "./contexts/ThemeContext";
 import { SessionProvider } from "./contexts/SessionContext";
@@ -16,6 +17,7 @@ import QSeal from "./pages/QSeal";
 import TripleSeal from "./pages/TripleSeal";
 import RemoveBg from "./pages/RemoveBg";
 import Developers from "./pages/Developers";
+import Affiliates from "./pages/Affiliates";
 
 
 function Router() {
@@ -30,6 +32,7 @@ function Router() {
       <Route path={"/triple-seal"} component={TripleSeal} />
       <Route path={"/remove-bg"} component={RemoveBg} />
       <Route path={"/developers"} component={Developers} />
+      <Route path={"/affiliates"} component={Affiliates} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />
@@ -43,7 +46,7 @@ function Router() {
 // - If you want to make theme switchable, pass `switchable` ThemeProvider and use `useTheme` hook
 
 function App() {
-  useEffect(() => { captureAwin(); }, []);
+  useEffect(() => { captureAwin(); captureRef(); }, []);
   return (
     <ErrorBoundary>
       <ThemeProvider

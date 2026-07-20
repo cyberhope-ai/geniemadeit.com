@@ -5,6 +5,7 @@
  * TRUST STANDARD: never fabricate results — surface real errors verbatim.
  */
 import { getAwin } from "./awin";
+import { getRef } from "./ref";
 
 export interface GmUser {
   id: string;
@@ -210,6 +211,30 @@ export interface ErrorItem {
   error: string;
 }
 
+export interface AffiliateCode {
+  code: string;
+  owner_name: string | null;
+  owner_email: string | null;
+  commission_pct: number;
+  active: number;
+  note: string | null;
+  clicks: number;
+  orders: number;
+  revenue_cents: number;
+  commission_cents: number;
+  created_at: string;
+}
+
+export interface Referral {
+  id: string;
+  code: string;
+  user_id: string | null;
+  amount_cents: number | null;
+  commission_cents: number | null;
+  currency: string | null;
+  created_at: string;
+}
+
 async function req<T>(path: string, init?: RequestInit): Promise<T> {
   const r = await fetch(path, {
     credentials: "same-origin",
@@ -247,7 +272,7 @@ export const api = {
   checkout: (pack: string) =>
     req<{ ok: boolean; url?: string }>("/api/billing/checkout", {
       method: "POST",
-      body: JSON.stringify({ pack, plan: pack, awc: getAwin() }),
+      body: JSON.stringify({ pack, plan: pack, awc: getAwin(), ref: getRef() }),
     }),
   verify: (receipt_id: string, hash?: string) =>
     req<{ ok: boolean; verdict?: "authentic" | "registered" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: (Certificate & { type?: string }); registration?: { owner?: string; registered_at?: string; title?: string | null; thumb_url?: string | null; is_public?: boolean }; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string; confirmed_at?: string | null } }>(
@@ -263,6 +288,13 @@ export const api = {
   listKeys: () => req<{ ok: boolean; keys: { id: string; prefix: string; name: string; created_at: string; last_used_at: string | null; calls: number; revoked: boolean }[] }>("/api/keys"),
   createKey: (name?: string) => req<{ ok: boolean; id: string; name: string; key: string; prefix: string; created_at: string; note: string }>("/api/keys", { method: "POST", body: JSON.stringify({ name }) }),
   revokeKey: (id: string) => req<{ ok: boolean }>(`/api/keys/${encodeURIComponent(id)}/revoke`, { method: "POST" }),
+
+  /* ---- Affiliate program (first-party, $0). Super-admin session only; engine enforces (403 otherwise). ---- */
+  affiliateCodes: () => req<{ ok: boolean; codes: AffiliateCode[] }>("/api/affiliates/codes"),
+  createAffiliateCode: (payload: { code: string; owner_name?: string; owner_email?: string; commission_pct?: number; active?: boolean; note?: string }) =>
+    req<{ ok: boolean; code?: AffiliateCode; error?: string }>("/api/affiliates/codes", { method: "POST", body: JSON.stringify(payload) }),
+  affiliateReferrals: (code?: string) =>
+    req<{ ok: boolean; referrals: Referral[] }>(`/api/affiliates/referrals${code ? `?code=${encodeURIComponent(code)}` : ""}`),
 
   /** QSeal public signing keys — anyone can verify our seals against these. */
   qsealPubkeys: () =>
