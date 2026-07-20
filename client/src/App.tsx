@@ -15,6 +15,7 @@ import Verify from "./pages/Verify";
 import QSeal from "./pages/QSeal";
 import TripleSeal from "./pages/TripleSeal";
 import RemoveBg from "./pages/RemoveBg";
+import Developers from "./pages/Developers";
 
 
 function Router() {
@@ -28,6 +29,7 @@ function Router() {
       <Route path={"/qseal"} component={QSeal} />
       <Route path={"/triple-seal"} component={TripleSeal} />
       <Route path={"/remove-bg"} component={RemoveBg} />
+      <Route path={"/developers"} component={Developers} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

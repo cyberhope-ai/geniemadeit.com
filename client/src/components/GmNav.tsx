@@ -13,6 +13,7 @@ const LINKS = [
   { href: "/verify", label: "Verify" },
   { href: "/triple-seal", label: "Triple Seal" },
   { href: "/qseal", label: "QSeal™" },
+  { href: "/developers", label: "Developers" },
 ];
 
 export function GmNav() {
