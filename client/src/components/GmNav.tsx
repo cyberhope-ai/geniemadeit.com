@@ -4,7 +4,7 @@ import { Link, useLocation } from "wouter";
 import { LampIcon, Wordmark } from "@/components/brand/Lamp";
 import { useSession } from "@/contexts/SessionContext";
 import { AuthModal, AuthMode } from "@/components/AuthModal";
-import { Menu, X } from "lucide-react";
+import { Menu, X, Phone, Mail } from "lucide-react";
 
 const LINKS = [
   { href: "/app", label: "Studio" },
@@ -32,6 +32,19 @@ export function GmNav() {
   return (
     <>
       <header className="sticky top-0 z-40 border-b border-border/60 backdrop-blur-xl" style={{ background: "rgba(19,10,38,.82)" }}>
+        {/* utility bar — contact up top (not buried in the footer) + secondary links */}
+        <div className="border-b border-border/40" style={{ background: "rgba(12,6,26,.55)" }}>
+          <div className="container flex items-center justify-between gap-4 py-1.5 text-xs text-muted-foreground">
+            <div className="flex items-center gap-4">
+              <a href="tel:+13179613077" className="flex items-center gap-1.5 no-underline hover:text-foreground" data-testid="nav-phone"><Phone className="h-3.5 w-3.5" style={{ color: "#f5c451" }} /> (317) 961-3077</a>
+              <a href="mailto:genie@geniemadeit.com" className="hidden items-center gap-1.5 no-underline hover:text-foreground sm:flex"><Mail className="h-3.5 w-3.5" style={{ color: "#f5c451" }} /> genie@geniemadeit.com</a>
+            </div>
+            <div className="flex items-center gap-4">
+              <Link href="/about" className="no-underline hover:text-foreground">About</Link>
+              <Link href="/partners" className="no-underline hover:text-foreground">Partners</Link>
+            </div>
+          </div>
+        </div>
         <nav className="container flex items-center gap-6 py-3.5">
           <Link href="/" className="flex items-center gap-2.5 no-underline">
             <LampIcon className="w-7 h-7" />
@@ -82,6 +95,9 @@ export function GmNav() {
                 {l.label}
               </Link>
             ))}
+            <Link href="/about" onClick={() => setMobile(false)} className="text-foreground no-underline">About</Link>
+            <Link href="/partners" onClick={() => setMobile(false)} className="text-foreground no-underline">Partners</Link>
+            <a href="tel:+13179613077" className="text-muted-foreground no-underline">Call (317) 961-3077</a>
             {user ? (
               <>
                 <Link href="/account" onClick={() => setMobile(false)} className="text-foreground no-underline">

@@ -18,6 +18,8 @@ import TripleSeal from "./pages/TripleSeal";
 import RemoveBg from "./pages/RemoveBg";
 import Developers from "./pages/Developers";
 import Affiliates from "./pages/Affiliates";
+import About from "./pages/About";
+import Partners from "./pages/Partners";
 
 
 function Router() {
@@ -33,6 +35,8 @@ function Router() {
       <Route path={"/remove-bg"} component={RemoveBg} />
       <Route path={"/developers"} component={Developers} />
       <Route path={"/affiliates"} component={Affiliates} />
+      <Route path={"/about"} component={About} />
+      <Route path={"/partners"} component={Partners} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

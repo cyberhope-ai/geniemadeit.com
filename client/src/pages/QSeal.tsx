@@ -76,7 +76,7 @@ export default function QSeal() {
     } catch { /* fall through to mailto if the endpoint is unreachable */ }
     const subject = encodeURIComponent("QSeal API waitlist");
     const body = encodeURIComponent(`Please add me to the QSeal API waitlist.\n\nEmail: ${email}\nCompany: ${company || "—"}`);
-    window.open(`mailto:hello@geniemadeit.com?subject=${subject}&body=${body}`, "_blank");
+    window.open(`mailto:genie@geniemadeit.com?subject=${subject}&body=${body}`, "_blank");
     setJoined(true);
   }
 
