@@ -259,6 +259,9 @@ export const api = {
   anchor: (hash: string) =>
     req<{ ok: boolean; already?: boolean; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string }; cost?: number; credits_remaining?: number; error?: string; message?: string }>("/api/anchor", { method: "POST", body: JSON.stringify({ hash }) }),
   removeBg: (image: string) => req<GenerateResult>("/api/removebg", { method: "POST", body: JSON.stringify({ image }) }),
+  listKeys: () => req<{ ok: boolean; keys: { id: string; prefix: string; name: string; created_at: string; last_used_at: string | null; calls: number; revoked: boolean }[] }>("/api/keys"),
+  createKey: (name?: string) => req<{ ok: boolean; id: string; name: string; key: string; prefix: string; created_at: string; note: string }>("/api/keys", { method: "POST", body: JSON.stringify({ name }) }),
+  revokeKey: (id: string) => req<{ ok: boolean }>(`/api/keys/${encodeURIComponent(id)}/revoke`, { method: "POST" }),
 
   /** QSeal public signing keys — anyone can verify our seals against these. */
   qsealPubkeys: () =>

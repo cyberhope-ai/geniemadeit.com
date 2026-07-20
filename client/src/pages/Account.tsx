@@ -24,6 +24,7 @@ import {
 } from "@/components/settings/BillingPanels";
 import { HistoryPanel, ErrorsPanel, DeveloperPanel } from "@/components/settings/AnalyticsPanels";
 import { VaultPanel } from "@/components/settings/VaultPanel";
+import { ApiKeysPanel } from "@/components/settings/ApiKeysPanel";
 
 type SectionId =
   | "vault"
@@ -70,7 +71,7 @@ const GROUPS: NavGroup[] = [
   {
     label: "Developer",
     items: [
-      { id: "api-keys", label: "API Keys", icon: KeyRound, coming: true },
+      { id: "api-keys", label: "API Keys", icon: KeyRound },
       { id: "webhooks", label: "Webhooks", icon: Webhook, coming: true },
     ],
   },
@@ -264,7 +265,7 @@ export default function Account() {
             {section === "invoices" && <InvoicesPanel />}
             {section === "history" && <HistoryPanel />}
             {section === "errors" && <ErrorsPanel />}
-            {section === "api-keys" && <DeveloperPanel item="api-keys" />}
+            {section === "api-keys" && <ApiKeysPanel />}
             {section === "webhooks" && <DeveloperPanel item="webhooks" />}
           </section>
         </div>
