@@ -4,6 +4,7 @@
  * (dev: vite proxy; prod: Cloudflare Pages _worker.js). Cookies are HttpOnly.
  * TRUST STANDARD: never fabricate results — surface real errors verbatim.
  */
+import { getAwin } from "./awin";
 
 export interface GmUser {
   id: string;
@@ -246,7 +247,7 @@ export const api = {
   checkout: (pack: string) =>
     req<{ ok: boolean; url?: string }>("/api/billing/checkout", {
       method: "POST",
-      body: JSON.stringify({ pack, plan: pack }),
+      body: JSON.stringify({ pack, plan: pack, awc: getAwin() }),
     }),
   verify: (receipt_id: string, hash?: string) =>
     req<{ ok: boolean; verdict?: "authentic" | "registered" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: (Certificate & { type?: string }); registration?: { owner?: string; registered_at?: string; title?: string | null; thumb_url?: string | null; is_public?: boolean }; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string; confirmed_at?: string | null } }>(
