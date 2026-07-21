@@ -31,6 +31,7 @@ export default function RemoveBg() {
   const [running, setRunning] = useState(false);
   const [needAuth, setNeedAuth] = useState(false);
   const [dragOver, setDragOver] = useState(false);
+  const [level, setLevel] = useState<"standard" | "detailed" | "soft">("detailed");
   const fileRef = useRef<HTMLInputElement>(null);
 
   useEffect(() => { document.title = "Remove background — free · batch · GenieMade"; }, []);
@@ -61,7 +62,7 @@ export default function RemoveBg() {
       for (let w = 0; w < 20 && !dataUri; w++) { await new Promise((r) => setTimeout(r, 150)); dataUri = (items.find((x) => x.id === it.id)?.dataUri) || ""; }
       setItems((prev) => prev.map((x) => (x.id === it.id ? { ...x, status: "processing" } : x)));
       try {
-        const j = await api.removeBg(dataUri);
+        const j = await api.removeBg(dataUri, level);
         if (j.generation) setItems((prev) => prev.map((x) => (x.id === it.id ? { ...x, status: "done", result: j.generation } : x)));
         else setItems((prev) => prev.map((x) => (x.id === it.id ? { ...x, status: "error", err: j.message || "couldn't process" } : x)));
       } catch (e) {
@@ -112,6 +113,29 @@ export default function RemoveBg() {
           <button className="btn-gold px-5 py-2.5" onClick={() => fileRef.current?.click()}>Choose images</button>
           <span className="text-xs opacity-70">…or drop them here · PNG · JPG · WebP · up to {MAX} at once</span>
           <input ref={fileRef} type="file" accept="image/*" multiple className="hidden" onChange={(e) => e.target.files && addFiles(e.target.files)} />
+        </div>
+
+        {/* edge quality — controls how much fine/soft edge detail we keep vs cut */}
+        <div className="mt-5 flex flex-wrap items-center gap-2">
+          <span className="text-xs font-medium text-muted-foreground">Edge quality:</span>
+          {([
+            ["standard", "Standard"],
+            ["detailed", "Detailed"],
+            ["soft", "Soft edges"],
+          ] as const).map(([key, label]) => (
+            <button
+              key={key}
+              type="button"
+              onClick={() => setLevel(key)}
+              className="rounded-xl border px-3 py-1.5 text-xs transition-colors"
+              style={level === key ? { borderColor: "#f5c451", color: "#f5c451", background: "rgba(245,196,81,.1)" } : { borderColor: "var(--border,#2a2f3a)", color: "var(--muted-foreground)" }}
+            >
+              {label}
+            </button>
+          ))}
+          <span className="text-xs text-muted-foreground">
+            — {level === "standard" ? "fastest, for simple subjects" : level === "detailed" ? "keeps fine & glowing edges like logos and text (recommended)" : "best for hair, fur, glass & glow"}
+          </span>
         </div>
 
         {needAuth && (

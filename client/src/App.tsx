@@ -20,6 +20,7 @@ import Developers from "./pages/Developers";
 import Affiliates from "./pages/Affiliates";
 import About from "./pages/About";
 import Partners from "./pages/Partners";
+import Authenticity from "./pages/Authenticity";
 
 
 function Router() {
@@ -37,6 +38,7 @@ function Router() {
       <Route path={"/affiliates"} component={Affiliates} />
       <Route path={"/about"} component={About} />
       <Route path={"/partners"} component={Partners} />
+      <Route path={"/authenticity"} component={Authenticity} />
       <Route path={"/404"} component={NotFound} />
       {/* Final fallback route */}
       <Route component={NotFound} />

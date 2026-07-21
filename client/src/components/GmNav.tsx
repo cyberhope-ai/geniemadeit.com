@@ -12,6 +12,7 @@ const LINKS = [
   { href: "/pricing", label: "Pricing" },
   { href: "/verify", label: "Verify" },
   { href: "/triple-seal", label: "Triple Seal" },
+  { href: "/authenticity", label: "Authenticity" },
   { href: "/qseal", label: "QSeal™" },
   { href: "/developers", label: "Developers" },
 ];

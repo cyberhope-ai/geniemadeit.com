@@ -149,7 +149,7 @@ export default function Affiliates() {
                   </div>
                 </label>
               </form>
-              <p className="mt-2 text-xs text-muted-foreground">20% is the SaaS sweet spot. You can raise a top partner to 25–30% anytime — just re-save the same code.</p>
+              <p className="mt-2 text-xs text-muted-foreground">30% for the launch push — generous to drive early growth. Adjust per partner anytime — just re-save the same code.</p>
             </section>
 
             {/* codes */}

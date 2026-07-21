@@ -59,7 +59,7 @@ export default function Partners() {
           <div className="kicker mb-3 text-xs font-semibold uppercase tracking-[.22em]" style={{ color: "#66e3e8" }}>The deal</div>
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="gm-panel p-5">
-              <div className="font-display text-4xl font-semibold gold-text">20%</div>
+              <div className="font-display text-4xl font-semibold gold-text">30%</div>
               <div className="mt-1 text-sm text-muted-foreground">commission on every referred order. Top partners earn more.</div>
             </div>
             <div className="gm-panel p-5">

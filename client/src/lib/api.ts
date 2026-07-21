@@ -269,11 +269,14 @@ export const api = {
   job: (id: string) => req<JobResult>(`/api/jobs/${encodeURIComponent(id)}`),
   gallery: () => req<{ ok: boolean; generations: Generation[] }>("/api/gallery"),
   examples: () => req<{ ok: boolean; examples: { url: string; prompt: string }[] }>("/api/examples"),
-  checkout: (pack: string) =>
-    req<{ ok: boolean; url?: string }>("/api/billing/checkout", {
-      method: "POST",
-      body: JSON.stringify({ pack, plan: pack, awc: getAwin(), ref: getRef() }),
-    }),
+  checkout: (pack: string) => {
+    // Rewardful attribution: pass the tracking script's referral UUID as client_reference_id (server-side
+    // checkout). Guarded — harmless if the Rewardful snippet hasn't loaded / no referral present.
+    const body: Record<string, unknown> = { pack, plan: pack, awc: getAwin(), ref: getRef() };
+    const rw = (window as unknown as { Rewardful?: { referral?: string } }).Rewardful?.referral;
+    if (rw) body.client_reference_id = rw;
+    return req<{ ok: boolean; url?: string }>("/api/billing/checkout", { method: "POST", body: JSON.stringify(body) });
+  },
   verify: (receipt_id: string, hash?: string) =>
     req<{ ok: boolean; verdict?: "authentic" | "registered" | "unknown" | "no_receipt" | string; verified?: boolean; generation?: Partial<Generation>; certificate?: (Certificate & { type?: string }); registration?: { owner?: string; registered_at?: string; title?: string | null; thumb_url?: string | null; is_public?: boolean }; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string; confirmed_at?: string | null } }>(
       "/api/verify",
@@ -284,7 +287,7 @@ export const api = {
   registryRecent: () => req<{ ok: boolean; count: number; registrations: { receipt_id: string; owner: string; title: string | null; hash_short: string; thumb_url: string | null; created_at: string; verify_url: string }[] }>("/api/registry/recent"),
   anchor: (hash: string) =>
     req<{ ok: boolean; already?: boolean; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string }; cost?: number; credits_remaining?: number; error?: string; message?: string }>("/api/anchor", { method: "POST", body: JSON.stringify({ hash }) }),
-  removeBg: (image: string) => req<GenerateResult>("/api/removebg", { method: "POST", body: JSON.stringify({ image }) }),
+  removeBg: (image: string, level?: string) => req<GenerateResult>("/api/removebg", { method: "POST", body: JSON.stringify({ image, level }) }),
   listKeys: () => req<{ ok: boolean; keys: { id: string; prefix: string; name: string; created_at: string; last_used_at: string | null; calls: number; revoked: boolean }[] }>("/api/keys"),
   createKey: (name?: string) => req<{ ok: boolean; id: string; name: string; key: string; prefix: string; created_at: string; note: string }>("/api/keys", { method: "POST", body: JSON.stringify({ name }) }),
   revokeKey: (id: string) => req<{ ok: boolean }>(`/api/keys/${encodeURIComponent(id)}/revoke`, { method: "POST" }),
