@@ -10,7 +10,8 @@ import { toast } from "sonner";
 import { api, Generation, Certificate, fmtDate } from "@/lib/api";
 import { CertCard } from "@/components/CertCard";
 import { Seal } from "@/components/brand/Seal";
-import { Loader2, Download, ShieldCheck, ExternalLink, Sparkles, X, Cloud, Globe, Trash2, ZoomIn } from "lucide-react";
+import { useSession } from "@/contexts/SessionContext";
+import { Loader2, Download, ShieldCheck, ExternalLink, Sparkles, X, Cloud, Globe, Trash2, ZoomIn, FileText } from "lucide-react";
 
 export function VaultPanel() {
   const [gens, setGens] = useState<Generation[]>([]);
@@ -23,6 +24,7 @@ export function VaultPanel() {
   const [autoPub, setAutoPub] = useState(false);
   const [delConfirm, setDelConfirm] = useState(false);
   const [zoom, setZoom] = useState<string | null>(null);
+  const { user } = useSession();
 
   useEffect(() => {
     api.gallery().then((j) => setGens(j.generations || [])).catch(() => {}).finally(() => setLoading(false));
@@ -59,6 +61,24 @@ export function VaultPanel() {
     if (!sel) return;
     try { await api.vaultDelete(sel.id); setGens((g) => g.filter((x) => x.id !== sel.id)); setSel(null); toast.success("Deleted from your Vault"); }
     catch { toast.error("Couldn't delete — try again."); }
+  }
+
+  async function downloadCert() {
+    if (!sel) return;
+    const rid = cert?.receipt_id || sel.cert_id || "";
+    try {
+      const { generateCertificate } = await import("@/lib/certificate");
+      await generateCertificate({
+        imageUrl: sel.url,
+        owner: user?.email ? user.email.split("@")[0] : "Creator",
+        title: sel.prompt || null,
+        date: sel.created_at,
+        hash: cert?.hash || sel.hash || null,
+        receiptId: rid,
+        verifyUrl: `https://geniemadeit.com/verify?receipt=${rid}`,
+        capability: sel.capability,
+      });
+    } catch { toast.error("Couldn't generate the certificate — try again."); }
   }
 
   async function open(g: Generation) {
@@ -159,6 +179,7 @@ export function VaultPanel() {
                   {!sel.capability?.startsWith("video") && !sel.capability?.startsWith("audio") && (
                     <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm text-muted-foreground hover:text-foreground" onClick={() => setZoom(sel.url)}><ZoomIn className="h-4 w-4" /> Zoom in</button>
                   )}
+                  <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm text-muted-foreground hover:text-foreground" onClick={downloadCert}><FileText className="h-4 w-4" /> Certificate (PDF)</button>
                 </div>
                 {(() => {
                   const isPub = regPub[(sel.hash || "").slice(0, 16)] === true;
