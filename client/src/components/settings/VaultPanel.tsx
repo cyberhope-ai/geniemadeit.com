@@ -10,7 +10,7 @@ import { toast } from "sonner";
 import { api, Generation, Certificate, fmtDate } from "@/lib/api";
 import { CertCard } from "@/components/CertCard";
 import { Seal } from "@/components/brand/Seal";
-import { Loader2, Download, ShieldCheck, ExternalLink, Sparkles, X, Cloud, Globe } from "lucide-react";
+import { Loader2, Download, ShieldCheck, ExternalLink, Sparkles, X, Cloud, Globe, Trash2, ZoomIn } from "lucide-react";
 
 export function VaultPanel() {
   const [gens, setGens] = useState<Generation[]>([]);
@@ -21,6 +21,8 @@ export function VaultPanel() {
   const [confirming, setConfirming] = useState(false);
   const [pubBusy, setPubBusy] = useState(false);
   const [autoPub, setAutoPub] = useState(false);
+  const [delConfirm, setDelConfirm] = useState(false);
+  const [zoom, setZoom] = useState<string | null>(null);
 
   useEffect(() => {
     api.gallery().then((j) => setGens(j.generations || [])).catch(() => {}).finally(() => setLoading(false));
@@ -53,9 +55,16 @@ export function VaultPanel() {
     setPubBusy(false);
   }
 
+  async function doDelete() {
+    if (!sel) return;
+    try { await api.vaultDelete(sel.id); setGens((g) => g.filter((x) => x.id !== sel.id)); setSel(null); toast.success("Deleted from your Vault"); }
+    catch { toast.error("Couldn't delete — try again."); }
+  }
+
   async function open(g: Generation) {
     setSel(g);
     setConfirming(false);
+    setDelConfirm(false);
     // seed the certificate from the gallery row, then enrich with the full signed verdict
     setCert({ hash: g.hash, receipt_id: g.cert_id, issued_at: g.created_at } as Certificate);
     if (g.cert_id) {
@@ -138,7 +147,7 @@ export function VaultPanel() {
               <div className="overflow-hidden rounded-xl border border-border">
                 {sel.capability?.startsWith("video") ? <video src={sel.url} controls loop className="w-full" /> :
                  sel.capability?.startsWith("audio") ? <audio src={sel.url} controls className="w-full" /> :
-                 <img src={sel.url} alt={sel.prompt || "creation"} className="w-full" />}
+                 <img src={sel.url} alt={sel.prompt || "creation"} className="w-full cursor-zoom-in" onClick={() => setZoom(sel.url)} />}
               </div>
               <div>
                 <CertCard cert={cert} model={sel.model} prompt={sel.prompt} capability={sel.capability} />
@@ -147,6 +156,9 @@ export function VaultPanel() {
                   <Link href={`/verify?receipt=${sel.cert_id || ""}`} className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm text-muted-foreground no-underline hover:text-foreground">
                     <ExternalLink className="h-4 w-4" /> Verify its certificate
                   </Link>
+                  {!sel.capability?.startsWith("video") && !sel.capability?.startsWith("audio") && (
+                    <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm text-muted-foreground hover:text-foreground" onClick={() => setZoom(sel.url)}><ZoomIn className="h-4 w-4" /> Zoom in</button>
+                  )}
                 </div>
                 {(() => {
                   const isPub = regPub[(sel.hash || "").slice(0, 16)] === true;
@@ -171,10 +183,29 @@ export function VaultPanel() {
                     </div>
                   );
                 })()}
+                {delConfirm ? (
+                  <div className="mt-2 rounded-xl border p-3" style={{ borderColor: "rgba(255,157,180,.4)", background: "rgba(255,157,180,.06)" }}>
+                    <p className="m-0 text-xs" style={{ color: "#ff9db4" }}>Delete this from your Vault? The file is removed. Its authentication record is kept.</p>
+                    <div className="mt-2 flex gap-2">
+                      <button className="rounded-lg px-3 py-1.5 text-xs font-semibold" style={{ background: "#ff9db4", color: "#2a0d15" }} onClick={doDelete}>Yes, delete</button>
+                      <button className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground" onClick={() => setDelConfirm(false)}>Cancel</button>
+                    </div>
+                  </div>
+                ) : (
+                  <button className="mt-2 flex items-center gap-1.5 text-xs text-muted-foreground transition-colors hover:text-[#ff9db4]" onClick={() => setDelConfirm(true)}><Trash2 className="h-3.5 w-3.5" /> Delete from Vault</button>
+                )}
                 <p className="mt-3 text-[11px] text-muted-foreground">Save the download into your OneDrive, Dropbox, Google Drive, or iCloud — those folders sync from your device. One-click cloud connections are coming.</p>
               </div>
             </div>
           </div>
+        </div>
+      )}
+
+      {/* full-screen zoom */}
+      {zoom && (
+        <div className="fixed inset-0 z-[60] grid cursor-zoom-out place-items-center bg-black/90 p-4" onClick={() => setZoom(null)}>
+          <img src={zoom} alt="" className="max-h-[95vh] max-w-[95vw] object-contain" />
+          <button className="absolute right-4 top-4 rounded-full border border-white/25 p-2 text-white/80 hover:text-white" onClick={() => setZoom(null)} aria-label="Close"><X className="h-5 w-5" /></button>
         </div>
       )}
     </div>

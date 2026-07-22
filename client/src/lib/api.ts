@@ -289,6 +289,7 @@ export const api = {
   registryPublish: (body: { receipt_id?: string; hash?: string; is_public: boolean }) => req<{ ok: boolean; receipt_id: string; is_public: boolean }>("/api/registry/publish", { method: "POST", body: JSON.stringify(body) }),
   autoPublishGet: () => req<{ ok: boolean; auto_publish: boolean }>("/api/settings/auto-publish"),
   autoPublishSet: (enabled: boolean) => req<{ ok: boolean; auto_publish: boolean }>("/api/settings/auto-publish", { method: "POST", body: JSON.stringify({ enabled }) }),
+  vaultDelete: (id: string) => req<{ ok: boolean; deleted: string }>("/api/vault/delete", { method: "POST", body: JSON.stringify({ id }) }),
   anchor: (hash: string) =>
     req<{ ok: boolean; already?: boolean; anchor?: { chain?: string; status?: string; block_height?: number | null; submitted_at?: string }; cost?: number; credits_remaining?: number; error?: string; message?: string }>("/api/anchor", { method: "POST", body: JSON.stringify({ hash }) }),
   removeBg: (image: string, level?: string) => req<GenerateResult>("/api/removebg", { method: "POST", body: JSON.stringify({ image, level }) }),
