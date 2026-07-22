@@ -18,7 +18,7 @@ export function VaultPanel() {
   const [loading, setLoading] = useState(true);
   const [sel, setSel] = useState<Generation | null>(null);
   const [cert, setCert] = useState<Certificate | null>(null);
-  const [regPub, setRegPub] = useState<Record<string, boolean>>({});
+  const [regPub, setRegPub] = useState<Record<string, { pub: boolean; rid: string }>>({});
   const [confirming, setConfirming] = useState(false);
   const [pubBusy, setPubBusy] = useState(false);
   const [autoPub, setAutoPub] = useState(false);
@@ -32,8 +32,8 @@ export function VaultPanel() {
 
   useEffect(() => {
     api.registryMine().then((j) => {
-      const m: Record<string, boolean> = {};
-      (j.registrations || []).forEach((r) => { m[r.hash_short] = r.is_public; });
+      const m: Record<string, { pub: boolean; rid: string }> = {};
+      (j.registrations || []).forEach((r) => { m[r.hash_short] = { pub: r.is_public, rid: r.receipt_id }; });
       setRegPub(m);
     }).catch(() => {});
     api.autoPublishGet().then((j) => setAutoPub(!!j.auto_publish)).catch(() => {});
@@ -49,8 +49,8 @@ export function VaultPanel() {
     if (!sel?.hash) return;
     setPubBusy(true);
     try {
-      await api.registryPublish({ hash: sel.hash, is_public: makePublic });
-      setRegPub((p) => ({ ...p, [sel.hash!.slice(0, 16)]: makePublic }));
+      const r = await api.registryPublish({ hash: sel.hash, is_public: makePublic });
+      setRegPub((p) => ({ ...p, [sel.hash!.slice(0, 16)]: { pub: makePublic, rid: r.receipt_id } }));
       setConfirming(false);
       toast.success(makePublic ? "Published to the EverVerify registry" : "Made private");
     } catch { toast.error("Couldn't update — try again."); }
@@ -182,12 +182,13 @@ export function VaultPanel() {
                   <button className="flex w-full items-center justify-center gap-2 rounded-xl border border-border py-2.5 text-sm text-muted-foreground hover:text-foreground" onClick={downloadCert}><FileText className="h-4 w-4" /> Certificate (PDF)</button>
                 </div>
                 {(() => {
-                  const isPub = regPub[(sel.hash || "").slice(0, 16)] === true;
+                  const reg = regPub[(sel.hash || "").slice(0, 16)];
+                  const isPub = reg?.pub === true;
                   return (
                     <div className="mt-2 rounded-xl border border-border p-3">
                       {isPub ? (
                         <div className="flex items-center justify-between gap-2">
-                          <span className="flex items-center gap-1.5 text-sm" style={{ color: "#66e3e8" }}><Globe className="h-4 w-4" /> On the public EverVerify wall</span>
+                          <a href={`https://eververify.org/r/${reg?.rid || ""}`} target="_blank" rel="noreferrer" className="flex items-center gap-1.5 text-sm no-underline hover:underline" style={{ color: "#66e3e8" }}><Globe className="h-4 w-4" /> View on EverVerify ↗</a>
                           <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => doPublish(false)} disabled={pubBusy}>{pubBusy ? "…" : "Make private"}</button>
                         </div>
                       ) : confirming ? (
