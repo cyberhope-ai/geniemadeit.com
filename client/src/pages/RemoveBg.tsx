@@ -134,7 +134,7 @@ export default function RemoveBg() {
             </button>
           ))}
           <span className="text-xs text-muted-foreground">
-            — {level === "standard" ? "fastest, for simple subjects" : level === "detailed" ? "keeps fine & glowing edges like logos and text (recommended)" : "best for hair, fur, glass & glow"}
+            — {level === "standard" ? "fastest — but can clip fine text; use Detailed for logos" : level === "detailed" ? "keeps fine text & glowing edges — best for logos (recommended)" : "best for hair, fur, glass & glow"}
           </span>
         </div>
 
