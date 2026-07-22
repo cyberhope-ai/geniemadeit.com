@@ -9,20 +9,45 @@ import { Link } from "wouter";
 import { toast } from "sonner";
 import { api, Generation, Certificate, fmtDate } from "@/lib/api";
 import { CertCard } from "@/components/CertCard";
-import { Loader2, Download, ShieldCheck, ExternalLink, Sparkles, X, Cloud } from "lucide-react";
+import { Seal } from "@/components/brand/Seal";
+import { Loader2, Download, ShieldCheck, ExternalLink, Sparkles, X, Cloud, Globe } from "lucide-react";
 
 export function VaultPanel() {
   const [gens, setGens] = useState<Generation[]>([]);
   const [loading, setLoading] = useState(true);
   const [sel, setSel] = useState<Generation | null>(null);
   const [cert, setCert] = useState<Certificate | null>(null);
+  const [regPub, setRegPub] = useState<Record<string, boolean>>({});
+  const [confirming, setConfirming] = useState(false);
+  const [pubBusy, setPubBusy] = useState(false);
 
   useEffect(() => {
     api.gallery().then((j) => setGens(j.generations || [])).catch(() => {}).finally(() => setLoading(false));
   }, []);
 
+  useEffect(() => {
+    api.registryMine().then((j) => {
+      const m: Record<string, boolean> = {};
+      (j.registrations || []).forEach((r) => { m[r.hash_short] = r.is_public; });
+      setRegPub(m);
+    }).catch(() => {});
+  }, []);
+
+  async function doPublish(makePublic: boolean) {
+    if (!sel?.hash) return;
+    setPubBusy(true);
+    try {
+      await api.registryPublish({ hash: sel.hash, is_public: makePublic });
+      setRegPub((p) => ({ ...p, [sel.hash!.slice(0, 16)]: makePublic }));
+      setConfirming(false);
+      toast.success(makePublic ? "Published to the EverVerify registry" : "Made private");
+    } catch { toast.error("Couldn't update — try again."); }
+    setPubBusy(false);
+  }
+
   async function open(g: Generation) {
     setSel(g);
+    setConfirming(false);
     // seed the certificate from the gallery row, then enrich with the full signed verdict
     setCert({ hash: g.hash, receipt_id: g.cert_id, issued_at: g.created_at } as Certificate);
     if (g.cert_id) {
@@ -83,6 +108,7 @@ export function VaultPanel() {
             <button key={g.id} onClick={() => open(g)} className="group relative overflow-hidden rounded-xl border border-border transition-colors hover:border-[color:rgba(200,143,44,.6)]" data-testid="vault-item">
               {thumb(g, "aspect-square w-full object-cover transition-transform duration-300 group-hover:scale-[1.04]")}
               <span className="absolute left-2 top-2 rounded-full bg-black/55 px-2 py-0.5 text-[10px] font-semibold uppercase tracking-wide text-white/90">{(g.capability || "").split(".")[0]}</span>
+              <span className="absolute right-2 top-2 grid h-7 w-7 place-items-center rounded-full bg-black/60 ring-1 ring-[color:rgba(245,196,81,.55)]" title="Sealed with a Certificate of Authenticity"><Seal className="h-4 w-4" /></span>
               <span className="absolute bottom-0 left-0 right-0 flex items-center gap-1 bg-gradient-to-t from-black/70 to-transparent px-2 py-1.5 text-[10px] text-white/85"><ShieldCheck className="h-3 w-3" style={{ color: "#66e3e8" }} /> Sealed · {g.created_at ? fmtDate(g.created_at) : ""}</span>
             </button>
           ))}
@@ -108,6 +134,29 @@ export function VaultPanel() {
                     <ExternalLink className="h-4 w-4" /> Verify its certificate
                   </Link>
                 </div>
+                {(() => {
+                  const isPub = regPub[(sel.hash || "").slice(0, 16)] === true;
+                  return (
+                    <div className="mt-2 rounded-xl border border-border p-3">
+                      {isPub ? (
+                        <div className="flex items-center justify-between gap-2">
+                          <span className="flex items-center gap-1.5 text-sm" style={{ color: "#66e3e8" }}><Globe className="h-4 w-4" /> On the public EverVerify wall</span>
+                          <button className="text-xs text-muted-foreground hover:text-foreground" onClick={() => doPublish(false)} disabled={pubBusy}>{pubBusy ? "…" : "Make private"}</button>
+                        </div>
+                      ) : confirming ? (
+                        <div>
+                          <p className="m-0 text-xs text-muted-foreground">Add this to the <b className="text-foreground">public</b> EverVerify registry? You can make it private again anytime — the authentication record itself stays permanent.</p>
+                          <div className="mt-2 flex gap-2">
+                            <button className="btn-gold px-3 py-1.5 text-xs" onClick={() => doPublish(true)} disabled={pubBusy}>{pubBusy ? "Publishing…" : "Yes, publish it"}</button>
+                            <button className="rounded-lg border border-border px-3 py-1.5 text-xs text-muted-foreground hover:text-foreground" onClick={() => setConfirming(false)}>Cancel</button>
+                          </div>
+                        </div>
+                      ) : (
+                        <button className="flex w-full items-center justify-center gap-2 text-sm text-muted-foreground hover:text-foreground" onClick={() => setConfirming(true)}><Globe className="h-4 w-4" /> Publish to EverVerify</button>
+                      )}
+                    </div>
+                  );
+                })()}
                 <p className="mt-3 text-[11px] text-muted-foreground">Save the download into your OneDrive, Dropbox, Google Drive, or iCloud — those folders sync from your device. One-click cloud connections are coming.</p>
               </div>
             </div>
