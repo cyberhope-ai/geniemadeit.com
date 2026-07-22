@@ -20,6 +20,7 @@ export function VaultPanel() {
   const [regPub, setRegPub] = useState<Record<string, boolean>>({});
   const [confirming, setConfirming] = useState(false);
   const [pubBusy, setPubBusy] = useState(false);
+  const [autoPub, setAutoPub] = useState(false);
 
   useEffect(() => {
     api.gallery().then((j) => setGens(j.generations || [])).catch(() => {}).finally(() => setLoading(false));
@@ -31,7 +32,14 @@ export function VaultPanel() {
       (j.registrations || []).forEach((r) => { m[r.hash_short] = r.is_public; });
       setRegPub(m);
     }).catch(() => {});
+    api.autoPublishGet().then((j) => setAutoPub(!!j.auto_publish)).catch(() => {});
   }, []);
+
+  async function setAuto(v: boolean) {
+    setAutoPub(v);
+    try { await api.autoPublishSet(v); toast.success(v ? "New creations will auto-publish to EverVerify" : "New creations stay private until you publish"); }
+    catch { setAutoPub(!v); toast.error("Couldn't save that setting."); }
+  }
 
   async function doPublish(makePublic: boolean) {
     if (!sel?.hash) return;
@@ -83,6 +91,12 @@ export function VaultPanel() {
         </div>
         <Link href="/app" className="btn-gold px-4 py-2 text-sm no-underline"><Sparkles className="h-4 w-4" /> Make a new one</Link>
       </div>
+
+      {/* auto-publish to EverVerify */}
+      <label className="mt-4 flex cursor-pointer items-start gap-2.5 rounded-xl border border-border p-3 text-sm">
+        <input type="checkbox" checked={autoPub} onChange={(e) => setAuto(e.target.checked)} className="mt-0.5 h-4 w-4 accent-[#f5c451]" />
+        <span className="flex items-start gap-2"><Globe className="mt-0.5 h-4 w-4 flex-shrink-0" style={{ color: "#66e3e8" }} /><span><b className="text-foreground">Auto-publish new creations to EverVerify.</b> <span className="text-muted-foreground">Off (default) — each creation stays private until you publish it. On — every new creation is added to the public registry automatically.</span></span></span>
+      </label>
 
       {/* storage / ownership note — honest */}
       <div className="mt-5 flex items-start gap-3 rounded-xl border border-border p-4 text-sm">
