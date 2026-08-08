@@ -1,5 +1,5 @@
 export default {
-  async fetch(request, env) {
+  async fetch(request, env, ctx) {
     const url = new URL(request.url);
     if (url.pathname === "/api/waitlist") {
       if (request.method !== "POST")
@@ -20,8 +20,20 @@ export default {
         return new Response(JSON.stringify({ ok:false, error:"server" }), { status:500, headers:{ "content-type":"application/json" }});
       }
     }
-    // API glue: proxy the rest of /api/* and generated /asset/* to the
-    // GenieMade engine so the Studio calls same-origin and never touches a provider.
+    // Cache generated/registry images at the geniemadeit edge (immutable, content-addressed):
+    // repeat views serve from cache and skip the engine + R2 entirely.
+    if (url.pathname.startsWith("/asset/") && request.method === "GET") {
+      const cache = caches.default;
+      const hit = await cache.match(request);
+      if (hit) return hit;
+      const t = new URL(request.url);
+      t.protocol = "https:"; t.hostname = "geniemade-engine.cyberhopeai.workers.dev"; t.port = "";
+      const resp = await fetch(new Request(t.toString(), request));
+      if (resp.ok) { const c = new Response(resp.body, resp); ctx.waitUntil(cache.put(request, c.clone())); return c; }
+      return resp;
+    }
+    // API glue: proxy the rest of /api/* to the GenieMade engine so the Studio
+    // calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
       const target = new URL(request.url);
       target.protocol = "https:";
