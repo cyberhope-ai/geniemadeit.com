@@ -340,7 +340,7 @@
       const referral = (window.Rewardful && window.Rewardful.referral) || undefined;
       const r = await fetch("/api/billing/checkout", {
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
-        body: JSON.stringify({ plan, pack: plan, referral }),
+        body: JSON.stringify({ plan, pack: plan, client_reference_id: referral }),
       });
       if (r.status === 401) { openAuth("signup"); return; }
       const j = await r.json().catch(() => ({}));
