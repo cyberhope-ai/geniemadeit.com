@@ -65,9 +65,10 @@
     if (href) { window.location.href = href; return; }
     const label = btn.textContent; btn.textContent = "Loading…"; btn.disabled = true;
     try {
+      const referral = (window.Rewardful && window.Rewardful.referral) || undefined;
       const r = await fetch("/api/billing/checkout", {
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
-        body: JSON.stringify({ plan }),
+        body: JSON.stringify({ plan, pack: plan, referral }),
       });
       if (r.status === 401) { openAuth("signup"); return; }
       const j = await r.json();

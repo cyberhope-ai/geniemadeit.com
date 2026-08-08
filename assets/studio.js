@@ -326,12 +326,30 @@
     $("#authSubmit").onclick = doAuth;
     $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth("signup"); };
-    $("#checkoutBtn").onclick = () => { alert("Secure Stripe checkout opens here once billing is live."); };
+    $$("#payModal button[data-plan]").forEach((b) => b.onclick = () => studioCheckout(b.dataset.plan));
     $$("[data-close]").forEach((b) => b.onclick = closeModals);
     $$(".modal, .lb").forEach((m) => m.addEventListener("click", (e) => { if (e.target === m) closeModals(); }));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModals(); });
   }
   function escapeHtml(s) { return (s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
+
+  // ---- in-app checkout: real Stripe session (was a dead alert). Carries the Rewardful referral. ----
+  async function studioCheckout(plan) {
+    if (!state.signedIn) { openAuth("signup"); return; }
+    try {
+      const referral = (window.Rewardful && window.Rewardful.referral) || undefined;
+      const r = await fetch("/api/billing/checkout", {
+        method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
+        body: JSON.stringify({ plan, pack: plan, referral }),
+      });
+      if (r.status === 401) { openAuth("signup"); return; }
+      const j = await r.json().catch(() => ({}));
+      if (j && (j.url || j.checkout_url)) { window.location.href = j.url || j.checkout_url; return; }
+      alert("Checkout is temporarily unavailable. Please try again in a moment.");
+    } catch (_) {
+      alert("Checkout is temporarily unavailable. Please try again in a moment.");
+    }
+  }
 
   // ---- gold dust (brand continuity) ----
   function dust() {
