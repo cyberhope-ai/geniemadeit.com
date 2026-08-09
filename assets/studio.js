@@ -250,6 +250,18 @@
 
   // ---- auth (real email + Google session via the engine) ----
   let authMode = "signin";
+  // ---- Turnstile bot-guard (only the signup path mints free credits) ----
+  const TS_SITEKEY = "0x4AAAAAAELcSNe5KdmNBXR9";
+  let tsWidgetId = null;
+  function renderTurnstile() {
+    if (!window.turnstile) return;
+    const box = $("#tsBox"); if (!box) return;
+    if (tsWidgetId !== null) { try { window.turnstile.reset(tsWidgetId); } catch (_) {} return; }
+    try { tsWidgetId = window.turnstile.render(box, { sitekey: TS_SITEKEY, appearance: "interaction-only", theme: "dark" }); } catch (_) {}
+  }
+  window.gmTsReady = renderTurnstile; // fired by the Turnstile api.js onload
+  function tsToken() { try { return (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : ""; } catch (_) { return ""; } }
+  const AUTH_MSG = { email_exists: "That email already has an account — try signing in.", human_check_failed: "The human check didn't pass — please try again.", bad_credentials: "Email or password is incorrect.", invalid_input: "Enter a valid email and an 8+ character password." };
   function openAuth(mode) {
     authMode = mode;
     $("#authTitle").textContent = mode === "signin" ? "Welcome back" : "Create your account";
@@ -257,6 +269,7 @@
     $("#authSubmit").textContent = mode === "signin" ? "Sign in" : "Create account";
     $("#authSwap").innerHTML = mode === "signin" ? `New here? <a href="#" id="swapLink">Create an account</a>` : `Already have an account? <a href="#" id="swapLink">Sign in</a>`;
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth(mode === "signin" ? "signup" : "signin"); };
+    renderTurnstile();
     openModal("authModal");
   }
   async function doAuth() {
@@ -267,9 +280,15 @@
     const btn = $("#authSubmit"); const label = btn.textContent; btn.textContent = "…"; btn.disabled = true;
     try {
       const ep = authMode === "signup" ? "/api/auth/signup" : "/api/auth/login";
-      const r = await fetch(ep, { method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ email, password }) });
+      const payload = { email, password };
+      if (authMode === "signup") {
+        const t = tsToken();
+        if (!t) { authErr("One moment — finishing the human check. Please try again."); renderTurnstile(); return; }
+        payload.turnstile = t;
+      }
+      const r = await fetch(ep, { method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin", body: JSON.stringify(payload) });
       const j = await r.json().catch(() => ({}));
-      if (!r.ok || j.ok === false) { authErr(j.error || "That didn't work — check your details."); return; }
+      if (!r.ok || j.ok === false) { authErr(AUTH_MSG[j.error] || j.error || "That didn't work — check your details."); if (authMode === "signup") renderTurnstile(); return; }
       const u = j.user || {};
       LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email;
       if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }

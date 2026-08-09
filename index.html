@@ -306,11 +306,13 @@
     <div class="gm-or">or</div>
     <input class="gm-field" id="authEmail" type="email" placeholder="your@email.com" autocomplete="email">
     <input class="gm-field" id="authPass" type="password" placeholder="Password (8+ characters)" autocomplete="current-password">
+    <div id="tsBox" style="margin:10px 0 2px"></div>
     <button class="btn gold" id="authSubmit" style="width:100%;justify-content:center;margin-top:2px">Create account</button>
     <div id="authErr" style="color:#ff6b8a;font-size:.85rem;margin-top:10px;text-align:center"></div>
     <div class="gm-fine" id="authSwap">Already have an account? <a href="#" id="swapLink">Sign in</a></div>
   </div>
 </div>
-<script src="assets/landing.js?v=20260809b"></script>
+<script src="assets/landing.js?v=20260809c"></script>
+<script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 </body>
 </html>
