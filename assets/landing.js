@@ -85,7 +85,7 @@
     el.querySelectorAll("button[data-pack]").forEach((b) => b.onclick = () => checkout({ pack: b.dataset.pack, btn: b }));
   }
   async function checkout(opts) {
-    if (!currentUser) { openAuth("signup"); return; } // must register before buying
+    if (!currentUser) { pendingCheckout = opts; openAuth("signup"); return; } // must register before buying — resume after login
     const btn = opts.btn, label = btn ? btn.textContent : "";
     if (btn) { btn.textContent = "Loading…"; btn.disabled = true; }
     try {
@@ -97,7 +97,7 @@
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
         body: JSON.stringify(payload),
       });
-      if (r.status === 401) { openAuth("signup"); return; }
+      if (r.status === 401) { pendingCheckout = opts; openAuth("signup"); return; }
       const j = await r.json();
       if (j && (j.url || j.checkout_url)) { window.location.href = j.url || j.checkout_url; return; }
       throw new Error("no url");
@@ -109,6 +109,7 @@
   // ---- auth (real email accounts today; Google when the OAuth client is set) ----
   let authMode = "signup";
   let currentUser = null;
+  let pendingCheckout = null; // a buy/subscribe click interrupted by the auth modal — resumed after login
   function openAuth(mode) {
     authMode = mode;
     $("#authTitle").textContent = mode === "signup" ? "Create your account" : "Welcome back";
@@ -135,7 +136,8 @@
       if (!r.ok || j.ok === false) { $("#authErr").textContent = j.error || "That didn't work — check your details."; return; }
       currentUser = j.user || { email };
       closeAuth();
-      window.location.href = "/app"; // straight into the Studio to start creating
+      if (pendingCheckout) { const p = pendingCheckout; pendingCheckout = null; checkout(p); return; } // resume the interrupted purchase → Stripe
+      window.location.href = "/app"; // otherwise straight into the Studio to start creating
     } catch (_) { $("#authErr").textContent = "Something went wrong. Try again."; }
     finally { btn.textContent = label; btn.disabled = false; }
   }
