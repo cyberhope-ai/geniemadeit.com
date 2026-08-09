@@ -143,6 +143,7 @@
     const g = resp.generation;
     if (typeof resp.credits_remaining === "number") LS.setItem("gm_credits", String(resp.credits_remaining));
     else state.credits = state.credits - 1;
+    LS.setItem("gm_first_wish_done", "1"); // first wish made — retire the onboarding nudge
     paintCredits();
 
     // record in vault
@@ -217,6 +218,30 @@
   function paintCredits() {
     $("#creditN").textContent = state.credits;
     $("#creditHint").textContent = state.credits + (state.credits === 1 ? " wish left" : " wishes left");
+    paintOnboarding();
+  }
+  // ---- onboarding: first-run welcome + "use your free wishes" until the first creation ----
+  const seenWelcome = () => LS.getItem("gm_welcomed") === "1";
+  const firstWishDone = () => LS.getItem("gm_first_wish_done") === "1";
+  function paintOnboarding() {
+    const ob = $("#onboardBanner");
+    if (!ob) return;
+    const show = !!state.signedIn && !firstWishDone() && state.credits > 0;
+    ob.style.display = show ? "" : "none";
+    const n = $("#obN"); if (n) n.textContent = state.credits;
+  }
+  function maybeWelcome() {
+    if (state.signedIn && !seenWelcome() && !firstWishDone() && state.credits > 0) {
+      LS.setItem("gm_welcomed", "1"); openModal("welcomeModal");
+    }
+  }
+  function checkPurchaseReturn() {
+    const q = new URLSearchParams(location.search);
+    if (q.get("purchase") === "success" || q.get("sub") === "success") {
+      LS.setItem("gm_first_wish_done", "1"); // a paying user isn't a first-timer — retire the free-wishes nudge
+      const bb = $("#buyBanner"); if (bb) { const bn = $("#buyN"); if (bn) bn.textContent = state.credits; bb.style.display = ""; }
+      paintOnboarding();
+    }
   }
   function paintAccount() {
     const b = $("#accountBtn");
@@ -248,7 +273,7 @@
       const u = j.user || {};
       LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email;
       if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }
-      paintAccount(); paintCredits(); closeModals(); loadGallery();
+      paintAccount(); paintCredits(); closeModals(); loadGallery(); maybeWelcome();
     } catch (_) { authErr("Something went wrong. Try again."); }
     finally { btn.textContent = label; btn.disabled = false; }
   }
@@ -327,6 +352,8 @@
     $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth("signup"); };
     $$("#payModal button[data-plan]").forEach((b) => b.onclick = () => studioCheckout(b.dataset.plan));
+    const ws = $("#welcomeStart"); if (ws) ws.onclick = () => { closeModals(); const p = $("#prompt"); if (p) p.focus(); };
+    const om = $("#obMore"); if (om) om.onclick = (e) => { e.preventDefault(); openModal("payModal"); };
     $$("[data-close]").forEach((b) => b.onclick = closeModals);
     $$(".modal, .lb").forEach((m) => m.addEventListener("click", (e) => { if (e.target === m) closeModals(); }));
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeModals(); });
@@ -377,6 +404,8 @@
       if (u && u.plan) state.plan = u.plan;
       paintAccount();
       loadGallery();
+      maybeWelcome();
+      checkPurchaseReturn();
     } catch (_) { /* engine offline — keep local */ }
   }
 

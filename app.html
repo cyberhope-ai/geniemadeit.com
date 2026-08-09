@@ -179,6 +179,8 @@
   <section class="studio">
     <span class="eyebrow"><span class="spark"></span> The lamp is lit · make a wish</span>
     <h1>Describe it. GenieMade <em>makes it real.</em></h1>
+    <div id="onboardBanner" style="display:none;margin:0 0 16px;padding:12px 16px;border:1px solid var(--gold);border-radius:12px;background:rgba(245,196,81,.09);font-size:.95rem">✨ Your <b><span id="obN">3</span> free wishes</b> are ready — describe anything below and hit <b>Make a wish</b> to create your first. <a href="#" id="obMore" style="color:var(--gold);white-space:nowrap">Need more later? →</a></div>
+    <div id="buyBanner" style="display:none;margin:0 0 16px;padding:12px 16px;border:1px solid var(--magic);border-radius:12px;background:rgba(102,227,232,.09);font-size:.95rem">🎉 You're topped up — <b><span id="buyN"></span> credits</b> ready to spend. Describe your next wish below.</div>
 
     <div class="composer">
       <textarea id="prompt" placeholder="a regal fox in a velvet coat, cinematic light, ultra detailed…" aria-label="Describe your creation"></textarea>
@@ -282,6 +284,18 @@
   </div>
 </div>
 
+<!-- first-run welcome -->
+<div class="modal" id="welcomeModal">
+  <div class="sheet" style="position:relative;text-align:center;max-width:460px">
+    <button class="x" data-close>×</button>
+    <div style="font-size:2.4rem;line-height:1.1">🧞✨</div>
+    <h3>Welcome to GenieMade!</h3>
+    <p>You've got <b>3 free wishes</b> to start. Describe anything — an image, a video, or a voice — and the lamp makes it real in seconds. Every creation is <b>sealed with a certificate of authenticity</b> and saved to your private Vault.</p>
+    <p class="fine" style="margin:12px 0 18px">When your wishes run low, keep the magic going with a <b>credit pack</b> or a <b>membership</b> — right here, anytime.</p>
+    <button class="btn gold full" id="welcomeStart">Make your first wish ✦</button>
+  </div>
+</div>
+
 <!-- lightbox -->
 <div class="lb" id="lightbox">
   <div class="in">
@@ -302,6 +316,6 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260809a"></script>
+<script src="assets/studio.js?v=20260809b"></script>
 </body>
 </html>
