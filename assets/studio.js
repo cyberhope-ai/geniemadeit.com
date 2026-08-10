@@ -103,7 +103,7 @@
   // Poll it until the job completes (real generation) or fails (credits are refunded server-side).
   async function pollJob(url, onTick) {
     const started = Date.now();
-    while (Date.now() - started < 240000) { // 4-minute safety ceiling
+    while (Date.now() - started < 420000) { // 7-min ceiling (Seedance 2.5 renders run 60–250s)
       await new Promise((r) => setTimeout(r, 4000));
       let j = null;
       try {
@@ -150,8 +150,8 @@
     // Async job (video): the engine accepted the wish and is rendering. Keep the
     // lamp animating and poll until the finished creation (or a refunded failure).
     if (resp.ok && resp.status === "processing" && resp.poll_url) {
-      els.summonSb.textContent = "rendering your video — this takes about a minute";
-      resp = await pollJob(resp.poll_url, () => { els.summonSb.textContent = "rendering your video — almost there"; });
+      els.summonSb.textContent = "rendering your video — this can take a couple of minutes";
+      resp = await pollJob(resp.poll_url, () => { els.summonSb.textContent = "rendering your video — still working, hang tight"; });
     }
     clearInterval(timer);
 
