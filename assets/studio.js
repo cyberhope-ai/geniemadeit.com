@@ -99,6 +99,25 @@
     }
   }
 
+  // Video renders are async (~1 min): the engine returns { status:"processing", poll_url }.
+  // Poll it until the job completes (real generation) or fails (credits are refunded server-side).
+  async function pollJob(url, onTick) {
+    const started = Date.now();
+    while (Date.now() - started < 240000) { // 4-minute safety ceiling
+      await new Promise((r) => setTimeout(r, 4000));
+      let j = null;
+      try {
+        const res = await fetch(url, { credentials: "same-origin" });
+        j = await res.json().catch(() => ({}));
+      } catch (_) { continue; } // transient network blip — keep polling
+      if (j && j.status === "completed") return j;
+      if (j && j.status === "failed")
+        return { ok: false, error: "gen_failed", message: j.error || "The video couldn't be generated — your credits were refunded." };
+      if (onTick) onTick(j || {}); // still processing
+    }
+    return { ok: false, error: "timeout", message: "This is taking longer than usual — it'll appear in your Vault when it's ready." };
+  }
+
   // ---- create flow ----
   const els = {
     prompt: $("#prompt"), make: $("#makeBtn"), summon: $("#summon"), summonSt: $("#summonSt"),
@@ -126,7 +145,14 @@
 
     const kind = kindOf(state.capability);
     const body = { capability: state.capability, prompt, ...(kind === "audio" ? {} : { aspect: state.aspect }) };
-    const resp = await generate(body);
+    let resp = await generate(body);
+
+    // Async job (video): the engine accepted the wish and is rendering. Keep the
+    // lamp animating and poll until the finished creation (or a refunded failure).
+    if (resp.ok && resp.status === "processing" && resp.poll_url) {
+      els.summonSb.textContent = "rendering your video — this takes about a minute";
+      resp = await pollJob(resp.poll_url, () => { els.summonSb.textContent = "rendering your video — almost there"; });
+    }
     clearInterval(timer);
 
     if (!resp.ok && resp.error === "auth_required") {
