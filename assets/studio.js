@@ -13,6 +13,8 @@
   const state = {
     capability: "image.text",
     aspect: "1:1",
+    refUrl: "",       // uploaded reference photo (same-origin /asset URL)
+    uploading: false,
     get credits() { const v = LS.getItem("gm_credits"); return v === null ? 3 : Number(v); },
     set credits(n) { LS.setItem("gm_credits", String(Math.max(0, n))); paintCredits(); },
     // The Vault is the real user's creations from /api/gallery — never seeded. Empty for new accounts.
@@ -131,6 +133,12 @@
     if (!prompt) { els.prompt.focus(); return; }
     if (!state.signedIn) { openAuth("signup"); return; } // registration required before a wish
     if (state.credits <= 0) { openModal("payModal"); return; }
+    if (state.uploading) { setRefHint("Hang on — your photo is still uploading."); return; }
+    if (state.capability === "video.image2video" && !state.refUrl) {
+      setRefHint("Add a photo to animate first.");
+      const rb = $("#refBtn"); if (rb) rb.focus();
+      return;
+    }
     els.make.disabled = true;
     els.result.classList.remove("on");
     els.summon.classList.add("on");
@@ -144,7 +152,11 @@
     }, 520);
 
     const kind = kindOf(state.capability);
-    const body = { capability: state.capability, prompt, ...(kind === "audio" ? {} : { aspect: state.aspect }) };
+    const body = {
+      capability: state.capability, prompt,
+      ...(kind === "audio" ? {} : { aspect: state.aspect }),
+      ...(state.refUrl ? { image_url: state.refUrl } : {}),
+    };
     let resp = await generate(body);
 
     // Async job (video): the engine accepted the wish and is rendering. Keep the
@@ -340,9 +352,48 @@
     if (it.id === "image.text") return "Image";
     if (it.id === "audio.speech") return "Voice";
     if (it.id === "audio.music") return "Music";
+    if (it.id === "video.image2video") return "Animate Photo";
+    if (it.id === "video.text2video") return "Video";
     if (k === "video") return "Video";
     return it.name;
   }
+  // Does this capability use a reference/source photo, and is it required?
+  function refMode(id) {
+    if (id === "video.image2video") return { show: true, required: true, label: "Add a photo to animate", hint: "Required — your photo becomes the first frame." };
+    if (kindOf(id) === "image") return { show: true, required: false, label: "Add a photo (optional)", hint: "Optional — upload a face/photo to star in the result." };
+    return { show: false, required: false, label: "", hint: "" };
+  }
+  // Upload a reference photo to the engine; store the returned same-origin URL.
+  async function uploadRef(file) {
+    if (!file) return;
+    if (!state.signedIn) { openAuth("signup"); return; }
+    if (!/^image\//.test(file.type)) { setRefHint("Please choose a JPG, PNG, or WebP image."); return; }
+    if (file.size > 12 * 1024 * 1024) { setRefHint("That image is over 12MB — pick a smaller one."); return; }
+    state.uploading = true; setRefHint("Uploading…");
+    try {
+      const fd = new FormData(); fd.append("file", file);
+      const r = await fetch("/api/upload", { method: "POST", body: fd, credentials: "same-origin" });
+      const j = await r.json().catch(() => ({}));
+      if (!j.ok || !j.url) { setRefHint(j.message || "Upload failed — try again."); state.uploading = false; return; }
+      state.refUrl = j.url;
+      const thumb = $("#refThumb"), prev = $("#refPreview"), btn = $("#refBtn");
+      if (thumb) thumb.src = j.url;
+      if (prev) prev.style.display = "flex";
+      if (btn) $("#refBtnLabel").textContent = "Change photo";
+      setRefHint("");
+    } catch (_) { setRefHint("Upload failed — try again."); }
+    finally { state.uploading = false; }
+  }
+  function clearRef() {
+    state.refUrl = "";
+    const prev = $("#refPreview"), inp = $("#refInput");
+    if (prev) prev.style.display = "none";
+    if (inp) inp.value = "";
+    const m = refMode(state.capability);
+    if ($("#refBtnLabel")) $("#refBtnLabel").textContent = m.label || "Add a photo";
+    setRefHint(m.hint);
+  }
+  function setRefHint(t) { const h = $("#refHint"); if (h) h.textContent = t || ""; }
   function selectCapability(id) {
     state.capability = id;
     $$("#typeSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.cap === id)));
@@ -353,8 +404,16 @@
     if (lab) lab.style.display = showAspect ? "" : "none";
     els.prompt.placeholder = k === "audio"
       ? "Type what you want spoken aloud — e.g. Welcome to GenieMade, where your words come to life…"
+      : id === "video.image2video"
+      ? "Describe the motion — e.g. gentle zoom, confetti falling, hair blowing in the wind…"
       : "a regal fox in a velvet coat, cinematic light, ultra detailed…";
-    $("#makeBtn").textContent = k === "audio" ? "✦ Speak it" : "✦ Make a wish";
+    $("#makeBtn").textContent = k === "audio" ? "✦ Speak it" : id === "video.image2video" ? "✦ Animate it" : "✦ Make a wish";
+    // reference/upload control — required for Animate Photo, optional for images
+    const m = refMode(id);
+    const rb = $("#refBox");
+    if (rb) rb.style.display = m.show ? "flex" : "none";
+    if ($("#refBtnLabel")) $("#refBtnLabel").textContent = state.refUrl ? "Change photo" : (m.label || "Add a photo");
+    setRefHint(state.refUrl ? "" : m.hint);
   }
   async function renderCapabilities() {
     let cats = null;
@@ -384,6 +443,16 @@
       b.setAttribute("aria-pressed", "true"); state.aspect = b.dataset.aspect;
     });
     $$("#chips .chip").forEach((c) => c.onclick = () => { els.prompt.value = c.textContent; els.prompt.focus(); });
+    // reference-photo upload (click, pick, drag-drop, clear)
+    const refInput = $("#refInput"), refBtn = $("#refBtn"), refClear = $("#refClear"), refBox = $("#refBox");
+    if (refBtn && refInput) refBtn.onclick = () => refInput.click();
+    if (refInput) refInput.onchange = (e) => uploadRef(e.target.files && e.target.files[0]);
+    if (refClear) refClear.onclick = clearRef;
+    if (refBox) {
+      refBox.addEventListener("dragover", (e) => { e.preventDefault(); refBox.style.opacity = ".7"; });
+      refBox.addEventListener("dragleave", () => { refBox.style.opacity = "1"; });
+      refBox.addEventListener("drop", (e) => { e.preventDefault(); refBox.style.opacity = "1"; const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) uploadRef(f); });
+    }
     els.make.onclick = makeWish;
     els.prompt.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") makeWish(); });
     $("#againBtn").onclick = () => { els.result.classList.remove("on"); els.prompt.focus(); els.prompt.scrollIntoView({ behavior: "smooth", block: "center" }); };
