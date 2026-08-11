@@ -208,6 +208,14 @@
     <div id="buyBanner" style="display:none;margin:0 0 16px;padding:12px 16px;border:1px solid var(--magic);border-radius:12px;background:rgba(102,227,232,.09);font-size:.95rem">🎉 You're topped up — <b><span id="buyN"></span> credits</b> ready to spend. Describe your next wish below.</div>
 
     <div class="composer">
+      <div id="packBanner" style="display:none;margin:0 0 12px;padding:12px 14px;border:1px solid var(--gold);border-radius:14px;background:rgba(245,196,81,.09);align-items:center;gap:12px;flex-wrap:wrap">
+        <span style="font-size:1.2rem">✨</span>
+        <div style="flex:1;min-width:170px">
+          <div style="font-weight:700;color:var(--gold2)" id="packBannerTitle">Pack selected</div>
+          <div style="font-size:.82rem;color:var(--mut)">Add your photo below, then hit <b>Make a wish</b> — GenieMade does the rest.</div>
+        </div>
+        <button type="button" id="packClear" class="btn ghost" style="padding:7px 12px;font-size:.82rem">✕ Change</button>
+      </div>
       <textarea id="prompt" placeholder="a regal fox in a velvet coat, cinematic light, ultra detailed…" aria-label="Describe your creation"></textarea>
       <div class="controls">
         <span class="lab">Make</span>
@@ -359,7 +367,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260811a"></script>
+<script src="assets/studio.js?v=20260811b"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 </body>
 </html>

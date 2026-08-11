@@ -23,6 +23,12 @@ export default {
     // Cache generated/registry images at the geniemadeit edge (immutable, content-addressed):
     // repeat views serve from cache and skip the engine + R2 entirely.
     if (url.pathname.startsWith("/asset/") && request.method === "GET") {
+      // Never cache or serve manifests — they hold the pack's secret prompts. Pass straight to the
+      // engine (which returns 404). Bypassing the cache here also stops serving any already-cached copy.
+      if (/\/manifest\.json$/.test(url.pathname)) {
+        const t = new URL(request.url); t.protocol = "https:"; t.hostname = "geniemade-engine.cyberhopeai.workers.dev"; t.port = "";
+        return fetch(new Request(t.toString(), request));
+      }
       const cache = caches.default;
       const hit = await cache.match(request);
       if (hit) return hit;

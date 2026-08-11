@@ -16,6 +16,7 @@
     refUrl: "",       // uploaded reference photo (same-origin /asset URL)
     uploading: false,
     packMode: false,  // user picked an occasion pack — a face photo is required ("Starring You")
+    pack: null,       // { id, look, label } — we send ids, never the (server-side, secret) prompt
     get credits() { const v = LS.getItem("gm_credits"); return v === null ? 3 : Number(v); },
     set credits(n) { LS.setItem("gm_credits", String(Math.max(0, n))); paintCredits(); },
     // The Vault is the real user's creations from /api/gallery — never seeded. Empty for new accounts.
@@ -131,7 +132,7 @@
 
   async function makeWish() {
     const prompt = els.prompt.value.trim();
-    if (!prompt) { els.prompt.focus(); return; }
+    if (!prompt && !state.packMode) { els.prompt.focus(); return; } // packs carry no visible prompt
     if (!state.signedIn) { openAuth("signup"); return; } // registration required before a wish
     if (state.credits <= 0) { openModal("payModal"); return; }
     if (state.uploading) { setRefHint("Hang on — your photo is still uploading."); return; }
@@ -158,11 +159,14 @@
     }, 520);
 
     const kind = kindOf(state.capability);
-    const body = {
-      capability: state.capability, prompt,
-      ...(kind === "audio" ? {} : { aspect: state.aspect }),
-      ...(state.refUrl ? { image_url: state.refUrl } : {}),
-    };
+    // Pack wish: send only the pack+look ids + the photo. The engine holds the (secret) prompt.
+    const body = (state.packMode && state.pack)
+      ? { pack: state.pack.id, look: state.pack.look, image_url: state.refUrl }
+      : {
+          capability: state.capability, prompt,
+          ...(kind === "audio" ? {} : { aspect: state.aspect }),
+          ...(state.refUrl ? { image_url: state.refUrl } : {}),
+        };
     let resp = await generate(body);
 
     // Async job (video): the engine accepted the wish and is rendering. Keep the
@@ -184,7 +188,7 @@
       els.make.disabled = false; setTimeout(() => els.summon.classList.remove("on"), 2600); return;
     }
     els.prog.style.width = "100%";
-    state.packMode = false; // wish landed — a fresh manual wish shouldn't stay photo-gated
+    exitPackUI(); // wish landed — restore the normal composer for the next one
     const g = resp.generation;
     if (typeof resp.credits_remaining === "number") LS.setItem("gm_credits", String(resp.credits_remaining));
     else state.credits = state.credits - 1;
@@ -436,7 +440,7 @@
     const seg = $("#typeSeg");
     seg.innerHTML = live.map((it, i) =>
       `<button data-cap="${it.id}" aria-pressed="${i === 0}" title="${it.credits || 1} credit${(it.credits || 1) > 1 ? "s" : ""}">${ICON[kindOf(it.id)] || "✦"} ${shortName(it)}</button>`).join("");
-    $$("#typeSeg button").forEach((b) => b.onclick = () => { state.packMode = false; selectCapability(b.dataset.cap); });
+    $$("#typeSeg button").forEach((b) => b.onclick = () => { exitPackUI(); selectCapability(b.dataset.cap); });
     selectCapability(live[0].id);
     const hint = $("#soonHint");
     if (hint) hint.textContent = soon.length ? "More coming soon: " + soon.map((s) => s.name).join(" · ") : "";
@@ -477,12 +481,18 @@
     });
   }
 
-  // Seed the composer from a pack look: Nano Banana "Starring You" edit + the look's prompt,
-  // a face photo becomes required, and we scroll the user to compose.
+  // Seed the composer from a pack look. The prompt is a trade secret held by the engine — we never
+  // fetch it or show it. We store only the pack+look ids, show a clean banner, and require a face photo.
   function applyPack(pack, look) {
     selectCapability(look.capability || "image.nano");
     state.packMode = true;
-    els.prompt.value = look.prompt || "";
+    state.pack = { id: pack.id, look: look.id, label: pack.title + " · " + look.name };
+    // hide the free-text prompt + chips (nothing for the user to type or copy) and show the pack banner
+    els.prompt.value = "";
+    els.prompt.style.display = "none";
+    const chips = $("#chips"); if (chips) chips.style.display = "none";
+    const bt = $("#packBannerTitle"); if (bt) bt.textContent = (pack.emoji || "✨") + " " + state.pack.label;
+    const banner = $("#packBanner"); if (banner) banner.style.display = "flex";
     state.aspect = "1:1";
     $$("#aspectSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.aspect === "1:1")));
     setRefHint(state.refUrl
@@ -491,6 +501,14 @@
     const comp = $(".composer"); if (comp) comp.scrollIntoView({ behavior: "smooth", block: "center" });
     if (!state.refUrl) { const rb = $("#refBtn"); if (rb) setTimeout(() => rb.focus(), 420); }
   }
+  // Leave pack mode: restore the normal composer (free-text prompt + chips), hide the banner.
+  function exitPackUI() {
+    state.packMode = false; state.pack = null;
+    els.prompt.style.display = "";
+    const chips = $("#chips"); if (chips) chips.style.display = "";
+    const banner = $("#packBanner"); if (banner) banner.style.display = "none";
+  }
+  function clearPack() { exitPackUI(); selectCapability("image.text"); setRefHint(""); els.prompt.focus(); }
 
   // ---- wire up ----
   function wire() {
@@ -506,6 +524,7 @@
     if (refBtn && refInput) refBtn.onclick = () => refInput.click();
     if (refInput) refInput.onchange = (e) => uploadRef(e.target.files && e.target.files[0]);
     if (refClear) refClear.onclick = clearRef;
+    const packClear = $("#packClear"); if (packClear) packClear.onclick = clearPack;
     if (refBox) {
       refBox.addEventListener("dragover", (e) => { e.preventDefault(); refBox.style.opacity = ".7"; });
       refBox.addEventListener("dragleave", () => { refBox.style.opacity = "1"; });
