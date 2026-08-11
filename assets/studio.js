@@ -15,6 +15,7 @@
     aspect: "1:1",
     refUrl: "",       // uploaded reference photo (same-origin /asset URL)
     uploading: false,
+    packMode: false,  // user picked an occasion pack — a face photo is required ("Starring You")
     get credits() { const v = LS.getItem("gm_credits"); return v === null ? 3 : Number(v); },
     set credits(n) { LS.setItem("gm_credits", String(Math.max(0, n))); paintCredits(); },
     // The Vault is the real user's creations from /api/gallery — never seeded. Empty for new accounts.
@@ -139,6 +140,11 @@
       const rb = $("#refBtn"); if (rb) rb.focus();
       return;
     }
+    if (state.packMode && !state.refUrl) {
+      setRefHint("Add your photo to star in this pack first.");
+      const rb = $("#refBtn"); if (rb) rb.focus();
+      return;
+    }
     els.make.disabled = true;
     els.result.classList.remove("on");
     els.summon.classList.add("on");
@@ -178,6 +184,7 @@
       els.make.disabled = false; setTimeout(() => els.summon.classList.remove("on"), 2600); return;
     }
     els.prog.style.width = "100%";
+    state.packMode = false; // wish landed — a fresh manual wish shouldn't stay photo-gated
     const g = resp.generation;
     if (typeof resp.credits_remaining === "number") LS.setItem("gm_credits", String(resp.credits_remaining));
     else state.credits = state.credits - 1;
@@ -429,15 +436,66 @@
     const seg = $("#typeSeg");
     seg.innerHTML = live.map((it, i) =>
       `<button data-cap="${it.id}" aria-pressed="${i === 0}" title="${it.credits || 1} credit${(it.credits || 1) > 1 ? "s" : ""}">${ICON[kindOf(it.id)] || "✦"} ${shortName(it)}</button>`).join("");
-    $$("#typeSeg button").forEach((b) => b.onclick = () => selectCapability(b.dataset.cap));
+    $$("#typeSeg button").forEach((b) => b.onclick = () => { state.packMode = false; selectCapability(b.dataset.cap); });
     selectCapability(live[0].id);
     const hint = $("#soonHint");
     if (hint) hint.textContent = soon.length ? "More coming soon: " + soon.map((s) => s.name).join(" · ") : "";
   }
 
+  // ---- occasion packs (the pick-a-pack angle) ----
+  const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
+  const escAttr = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
+  let PACKS = [];
+  async function renderPacks() {
+    const grid = $("#packGrid"), sect = $("#packs");
+    if (!grid) return;
+    try {
+      const r = await fetch("/api/packs", { headers: { accept: "application/json" } });
+      const j = await r.json();
+      PACKS = (j && j.packs) || [];
+    } catch (_) { PACKS = []; }
+    if (!PACKS.length) { if (sect) sect.style.display = "none"; return; }
+    if (sect) sect.style.display = "";
+    grid.innerHTML = PACKS.map((p, pi) => `
+      <div class="packcard">
+        <div class="cover"><img loading="lazy" src="${escAttr(p.cover)}" alt="${escAttr(p.title)}">
+          <div class="title">${escHtml(p.emoji || "✨")} ${escHtml(p.title)}</div></div>
+        <div class="body">
+          <p class="blurb">${escHtml(p.blurb || "")}</p>
+          <div class="packlooks">
+            ${(p.looks || []).map((l, li) => `
+              <button class="looktile" data-pi="${pi}" data-li="${li}" title="${escAttr(l.name)} — add your photo to star in this">
+                <img loading="lazy" src="${escAttr(l.tile)}" alt="${escAttr(l.name)}"><span class="ln">${escHtml(l.name)}</span>
+              </button>`).join("")}
+          </div>
+          <div class="starron">✦ Add your face → Starring You, certified</div>
+        </div>
+      </div>`).join("");
+    $$("#packGrid .looktile").forEach((b) => b.onclick = () => {
+      const p = PACKS[+b.dataset.pi]; const l = p && p.looks[+b.dataset.li];
+      if (l) applyPack(p, l);
+    });
+  }
+
+  // Seed the composer from a pack look: Nano Banana "Starring You" edit + the look's prompt,
+  // a face photo becomes required, and we scroll the user to compose.
+  function applyPack(pack, look) {
+    selectCapability(look.capability || "image.nano");
+    state.packMode = true;
+    els.prompt.value = look.prompt || "";
+    state.aspect = "1:1";
+    $$("#aspectSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.aspect === "1:1")));
+    setRefHint(state.refUrl
+      ? "Your photo's ready — hit “Make a wish” to star in this look."
+      : `Add your photo to star in “${look.name},” then hit “Make a wish.”`);
+    const comp = $(".composer"); if (comp) comp.scrollIntoView({ behavior: "smooth", block: "center" });
+    if (!state.refUrl) { const rb = $("#refBtn"); if (rb) setTimeout(() => rb.focus(), 420); }
+  }
+
   // ---- wire up ----
   function wire() {
     renderCapabilities();
+    renderPacks();
     $$("#aspectSeg button").forEach((b) => b.onclick = () => {
       $$("#aspectSeg button").forEach((x) => x.setAttribute("aria-pressed", "false"));
       b.setAttribute("aria-pressed", "true"); state.aspect = b.dataset.aspect;

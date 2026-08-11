@@ -75,6 +75,31 @@
     border-radius:30px;padding:6px 12px;cursor:pointer;transition:.15s}
   .chip:hover{border-color:var(--gold);color:var(--ink)}
 
+  /* ---- occasion packs (the pick-a-pack angle) ---- */
+  .packs{margin-top:48px}
+  .packs h2{font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:0 0 3px}
+  .packs .psub{color:var(--mut);font-size:.92rem;margin:0 0 18px;max-width:640px}
+  .packgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(268px,1fr));gap:18px}
+  .packcard{border:1px solid var(--line);border-radius:18px;overflow:hidden;
+    background:linear-gradient(135deg,var(--panel),var(--panel2));display:flex;flex-direction:column;transition:border-color .2s}
+  .packcard:hover{border-color:var(--goldd)}
+  .packcard .cover{position:relative;aspect-ratio:4/3;overflow:hidden}
+  .packcard .cover img{width:100%;height:100%;object-fit:cover;display:block;transition:transform .35s}
+  .packcard:hover .cover img{transform:scale(1.045)}
+  .packcard .cover .title{position:absolute;left:0;right:0;bottom:0;padding:28px 14px 11px;font-family:var(--serif);
+    font-size:1.14rem;font-weight:600;color:#fff;background:linear-gradient(transparent,rgba(10,6,22,.92))}
+  .packcard .body{padding:13px 14px 15px;display:flex;flex-direction:column;flex:1}
+  .packcard .blurb{color:var(--mut);font-size:.85rem;margin:0 0 12px;line-height:1.42}
+  .packlooks{display:flex;gap:9px;margin-top:auto}
+  .looktile{flex:1;position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;cursor:pointer;
+    aspect-ratio:1/1;padding:0;background:#0c0720;transition:transform .15s,border-color .15s}
+  .looktile:hover{transform:translateY(-2px);border-color:var(--gold)}
+  .looktile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+  .looktile .ln{position:absolute;left:0;right:0;bottom:0;padding:15px 5px 5px;font-size:.63rem;font-weight:700;
+    color:#fff;text-align:center;background:linear-gradient(transparent,rgba(10,6,22,.92));line-height:1.15}
+  .packcard .starron{display:inline-flex;align-items:center;gap:6px;margin-top:11px;font-size:.74rem;color:var(--gold2)}
+  @media(max-width:520px){.packgrid{grid-template-columns:1fr}}
+
   /* ---- stage (progress + result) ---- */
   .stage{margin-top:20px}
   .summon{display:none;text-align:center;padding:44px 20px;border:1px dashed var(--line);border-radius:20px;
@@ -254,6 +279,12 @@
     </div>
   </section>
 
+  <section class="packs" id="packs" style="display:none">
+    <h2>✨ Pick a Pack</h2>
+    <p class="psub">Add your photo and GenieMade drops <b>you</b> into the scene — birthdays, love, congrats and more. Each one comes back sealed with your certificate. No prompt-writing required.</p>
+    <div class="packgrid" id="packGrid"></div>
+  </section>
+
   <section class="vault">
     <h2>Your Vault</h2>
     <div class="vsub">Every creation, sealed and provably yours. Tap any to see its certificate.</div>
@@ -328,7 +359,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260810c"></script>
+<script src="assets/studio.js?v=20260811a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 </body>
 </html>
