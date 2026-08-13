@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>GenieMade Studio — Hyper-Real You</title>
+<meta name="description" content="Upload a few photos and GenieMade trains a private model of you — then create unlimited studio-grade, unmistakably-you portraits in any style. Every image certified and provably yours.">
+<meta property="og:title" content="GenieMade Studio — Hyper-Real You">
+<meta property="og:description" content="Your private AI photo studio. Train once, shoot forever. Every image certified.">
+<meta property="og:type" content="website">
+<link rel="canonical" href="https://geniemadeit.com/studio-you">
+<meta property="og:image" content="https://geniemadeit.com/assets/studio-you/gala.jpg">
+<link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🧞</text></svg>">
+<style>
+  :root{
+    --night:#130a26;--night2:#1c1140;--panel:#231553;--panel2:#2b1b63;--line:#3a2a6b;
+    --ink:#f7f1ff;--mut:#c6b6ea;--faint:#8f7fbb;--gold:#f5c451;--gold2:#ffe390;--goldd:#c88f2c;
+    --magic:#66e3e8;--viol:#a06bff;
+    --serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  body{background:var(--night);color:var(--ink);font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;line-height:1.6;
+    background-image:radial-gradient(1200px 620px at 78% -8%,rgba(160,107,255,.18),transparent 60%),radial-gradient(900px 500px at 12% 10%,rgba(102,227,232,.10),transparent 55%)}
+  a{color:inherit;text-decoration:none}
+  .wrap{max-width:1120px;margin:0 auto;padding:0 22px}
+  /* header */
+  header{border-bottom:1px solid var(--line);position:sticky;top:0;z-index:5;background:rgba(19,10,38,.82);backdrop-filter:blur(8px)}
+  .bar{display:flex;align-items:center;gap:16px;max-width:1120px;margin:0 auto;padding:13px 22px}
+  .brand{display:flex;align-items:center;gap:9px;font-family:var(--serif);font-size:20px}
+  .brand b{color:var(--gold2)} .lamp{width:30px;height:30px}
+  .bar .links{display:flex;gap:20px;margin-left:14px;font-size:14px;color:var(--mut)}
+  .bar .links a:hover{color:var(--ink)} .spacer{flex:1}
+  .btn{display:inline-block;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1c04;font-weight:800;
+    padding:11px 22px;border-radius:999px;font-size:14.5px;box-shadow:0 10px 26px rgba(245,196,81,.24);transition:transform .18s}
+  .btn:hover{transform:translateY(-2px)} .btn.ghost{background:transparent;color:var(--gold2);border:1px solid var(--goldd);box-shadow:none}
+  /* hero */
+  .hero{display:grid;grid-template-columns:1.05fr .95fr;gap:40px;align-items:center;padding:60px 0 30px}
+  .eyebrow{font-size:12px;letter-spacing:2.6px;text-transform:uppercase;color:var(--magic);font-weight:700}
+  h1{font-family:var(--serif);font-size:clamp(42px,7vw,76px);line-height:1;margin:14px 0 16px;font-weight:600}
+  h1 em{font-style:italic;background:linear-gradient(180deg,#fff,var(--gold));-webkit-background-clip:text;background-clip:text;color:transparent}
+  .lede{font-size:clamp(16px,2vw,20px);color:var(--mut);max-width:32em}
+  .lede b{color:var(--ink)}
+  .cta{display:flex;gap:14px;align-items:center;flex-wrap:wrap;margin-top:26px}
+  .micro{font-size:12.5px;color:var(--faint)}
+  .hero-img{position:relative}
+  .hero-img img{width:100%;border-radius:18px;aspect-ratio:4/5;object-fit:cover;box-shadow:0 30px 70px rgba(0,0,0,.55);border:1px solid var(--line)}
+  .badge{position:absolute;left:14px;bottom:14px;background:rgba(19,10,38,.85);border:1px solid var(--line);color:var(--gold2);font-size:11px;padding:5px 11px;border-radius:20px}
+  h2{font-family:var(--serif);font-size:clamp(26px,4vw,40px);text-align:center;font-weight:600;margin-bottom:6px}
+  .sub{text-align:center;color:var(--mut);margin-bottom:26px}
+  /* showcase */
+  .showcase{padding:38px 0}
+  .klabel{text-align:center;font-size:11.5px;letter-spacing:2.4px;text-transform:uppercase;color:var(--faint);margin-bottom:16px}
+  .strip{display:grid;grid-template-columns:repeat(5,1fr);gap:12px}
+  .strip figure{position:relative;border-radius:12px;overflow:hidden;border:1px solid var(--line)}
+  .strip img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+  .strip figcaption{position:absolute;left:0;right:0;bottom:0;padding:18px 10px 8px;font-size:12px;background:linear-gradient(transparent,rgba(0,0,0,.75))}
+  @media(max-width:780px){.hero{grid-template-columns:1fr}.strip{grid-template-columns:repeat(2,1fr)}}
+  /* steps */
+  .steps{display:grid;grid-template-columns:repeat(3,1fr);gap:18px;padding:20px 0 8px}
+  .step{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:22px}
+  .step .n{width:34px;height:34px;border-radius:50%;display:grid;place-items:center;font-family:var(--serif);font-size:18px;color:var(--gold2);border:1px solid var(--goldd);margin-bottom:10px}
+  .step h3{font-family:var(--serif);font-size:20px;margin-bottom:4px}
+  .step p{font-size:14px;color:var(--mut)} .step em{color:var(--ink);font-style:italic}
+  @media(max-width:780px){.steps{grid-template-columns:1fr}}
+  /* pricing */
+  .plans{display:grid;grid-template-columns:repeat(2,minmax(240px,330px));gap:18px;justify-content:center;padding:16px 0}
+  .plan{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 24px}
+  .plan.feature{border-color:var(--goldd);box-shadow:0 22px 54px rgba(245,196,81,.14)}
+  .pk{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint)}
+  .price{font-family:var(--serif);margin:6px 0 14px}.amt{font-size:44px}.per{font-size:15px;color:var(--mut);margin-left:6px}
+  .plan ul{list-style:none;margin:0 0 20px}.plan li{font-size:14px;color:var(--mut);padding:6px 0 6px 22px;position:relative}
+  .plan li::before{content:"✦";position:absolute;left:0;color:var(--gold)}
+  .plan .btn{width:100%;text-align:center}
+  .certline{text-align:center;max-width:640px;margin:26px auto 0;color:var(--mut);font-size:15px}
+  .certline b{color:var(--ink)}
+  section.blk{padding:44px 0;border-top:1px solid var(--line)}
+  footer{border-top:1px solid var(--line);padding:26px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
+</style>
+</head>
+<body>
+<header><div class="bar">
+  <a class="brand" href="/"><svg class="lamp" viewBox="0 0 48 48"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/></svg><span>Genie<b>Made</b></span></a>
+  <div class="links"><a href="/#examples">Examples</a><a href="/studio-you">Studio You</a><a href="/#pricing">Pricing</a><a href="/verify.html">Verify</a></div>
+  <div class="spacer"></div>
+  <a class="btn" href="/app">Open the Studio</a>
+</div></header>
+
+<div class="wrap">
+  <section class="hero">
+    <div>
+      <p class="eyebrow">GenieMade Studio · Premium</p>
+      <h1>Hyper-Real <em>You</em>.</h1>
+      <p class="lede">Upload a few photos and GenieMade trains a <b>private model of you</b>. Then create unlimited, studio-grade, unmistakably-<em>you</em> portraits — in any style, forever. Every image certified and provably yours.</p>
+      <div class="cta"><a class="btn" href="/app?studio=1">Create my Studio</a><span class="micro">Your model, sealed in your Vault · certified</span></div>
+    </div>
+    <div class="hero-img"><img src="/assets/studio-you/gala.jpg" alt="A hyper-real GenieMade Studio portrait"><span class="badge">✦ Real result · certified on GenieMade</span></div>
+  </section>
+
+  <section class="showcase">
+    <p class="klabel">One real person · one trained model · every style below</p>
+    <div class="strip">
+      <figure><img src="/assets/studio-you/headshot.jpg" alt="Studio Headshot"><figcaption>Studio Headshot</figcaption></figure>
+      <figure><img src="/assets/studio-you/gala.jpg" alt="The Gala"><figcaption>The Gala</figcaption></figure>
+      <figure><img src="/assets/studio-you/goldenhour.jpg" alt="Golden Hour"><figcaption>Golden Hour</figcaption></figure>
+      <figure><img src="/assets/studio-you/garden.jpg" alt="Garden Light"><figcaption>Garden Light</figcaption></figure>
+      <figure><img src="/assets/studio-you/bw.jpg" alt="Fine Art"><figcaption>Fine Art</figcaption></figure>
+    </div>
+    <p class="certline" style="margin-top:16px">Real GenieMade Studio results — created and certified on GenieMade, shown with permission.</p>
+  </section>
+
+  <section class="blk">
+    <h2>How it works</h2>
+    <p class="sub">Three steps. A few minutes. Then unlimited.</p>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Add your photos</h3><p>Drop in 3–10 photos — different angles, lighting, expressions. That's it.</p></div>
+      <div class="step"><div class="n">2</div><h3>We train your private model</h3><p>In a few minutes we build a model of <em>you</em> — not a filter, not a face-swap. Yours alone, sealed in your Vault.</p></div>
+      <div class="step"><div class="n">3</div><h3>Shoot forever</h3><p>Create studio-grade, unmistakably-<em>you</em> portraits in any style or setting — instantly, as many as you like.</p></div>
+    </div>
+  </section>
+
+  <section class="blk">
+    <h2>Simple, premium pricing</h2>
+    <p class="sub">Train once. Every future photo is instant.</p>
+    <div class="plans">
+      <div class="plan feature">
+        <p class="pk">Studio Session</p>
+        <p class="price"><span class="amt">$39</span><span class="per">one-time</span></p>
+        <ul><li>Your private trained model</li><li>20 finished photoreal portraits</li><li>Kept in your Vault, reusable forever</li><li>Certified &amp; private</li></ul>
+        <a class="btn" href="/app?studio=1">Create my Studio</a>
+      </div>
+      <div class="plan">
+        <p class="pk">Studio VIP</p>
+        <p class="price"><span class="amt">$99</span><span class="per">/month</span></p>
+        <ul><li>Your model kept warm</li><li>100 photos every month</li><li>Any style, any setting, instant</li><li>Priority + all premium features</li></ul>
+        <a class="btn ghost" href="/#pricing">Go VIP</a>
+      </div>
+    </div>
+    <p class="certline"><b>Every image is provably yours.</b> Each Studio Photo is sealed with a GenieMade certificate and registered to our authenticated platform — verify any of them yourself.</p>
+  </section>
+</div>
+
+<footer><div class="wrap">GenieMade Studio · consented likeness · certified, tamper-evident authenticity · patent-pending · <a href="/" style="color:var(--mut)">geniemadeit.com</a></div></footer>
+</body>
+</html>
