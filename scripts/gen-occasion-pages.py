@@ -20,6 +20,14 @@ REWARDFUL = ("<!-- Rewardful affiliate tracking -->\n"
              "<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>\n"
              "<script async src='https://r.wdfl.co/rw.js' data-rewardful='3b9f63'></script>")
 
+# Microsoft Clarity — heatmaps + session recordings + funnel (CEO growth-plan "day one"). Project y21d6q7oku.
+CLARITY = ('<!-- Microsoft Clarity -->\n'
+           '<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};'
+           't=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;'
+           'y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","y21d6q7oku");</script>')
+
+TRACKING = REWARDFUL + "\n" + CLARITY
+
 # Occasion catalog = the live /api/packs, enriched with SEO intent (keyword, title, meta, hero copy).
 # looks: (slug, name) — tiles live at /asset/packs/<id>/<slug>.jpg (served via the engine proxy).
 OCCASIONS = [
@@ -78,6 +86,61 @@ OCCASIONS = [
      "meta": "Mad genius, master painter or space pioneer — turn a photo into a Hall-of-Icons AI portrait. Certified and provably yours. First 3 free.",
      "intro": "Mad genius, master painter, space pioneer — GenieMade casts them as an original icon from one photo, sealed and provably yours.",
      "looks": [("genius", "Mad Genius"), ("painter", "Master Painter"), ("pioneer", "Space Pioneer")]},
+]
+
+# Long-tail modifiers (the JibJab tail). Each is a distinct SEARCH INTENT with its own copy, applied only
+# to occasions where it's a real query — so every page is genuinely unique, not a thin duplicate.
+# {t}=Title, {tl}=title-lower. slug reads like the query. Pages reuse the occasion's real look tiles.
+MODIFIERS = [
+    {"key": "funny", "slug": "funny-{id}", "occ": ["birthday", "halloween", "congrats", "cheer-up"],
+     "kw": "funny {tl} card",
+     "h1": "Make a funny {tl} card they'll actually laugh at",
+     "meta": "Turn any photo into a hilarious {tl} card in seconds — pick a look, we make the magic, and it's certified and provably yours. First 3 free.",
+     "intro": "The card that gets the group-chat screenshot. Upload one photo and GenieMade turns them into a laugh-out-loud {tl} moment — no design skills, no awkward stock art.",
+     "angle": "Funny lands best when it's personal. Because it's their face in the scene, a GenieMade {tl} card hits harder than any generic meme — and every one is sealed with a certificate that's provably yours.",
+     "faq": "What makes a funny {tl} card work?"},
+    {"key": "video", "slug": "{id}-video", "occ": ["birthday", "dance", "love", "congrats", "halloween"],
+     "kw": "{tl} video",
+     "h1": "Make a {tl} video from a single photo",
+     "meta": "Turn one photo into a share-worthy {tl} video — motion, music and magic in seconds. Certified and provably yours. First 3 free.",
+     "intro": "A moving, music-backed {tl} moment beats a flat card every time. Upload one photo and GenieMade brings it to life — ready to text, post or drop in the group chat.",
+     "angle": "Video is what people actually share. A personalized {tl} video is inherently viral — every share carries your certified 'made with GenieMade' mark back to the source.",
+     "faq": "How do I make a {tl} video from a photo?"},
+    {"key": "for-mom", "slug": "{id}-for-mom", "occ": ["birthday", "thank-you", "congrats"],
+     "kw": "{tl} for mom",
+     "h1": "{an} {tl} gift for Mom she'll keep forever",
+     "meta": "Turn a photo into a heartfelt {tl} portrait for Mom — thoughtful, personal, and certified as provably hers. First 3 free.",
+     "intro": "Skip the generic card aisle. Upload one photo and GenieMade makes Mom the star of a {tl} keepsake she'll want to frame — thoughtful in a way a store-bought card can't be.",
+     "angle": "The best gift for Mom is one that's unmistakably about her. Because it starts from your own photo, a GenieMade {tl} portrait is personal by design — and sealed with a certificate that's provably hers.",
+     "faq": "What's a good personalized {tl} gift for Mom?"},
+    {"key": "for-dad", "slug": "{id}-for-dad", "occ": ["birthday", "thank-you", "congrats"],
+     "kw": "{tl} for dad",
+     "h1": "{an} {tl} gift for Dad that isn't another tie",
+     "meta": "Turn a photo into a {tl} portrait Dad will actually love — legendary, funny or heroic, and certified as provably his. First 3 free.",
+     "intro": "Give Dad something he'll show his friends. Upload one photo and GenieMade casts him as the star of a {tl} moment — way better than another mug or tie.",
+     "angle": "Dads are hard to shop for because they say they want nothing. A personalized {tl} portrait of him is the exception — memorable, a little funny, and provably his.",
+     "faq": "What's a good personalized {tl} gift for Dad?"},
+    {"key": "for-kids", "slug": "{id}-for-kids", "occ": ["birthday", "halloween", "game-on"],
+     "kw": "{tl} for kids",
+     "h1": "Make {tl} magic your kids will adore",
+     "meta": "Turn your kid's photo into a magical {tl} creation they'll adore — playful, safe and certified as provably yours. First 3 free.",
+     "intro": "Make your kid the hero of the story. Upload one photo and GenieMade turns them into a {tl} creation they'll ask to see again and again.",
+     "angle": "Kids light up when it's actually them in the scene. A GenieMade {tl} creation is that magic on demand — and each one is sealed and provably yours to keep.",
+     "faq": "Is a {tl} creation good for kids?"},
+    {"key": "for-him", "slug": "{id}-for-him", "occ": ["love", "birthday"],
+     "kw": "{tl} for him",
+     "h1": "{an} {tl} gift for him that means something",
+     "meta": "Turn a photo into a {tl} portrait made for him — romantic, epic or heartfelt, and certified as provably his. First 3 free.",
+     "intro": "Say it in a way a text can't. Upload one photo and GenieMade makes him the star of a {tl} keepsake that actually means something.",
+     "angle": "The gift that lands is the one that's clearly about him. A personalized {tl} portrait is personal by design — and provably his.",
+     "faq": "What's a good personalized {tl} gift for him?"},
+    {"key": "for-her", "slug": "{id}-for-her", "occ": ["love", "birthday"],
+     "kw": "{tl} for her",
+     "h1": "{an} {tl} gift for her she'll want to frame",
+     "meta": "Turn a photo into a {tl} portrait made for her — romantic, glamorous or heartfelt, and certified as provably hers. First 3 free.",
+     "intro": "More thoughtful than flowers, more personal than a card. Upload one photo and GenieMade makes her the star of a {tl} keepsake she'll treasure.",
+     "angle": "A gift she keeps is one that's unmistakably about her. A personalized {tl} portrait is exactly that — and sealed as provably hers.",
+     "faq": "What's a good personalized {tl} gift for her?"},
 ]
 
 BRAND_CSS = """
@@ -154,6 +217,10 @@ def render(occ):
     more = "\n".join(
         f'<a href="/make/{o["id"]}">{o["emoji"]} {esc(o["title"])}</a>'
         for o in OCCASIONS if o["id"] != oid)
+    mod_links = " ".join(f'<a href="/make/{s}">{esc(_mt(m["kw"], occ).title())}</a>'
+                         for m, s in modifier_pages_for(occ))
+    mod_sec = (f'<section class="sec"><h2>Popular <em>{esc(occ["title"])}</em> ideas</h2>'
+               f'<div class="more">{mod_links}</div></section>') if mod_links else ""
     # JSON-LD: WebApplication offer + breadcrumb + FAQ (rich results)
     ld = f'''<script type="application/ld+json">{{
   "@context":"https://schema.org","@graph":[
@@ -184,7 +251,7 @@ def render(occ):
 <meta name="twitter:description" content="{esc(occ['meta'])}"><meta name="twitter:image" content="{cover}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
-{REWARDFUL}
+{TRACKING}
 {ld}
 <style>{BRAND_CSS}</style></head>
 <body>
@@ -225,6 +292,7 @@ def render(occ):
     <div class="midcta"><a class="btn gold" href="/app?pack={oid}">Start free →</a></div>
   </section>
 
+  {mod_sec}
   <section class="sec">
     <h2>More <em>occasions</em></h2>
     <div class="more">{more}</div>
@@ -246,6 +314,108 @@ def esc_json(s):
     return json.dumps(str(s))
 
 
+# Clean SEARCH NOUN per occasion (what people actually type) — used in modifier copy so keywords read
+# naturally ("funny birthday card", not "funny birthday bash card").
+NOUNS = {"birthday": "birthday", "love": "anniversary", "congrats": "congrats", "cheer-up": "cheer-up",
+         "thank-you": "thank you", "dance": "dance", "halloween": "Halloween", "legends": "legend",
+         "queens": "queen", "game-on": "gaming", "icons": "icon"}
+
+
+def _mt(s, occ):
+    noun = NOUNS.get(occ["id"], occ["title"].lower())
+    an = "An" if noun[:1].lower() in "aeiou" else "A"
+    return s.format(t=occ["title"], tl=noun, id=occ["id"], an=an)
+
+
+def modifier_pages_for(occ):
+    """The modifier long-tail slugs that apply to this occasion (for interlinking + sitemap)."""
+    return [(m, m["slug"].format(id=occ["id"])) for m in MODIFIERS if occ["id"] in m["occ"]]
+
+
+def render_modifier(occ, mod):
+    oid = occ["id"]
+    slug = mod["slug"].format(id=oid)
+    url = f"{SITE}/make/{slug}"
+    cover = f"{SITE}/asset/packs/{oid}/cover.jpg"
+    h1 = _mt(mod["h1"], occ); meta = _mt(mod["meta"], occ); kw = _mt(mod["kw"], occ)
+    intro = _mt(mod["intro"], occ); angle = _mt(mod["angle"], occ); faqq = _mt(mod["faq"], occ)
+    title = f"{h1} | GenieMade"
+    looks_html = "\n".join(
+        f'''<a class="look" href="/app?pack={oid}&look={ls}">
+        <img src="{look_tile(oid, ls)}" alt="{esc(ln)} — {esc(kw)} by GenieMade" loading="lazy" width="512" height="512">
+        <div class="cap"><b>{esc(ln)}</b><span class="go">Make it →</span></div></a>'''
+        for ls, ln in occ["looks"])
+    # sibling modifiers of the SAME occasion + the parent hub (tight interlinking)
+    sibs = [f'<a href="/make/{s}">{esc(_mt(m["kw"], occ).title())}</a>'
+            for m, s in modifier_pages_for(occ) if s != slug]
+    sibs.insert(0, f'<a href="/make/{oid}">{occ["emoji"]} All {esc(occ["title"])}</a>')
+    ld = f'''<script type="application/ld+json">{{
+  "@context":"https://schema.org","@graph":[
+   {{"@type":"WebApplication","name":"GenieMade — {esc(h1)}","url":"{url}",
+     "applicationCategory":"MultimediaApplication","operatingSystem":"Web","description":{esc_json(meta)},
+     "offers":{{"@type":"Offer","price":"0","priceCurrency":"USD","description":"3 free creations to start"}},
+     "publisher":{{"@type":"Organization","name":"CyberHope AI","url":"https://cyberhopeai.com"}}}},
+   {{"@type":"BreadcrumbList","itemListElement":[
+     {{"@type":"ListItem","position":1,"name":"GenieMade","item":"{SITE}/"}},
+     {{"@type":"ListItem","position":2,"name":"{esc(occ['title'])}","item":"{SITE}/make/{oid}"}},
+     {{"@type":"ListItem","position":3,"name":"{esc(kw.title())}","item":"{url}"}}]}},
+   {{"@type":"FAQPage","mainEntity":[
+     {{"@type":"Question","name":"{esc(faqq)}","acceptedAnswer":{{"@type":"Answer","text":{esc_json(angle)}}}}},
+     {{"@type":"Question","name":"How much does it cost?","acceptedAnswer":{{"@type":"Answer","text":"Your first 3 creations are free — no credit card to start."}}}}]}}
+  ]}}</script>'''
+    return f'''<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>{esc(title)}</title>
+<meta name="description" content="{esc(meta)}">
+<link rel="canonical" href="{url}">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<meta property="og:type" content="website"><meta property="og:site_name" content="GenieMade">
+<meta property="og:title" content="{esc(h1)} | GenieMade"><meta property="og:description" content="{esc(meta)}">
+<meta property="og:url" content="{url}"><meta property="og:image" content="{cover}">
+<meta name="twitter:card" content="summary_large_image"><meta name="twitter:title" content="{esc(h1)}">
+<meta name="twitter:description" content="{esc(meta)}"><meta name="twitter:image" content="{cover}">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+{TRACKING}
+{ld}
+<style>{BRAND_CSS}</style></head>
+<body>
+<header><div class="wrap nav">
+  <a class="wm" href="/">Genie<b>Made</b></a>
+  <nav class="links"><a class="hide-sm" href="/make/{oid}">{esc(occ['title'])}</a><a class="hide-sm" href="/studio-you">Studio You</a><a class="hide-sm" href="/#pricing">Pricing</a><a class="btn gold" href="/app?pack={oid}" style="padding:9px 18px">Open the Studio</a></nav>
+</div></header>
+<main class="wrap">
+  <section class="hero">
+    <span class="eyebrow"><span class="spark"></span>{occ['emoji']} {esc(kw.title())}</span>
+    <h1>{esc(h1)}</h1>
+    <p class="lead">{esc(intro)}</p>
+    <div class="cta-row"><a class="btn gold" href="/app?pack={oid}">Make one free</a><a class="btn ghost" href="#looks">See the looks</a></div>
+    <div class="free">✦ Your first 3 creations are free · no credit card to start</div>
+    <div class="cert-strip">◈ Every creation sealed with a Certificate of Authenticity — provably yours</div>
+  </section>
+  <section class="sec"><p class="lead" style="text-align:center">{esc(angle)}</p></section>
+  <section id="looks" class="sec">
+    <h2>Pick a <em>{esc(occ['title'])}</em> look</h2>
+    <div class="looks">{looks_html}</div>
+    <div class="midcta"><a class="btn gold" href="/app?pack={oid}">Start free →</a></div>
+  </section>
+  <section class="sec">
+    <h2>How it <em>works</em></h2>
+    <div class="steps">
+      <div class="step"><div class="n">1</div><h3>Add your photo</h3><p>One clear photo is all it takes.</p></div>
+      <div class="step"><div class="n">2</div><h3>We make the magic</h3><p>GenieMade renders it in seconds.</p></div>
+      <div class="step"><div class="n">3</div><h3>Certified &amp; yours</h3><p>Download, share — sealed and provably yours.</p></div>
+    </div>
+  </section>
+  <section class="sec"><h2>More <em>ideas</em></h2><div class="more">{' '.join(sibs)}</div></section>
+</main>
+<footer><div class="wrap foot">
+  <div>© GenieMade · a CyberHope AI product</div>
+  <div style="display:flex;gap:18px;flex-wrap:wrap"><a href="/make/{oid}">{esc(occ['title'])}</a><a href="/studio-you">Studio You</a><a class="aff" href="/affiliates">Earn with GenieMade →</a></div>
+</div></footer>
+</body></html>'''
+
+
 def build_sitemap():
     from datetime import date  # noqa
     # (date import kept minimal; lastmod omitted to avoid churn — Google recrawls on content change)
@@ -263,6 +433,14 @@ def build_sitemap():
             f'<image:caption>{esc(occ["h1"])} with GenieMade. {esc(ln)} look.</image:caption></image:image>'
             for ls, ln in occ["looks"])
         parts.append(f"  <url><loc>{url}</loc><changefreq>weekly</changefreq><priority>0.8</priority>{imgs}</url>")
+        # long-tail modifier pages share the occasion's tiles (image sitemap coverage)
+        for mod, slug in modifier_pages_for(occ):
+            kw = _mt(mod["kw"], occ)
+            mimgs = "".join(
+                f'<image:image><image:loc>{look_tile(oid, ls)}</image:loc>'
+                f'<image:title>{esc(ln)} — {esc(kw)}</image:title></image:image>'
+                for ls, ln in occ["looks"])
+            parts.append(f"  <url><loc>{SITE}/make/{slug}</loc><changefreq>weekly</changefreq><priority>0.7</priority>{mimgs}</url>")
     parts.append("</urlset>")
     return "\n".join(parts)
 
@@ -270,12 +448,18 @@ def build_sitemap():
 def main():
     mk = os.path.join(OUT, "make")
     os.makedirs(mk, exist_ok=True)
+    nmod = 0
     for occ in OCCASIONS:
         with open(os.path.join(mk, f"{occ['id']}.html"), "w", encoding="utf-8") as f:
             f.write(render(occ))
+        for mod, slug in modifier_pages_for(occ):
+            with open(os.path.join(mk, f"{slug}.html"), "w", encoding="utf-8") as f:
+                f.write(render_modifier(occ, mod))
+            nmod += 1
     with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write(build_sitemap())
-    print(f"wrote {len(OCCASIONS)} occasion pages to make/ + sitemap.xml ({len(OCCASIONS)*3} image entries)")
+    total = len(OCCASIONS) + nmod
+    print(f"wrote {len(OCCASIONS)} occasion + {nmod} long-tail = {total} pages to make/ + sitemap.xml")
 
 
 if __name__ == "__main__":
