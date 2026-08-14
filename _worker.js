@@ -38,6 +38,29 @@ export default {
       if (resp.ok) { const c = new Response(resp.body, resp); ctx.waitUntil(cache.put(request, c.clone())); return c; }
       return resp;
     }
+    // Affiliate admin — proxy the Rewardful REST API server-side (its SECRET must never reach the
+    // browser). Distinct /rwadmin/ prefix so it never collides with the engine's /api/* (incl.
+    // /api/admin/purge). Gated by ADMIN_TOKEN; READ-ONLY (GET) so the browser admin can never issue a
+    // destructive Rewardful write — deliberate writes get a separate, audited path later.
+    if (url.pathname.startsWith("/rwadmin/")) {
+      const provided = request.headers.get("x-admin-token") || "";
+      if (!env.ADMIN_TOKEN || provided !== env.ADMIN_TOKEN)
+        return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "content-type": "application/json" }});
+      if (!env.REWARDFUL_API_SECRET)
+        return new Response(JSON.stringify({ error: "rewardful_not_configured" }), { status: 503, headers: { "content-type": "application/json" }});
+      if (request.method !== "GET")
+        return new Response(JSON.stringify({ error: "read_only" }), { status: 405, headers: { "content-type": "application/json" }});
+      const sub = url.pathname.slice("/rwadmin/".length).replace(/^\/+/, "");
+      const rw = "https://api.getrewardful.com/v1/" + sub + url.search;
+      const auth = "Basic " + btoa(env.REWARDFUL_API_SECRET + ":");
+      try {
+        const resp = await fetch(rw, { headers: { authorization: auth } });
+        const body = await resp.text();
+        return new Response(body, { status: resp.status, headers: { "content-type": "application/json", "cache-control": "no-store" }});
+      } catch (e) {
+        return new Response(JSON.stringify({ error: "upstream" }), { status: 502, headers: { "content-type": "application/json" }});
+      }
+    }
     // API glue: proxy the rest of /api/* to the GenieMade engine so the Studio
     // calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
