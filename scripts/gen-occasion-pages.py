@@ -86,6 +86,32 @@ OCCASIONS = [
      "meta": "Mad genius, master painter or space pioneer — turn a photo into a Hall-of-Icons AI portrait. Certified and provably yours. First 3 free.",
      "intro": "Mad genius, master painter, space pioneer — GenieMade casts them as an original icon from one photo, sealed and provably yours.",
      "looks": [("genius", "Mad Genius"), ("painter", "Master Painter"), ("pioneer", "Space Pioneer")]},
+    # Seasonal hubs — huge B2C search volume; reuse a fitting existing pack's imagery via "pack".
+    {"id": "valentines-day", "emoji": "💝", "title": "Valentine's Day", "pack": "love",
+     "kw": "AI Valentine's Day card", "h1": "Make a Valentine's Day card that melts them",
+     "meta": "Turn a photo into a romantic AI Valentine's Day card — classic, retro or starry-eyed. Certified and provably yours. First 3 free.",
+     "intro": "Skip the drugstore card. Upload one photo and GenieMade turns it into a Valentine's Day keepsake made just for them — sealed and provably yours.",
+     "looks": [("classic-romance", "Classic Romance"), ("retro-valentine", "Retro Valentine"), ("starry-dance", "Starry Slow Dance")]},
+    {"id": "graduation", "emoji": "🎓", "title": "Graduation", "pack": "congrats",
+     "kw": "AI graduation card", "h1": "Celebrate the grad like the champion they are",
+     "meta": "Turn a photo into a proud AI graduation card — trophy, cap-and-gown or confetti-cannon. Certified and provably yours. First 3 free.",
+     "intro": "Cap, gown, and a moment worth framing. Upload one photo and GenieMade makes the grad the star of it — certified and provably theirs.",
+     "looks": [("trophy", "Trophy Moment"), ("grad", "Graduation Glory"), ("confetti-cannon", "Confetti Cannon")]},
+    {"id": "new-year", "emoji": "🎆", "title": "New Year", "pack": "dance",
+     "kw": "AI New Year card", "h1": "Ring in the New Year on the dance floor",
+     "meta": "Turn a photo into a New Year's party moment — disco, hip-hop or rockstar. Certified and provably yours. First 3 free.",
+     "intro": "Cue the countdown. Upload one photo and GenieMade drops them into a New Year's party moment worth sharing — sealed and provably yours.",
+     "looks": [("disco", "Disco Fever"), ("hiphop", "90s Hip-Hop"), ("rockstar", "Rockstar Encore")]},
+    {"id": "mothers-day", "emoji": "👑", "title": "Mother's Day", "pack": "queens",
+     "kw": "AI Mother's Day gift", "h1": "Make Mom the queen she already is",
+     "meta": "Turn a photo into a regal AI Mother's Day portrait — rock queen, warrior princess or golden glam. Certified as provably hers. First 3 free.",
+     "intro": "Give Mom more than a card. Upload one photo and GenieMade crowns her the icon of the story — a Mother's Day keepsake she'll want to frame.",
+     "looks": [("rock-queen", "Rockstar Queen"), ("warrior-princess", "Warrior Princess"), ("golden-glam", "Golden Age Glam")]},
+    {"id": "fathers-day", "emoji": "⚡", "title": "Father's Day", "pack": "legends",
+     "kw": "AI Father's Day gift", "h1": "Make Dad the legend he thinks he is",
+     "meta": "Turn a photo into a legendary AI Father's Day portrait — rockstar, outlaw or caped hero. Certified as provably his. First 3 free.",
+     "intro": "Better than another tie. Upload one photo and GenieMade casts Dad as the legend of the story — a Father's Day gift he'll actually show his friends.",
+     "looks": [("rock-legend", "Rockstar Legend"), ("outlaw", "Wild West Outlaw"), ("super-hero", "Caped Super Hero")]},
 ]
 
 # Long-tail modifiers (the JibJab tail). Each is a distinct SEARCH INTENT with its own copy, applied only
@@ -205,12 +231,13 @@ def look_tile(occ_id, look_slug):
 
 def render(occ):
     oid = occ["id"]
+    pk = occ.get("pack", oid)
     url = f"{SITE}/make/{oid}"
-    cover = f"{SITE}/asset/packs/{oid}/cover.jpg"
+    cover = f"{SITE}/asset/packs/{pk}/cover.jpg"
     title = f"{occ['h1']} · {occ['kw']} | GenieMade"
     looks_html = "\n".join(
-        f'''<a class="look" href="/app?pack={oid}&look={ls}">
-        <img src="{look_tile(oid, ls)}" alt="{esc(ln)} — {esc(occ['kw'])} by GenieMade" loading="lazy" width="512" height="512">
+        f'''<a class="look" href="/app?pack={pk}&look={ls}">
+        <img src="{look_tile(pk, ls)}" alt="{esc(ln)} — {esc(occ['kw'])} by GenieMade" loading="lazy" width="512" height="512">
         <div class="cap"><b>{esc(ln)}</b><span class="go">Make it →</span></div></a>'''
         for ls, ln in occ["looks"])
     # internal links to sibling occasions (SEO interlinking)
@@ -261,7 +288,7 @@ def render(occ):
     <a class="hide-sm" href="/make/birthday">Occasions</a>
     <a class="hide-sm" href="/studio-you">Studio You</a>
     <a class="hide-sm" href="/#pricing">Pricing</a>
-    <a class="btn gold" href="/app?pack={oid}" style="padding:9px 18px">Open the Studio</a>
+    <a class="btn gold" href="/app?pack={pk}" style="padding:9px 18px">Open the Studio</a>
   </nav></div></header>
 
 <main class="wrap">
@@ -270,7 +297,7 @@ def render(occ):
     <h1>{esc(occ['h1'])}</h1>
     <p class="lead">{esc(occ['intro'])}</p>
     <div class="cta-row">
-      <a class="btn gold" href="/app?pack={oid}">Make your {esc(occ['title'].lower())} photo</a>
+      <a class="btn gold" href="/app?pack={pk}">Make your {esc(occ['title'].lower())} photo</a>
       <a class="btn ghost" href="#looks">See the looks</a>
     </div>
     <div class="free">✦ Your first 3 creations are free · no credit card to start</div>
@@ -289,7 +316,7 @@ def render(occ):
       <div class="step"><div class="n">2</div><h3>We make the magic</h3><p>GenieMade renders your {esc(occ['title'].lower())} look in seconds.</p></div>
       <div class="step"><div class="n">3</div><h3>Certified &amp; yours</h3><p>Download it, share it — sealed with a certificate that's provably yours.</p></div>
     </div>
-    <div class="midcta"><a class="btn gold" href="/app?pack={oid}">Start free →</a></div>
+    <div class="midcta"><a class="btn gold" href="/app?pack={pk}">Start free →</a></div>
   </section>
 
   {mod_sec}
@@ -334,15 +361,16 @@ def modifier_pages_for(occ):
 
 def render_modifier(occ, mod):
     oid = occ["id"]
+    pk = occ.get("pack", oid)
     slug = mod["slug"].format(id=oid)
     url = f"{SITE}/make/{slug}"
-    cover = f"{SITE}/asset/packs/{oid}/cover.jpg"
+    cover = f"{SITE}/asset/packs/{pk}/cover.jpg"
     h1 = _mt(mod["h1"], occ); meta = _mt(mod["meta"], occ); kw = _mt(mod["kw"], occ)
     intro = _mt(mod["intro"], occ); angle = _mt(mod["angle"], occ); faqq = _mt(mod["faq"], occ)
     title = f"{h1} | GenieMade"
     looks_html = "\n".join(
-        f'''<a class="look" href="/app?pack={oid}&look={ls}">
-        <img src="{look_tile(oid, ls)}" alt="{esc(ln)} — {esc(kw)} by GenieMade" loading="lazy" width="512" height="512">
+        f'''<a class="look" href="/app?pack={pk}&look={ls}">
+        <img src="{look_tile(pk, ls)}" alt="{esc(ln)} — {esc(kw)} by GenieMade" loading="lazy" width="512" height="512">
         <div class="cap"><b>{esc(ln)}</b><span class="go">Make it →</span></div></a>'''
         for ls, ln in occ["looks"])
     # sibling modifiers of the SAME occasion + the parent hub (tight interlinking)
@@ -382,14 +410,14 @@ def render_modifier(occ, mod):
 <body>
 <header><div class="wrap nav">
   <a class="wm" href="/">Genie<b>Made</b></a>
-  <nav class="links"><a class="hide-sm" href="/make/{oid}">{esc(occ['title'])}</a><a class="hide-sm" href="/studio-you">Studio You</a><a class="hide-sm" href="/#pricing">Pricing</a><a class="btn gold" href="/app?pack={oid}" style="padding:9px 18px">Open the Studio</a></nav>
+  <nav class="links"><a class="hide-sm" href="/make/{oid}">{esc(occ['title'])}</a><a class="hide-sm" href="/studio-you">Studio You</a><a class="hide-sm" href="/#pricing">Pricing</a><a class="btn gold" href="/app?pack={pk}" style="padding:9px 18px">Open the Studio</a></nav>
 </div></header>
 <main class="wrap">
   <section class="hero">
     <span class="eyebrow"><span class="spark"></span>{occ['emoji']} {esc(kw.title())}</span>
     <h1>{esc(h1)}</h1>
     <p class="lead">{esc(intro)}</p>
-    <div class="cta-row"><a class="btn gold" href="/app?pack={oid}">Make one free</a><a class="btn ghost" href="#looks">See the looks</a></div>
+    <div class="cta-row"><a class="btn gold" href="/app?pack={pk}">Make one free</a><a class="btn ghost" href="#looks">See the looks</a></div>
     <div class="free">✦ Your first 3 creations are free · no credit card to start</div>
     <div class="cert-strip">◈ Every creation sealed with a Certificate of Authenticity — provably yours</div>
   </section>
@@ -397,7 +425,7 @@ def render_modifier(occ, mod):
   <section id="looks" class="sec">
     <h2>Pick a <em>{esc(occ['title'])}</em> look</h2>
     <div class="looks">{looks_html}</div>
-    <div class="midcta"><a class="btn gold" href="/app?pack={oid}">Start free →</a></div>
+    <div class="midcta"><a class="btn gold" href="/app?pack={pk}">Start free →</a></div>
   </section>
   <section class="sec">
     <h2>How it <em>works</em></h2>
@@ -426,9 +454,9 @@ def build_sitemap():
     for p in core:
         parts.append(f"  <url><loc>{SITE}{p}</loc><changefreq>weekly</changefreq></url>")
     for occ in OCCASIONS:
-        oid = occ["id"]; url = f"{SITE}/make/{oid}"
+        oid = occ["id"]; pk = occ.get("pack", oid); url = f"{SITE}/make/{oid}"
         imgs = "".join(
-            f'<image:image><image:loc>{look_tile(oid, ls)}</image:loc>'
+            f'<image:image><image:loc>{look_tile(pk, ls)}</image:loc>'
             f'<image:title>{esc(ln)} — {esc(occ["kw"])}</image:title>'
             f'<image:caption>{esc(occ["h1"])} with GenieMade. {esc(ln)} look.</image:caption></image:image>'
             for ls, ln in occ["looks"])
@@ -437,7 +465,7 @@ def build_sitemap():
         for mod, slug in modifier_pages_for(occ):
             kw = _mt(mod["kw"], occ)
             mimgs = "".join(
-                f'<image:image><image:loc>{look_tile(oid, ls)}</image:loc>'
+                f'<image:image><image:loc>{look_tile(pk, ls)}</image:loc>'
                 f'<image:title>{esc(ln)} — {esc(kw)}</image:title></image:image>'
                 for ls, ln in occ["looks"])
             parts.append(f"  <url><loc>{SITE}/make/{slug}</loc><changefreq>weekly</changefreq><priority>0.7</priority>{mimgs}</url>")
@@ -448,18 +476,28 @@ def build_sitemap():
 def main():
     mk = os.path.join(OUT, "make")
     os.makedirs(mk, exist_ok=True)
+    written = set()
     nmod = 0
     for occ in OCCASIONS:
-        with open(os.path.join(mk, f"{occ['id']}.html"), "w", encoding="utf-8") as f:
+        name = f"{occ['id']}.html"
+        with open(os.path.join(mk, name), "w", encoding="utf-8") as f:
             f.write(render(occ))
+        written.add(name)
         for mod, slug in modifier_pages_for(occ):
-            with open(os.path.join(mk, f"{slug}.html"), "w", encoding="utf-8") as f:
+            name = f"{slug}.html"
+            with open(os.path.join(mk, name), "w", encoding="utf-8") as f:
                 f.write(render_modifier(occ, mod))
+            written.add(name)
             nmod += 1
+    # self-clean: drop any stale make/*.html no longer in the catalog (renamed/removed modifiers)
+    removed = 0
+    for fn in os.listdir(mk):
+        if fn.endswith(".html") and fn not in written:
+            os.remove(os.path.join(mk, fn)); removed += 1
     with open(os.path.join(OUT, "sitemap.xml"), "w", encoding="utf-8") as f:
         f.write(build_sitemap())
     total = len(OCCASIONS) + nmod
-    print(f"wrote {len(OCCASIONS)} occasion + {nmod} long-tail = {total} pages to make/ + sitemap.xml")
+    print(f"wrote {len(OCCASIONS)} occasion + {nmod} long-tail = {total} pages; removed {removed} stale")
 
 
 if __name__ == "__main__":
