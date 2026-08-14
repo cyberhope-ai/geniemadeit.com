@@ -41,7 +41,9 @@
         prompt: g.prompt || "",
         model: g.model || "GenieMade",
         ts: Date.parse(g.created_at || (g.certificate && g.certificate.issued_at)) || Date.now(),
-        certificate: g.certificate || {},
+        // /api/gallery returns FLAT cert fields (cert_id/created_at/hash) — rebuild the nested shape the
+        // certificate modal reads, so reloaded + imported creations show Receipt/Sealed/Fingerprint (not blanks).
+        certificate: g.certificate || { receipt_id: g.cert_id, issued_at: g.created_at, hash: g.hash, c2pa: true },
       }));
       renderVault();
     } catch (_) { /* keep whatever we have */ }
