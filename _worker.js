@@ -61,6 +61,28 @@ export default {
         return new Response(JSON.stringify({ error: "upstream" }), { status: 502, headers: { "content-type": "application/json" }});
       }
     }
+    // GenieAdmin customer panel — proxy the ENGINE's owner-gated admin endpoints (customer data lives in
+    // the engine D1: credits, email, phone, card last4, plan). Same ADMIN_TOKEN gate; READ-ONLY. The engine
+    // admin secret is sent server-side only (never the browser). Returns 503 until ENGINE_ADMIN_SECRET is
+    // set — the /admin Customers tab shows a "coming online" state until then. Auth header confirmed w/ atlas2.
+    if (url.pathname.startsWith("/gmadmin/")) {
+      const provided = request.headers.get("x-admin-token") || "";
+      if (!env.ADMIN_TOKEN || provided !== env.ADMIN_TOKEN)
+        return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "content-type": "application/json" }});
+      if (!env.ENGINE_ADMIN_SECRET)
+        return new Response(JSON.stringify({ error: "engine_admin_not_configured" }), { status: 503, headers: { "content-type": "application/json" }});
+      if (request.method !== "GET")
+        return new Response(JSON.stringify({ error: "read_only" }), { status: 405, headers: { "content-type": "application/json" }});
+      const sub = url.pathname.slice("/gmadmin/".length).replace(/^\/+/, "");
+      const eng = "https://geniemade-engine.cyberhopeai.workers.dev/api/admin/" + sub + url.search;
+      try {
+        const resp = await fetch(eng, { headers: { "x-admin-secret": env.ENGINE_ADMIN_SECRET } });
+        const body = await resp.text();
+        return new Response(body, { status: resp.status, headers: { "content-type": "application/json", "cache-control": "no-store" }});
+      } catch (e) {
+        return new Response(JSON.stringify({ error: "upstream" }), { status: 502, headers: { "content-type": "application/json" }});
+      }
+    }
     // API glue: proxy the rest of /api/* to the GenieMade engine so the Studio
     // calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
