@@ -76,7 +76,7 @@ export default {
       const sub = url.pathname.slice("/gmadmin/".length).replace(/^\/+/, "");
       const eng = "https://geniemade-engine.cyberhopeai.workers.dev/api/admin/" + sub + url.search;
       try {
-        const resp = await fetch(eng, { headers: { "x-admin-secret": env.ENGINE_ADMIN_SECRET } });
+        const resp = await fetch(eng, { headers: { "x-admin-token": env.ENGINE_ADMIN_SECRET } });
         const body = await resp.text();
         return new Response(body, { status: resp.status, headers: { "content-type": "application/json", "cache-control": "no-store" }});
       } catch (e) {
