@@ -1,0 +1,145 @@
+<!doctype html><html lang="en"><head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Your Account — GenieMade</title>
+<meta name="robots" content="noindex, nofollow">
+<meta name="description" content="Manage your GenieMade account — profile, credits, billing and receipts.">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+<!-- Rewardful affiliate tracking -->
+<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>
+<script async src='https://r.wdfl.co/rw.js' data-rewardful='3b9f63'></script>
+<!-- Microsoft Clarity -->
+<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","y21d6q7oku");</script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--night:#130a26;--night2:#1c1140;--panel:#231553;--panel2:#2b1b63;--line:#3a2a6b;--ink:#f7f1ff;--mut:#c6b6ea;--faint:#8f7fbb;--gold:#f5c451;--gold2:#ffe390;--goldd:#c88f2c;--ok:#57e0a8;--serif:"Playfair Display",Georgia,serif;--sans:"Inter",system-ui,sans-serif}
+body{background:radial-gradient(1200px 640px at 80% -6%,rgba(245,196,81,.13),transparent 60%),linear-gradient(178deg,var(--night2),var(--night));color:var(--ink);font:15px/1.6 var(--sans);min-height:100vh}
+a{color:inherit;text-decoration:none} .wrap{max-width:920px;margin:0 auto;padding:0 22px}
+header{position:sticky;top:0;z-index:40;backdrop-filter:blur(10px);background:linear-gradient(180deg,rgba(19,10,38,.86),rgba(19,10,38,.5));border-bottom:1px solid var(--line)}
+.nav{display:flex;align-items:center;justify-content:space-between;height:64px}
+.wm{font-family:var(--serif);font-size:1.3rem;font-weight:600}.wm b{color:var(--gold)}
+.links{display:flex;gap:20px;align-items:center}.links a{color:var(--mut);font-size:.92rem}.links a:hover{color:var(--ink)}
+.btn{display:inline-flex;align-items:center;justify-content:center;border:none;border-radius:22px;padding:10px 18px;font:inherit;font-weight:700;cursor:pointer;background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1a05}
+.btn:hover{filter:brightness(1.06)} .btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink)} .btn.sm{padding:7px 13px;font-size:.85rem}
+h1{font-family:var(--serif);font-weight:600;font-size:2rem;margin:26px 0 4px}
+.sub{color:var(--mut);margin-bottom:20px}
+.card{border:1px solid var(--line);border-radius:14px;background:var(--panel);padding:20px 22px;margin-bottom:18px}
+.card h2{font-family:var(--serif);font-size:1.2rem;margin-bottom:14px}
+.row{display:flex;justify-content:space-between;gap:14px;align-items:center;padding:10px 0;border-bottom:1px solid var(--line);flex-wrap:wrap}
+.row:last-child{border-bottom:none} .row .k{color:var(--faint);font-size:.85rem} .row .v{font-weight:600}
+.field{display:flex;flex-direction:column;gap:5px;margin-bottom:12px} .field label{font-size:.8rem;color:var(--faint)}
+.field input{padding:11px 13px;border-radius:9px;border:1px solid var(--line);background:var(--night);color:var(--ink);font:inherit}
+.field .ro{color:var(--faint);font-size:.78rem}
+.bignum{font-family:var(--serif);font-size:2.6rem;color:var(--gold2)}
+table{width:100%;border-collapse:collapse;font-size:.9rem} th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)} th{color:var(--faint);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em}
+.rcpt{color:var(--gold2)} .muted{color:var(--faint)} .err{color:#ff9f6f} .ok{color:var(--ok)}
+.note{font-size:.82rem;color:var(--faint);margin-top:6px}
+.signin{max-width:420px;margin:80px auto;text-align:center}
+.signin .card{padding:30px}
+</style></head>
+<body>
+<header><div class="wrap nav">
+  <a class="wm" href="/">Genie<b>Made</b></a>
+  <nav class="links"><a href="/make/birthday">Occasions</a><a href="/app">Studio</a><a href="/#pricing">Pricing</a><a class="btn sm" id="logoutBtn" href="#" style="display:none">Sign out</a></nav>
+</div></header>
+
+<main class="wrap" id="app">
+  <div class="muted" id="boot" style="padding:40px 0">Loading your account…</div>
+
+  <div id="signedout" class="signin" hidden>
+    <div class="card">
+      <h2>Sign in to view your account</h2>
+      <p class="sub">Your receipts, credits and settings live here once you’re signed in.</p>
+      <a class="btn" href="/app">Go to the Studio to sign in →</a>
+    </div>
+  </div>
+
+  <div id="acct" hidden>
+    <h1>Your account</h1>
+    <div class="sub" id="hello"></div>
+
+    <div class="card">
+      <h2>Credits</h2>
+      <div class="row"><div><div class="bignum" id="creditBal">—</div><div class="k">wishes remaining</div></div>
+        <a class="btn" href="/#pricing">Top up →</a></div>
+    </div>
+
+    <div class="card">
+      <h2>Profile</h2>
+      <div class="field"><label>Display name</label><input id="pfName" placeholder="Your name"></div>
+      <div class="field"><label>Email</label><input id="pfEmail" disabled><span class="ro">To change your email, contact support.</span></div>
+      <button class="btn sm" id="saveProfile">Save profile</button> <span id="profileMsg" class="note"></span>
+      <h2 style="margin-top:22px">Change password</h2>
+      <div class="field"><label>Current password</label><input id="pwOld" type="password" autocomplete="current-password"></div>
+      <div class="field"><label>New password (8+ characters)</label><input id="pwNew" type="password" autocomplete="new-password"></div>
+      <button class="btn sm" id="savePw">Update password</button> <span id="pwMsg" class="note"></span>
+    </div>
+
+    <div class="card">
+      <h2>Billing &amp; receipts</h2>
+      <p class="note" id="billNote">Your purchases and receipts. Manage your card and download official receipts in the billing portal.</p>
+      <div style="margin:10px 0"><button class="btn sm" id="portalBtn">Manage billing &amp; cards →</button> <span id="portalMsg" class="note"></span></div>
+      <div id="invWrap"><div class="muted">Loading receipts…</div></div>
+    </div>
+  </div>
+</main>
+
+<script>
+function money(c,cur){return (cur&&cur!=="usd"?cur.toUpperCase()+" ":"$")+((Number(c)||0)/100).toFixed(2);}
+function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+async function api(path,opts){var r=await fetch(path,Object.assign({credentials:"same-origin"},opts||{}));var d=null;try{d=await r.json();}catch(e){}return {status:r.status,ok:r.ok,data:d||{}};}
+function show(id,on){var e=document.getElementById(id);if(e)e.hidden=!on;}
+
+async function boot(){
+  var me=await api("/api/auth/me");
+  if(me.status===401||!me.ok||!(me.data&&(me.data.user||me.data.email||me.data.id))){
+    show("boot",false); show("signedout",true); return;
+  }
+  show("boot",false); show("acct",true);
+  document.getElementById("logoutBtn").style.display="";
+  loadAccount(); loadCredits(); loadInvoices();
+}
+async function loadAccount(){
+  var a=await api("/api/account"); var u=(a.data&&(a.data.account||a.data.user||a.data))||{};
+  document.getElementById("hello").textContent=(u.email?("Signed in as "+u.email):"");
+  document.getElementById("pfName").value=u.display_name||u.name||"";
+  document.getElementById("pfEmail").value=u.email||"";
+}
+async function loadCredits(){
+  var c=await api("/api/credits"); var d=c.data||{};
+  document.getElementById("creditBal").textContent=(d.credits!=null?d.credits:(d.balance!=null?d.balance:"—"));
+}
+async function loadInvoices(){
+  var r=await api("/api/billing/invoices"); var inv=(r.data&&(r.data.invoices||r.data.data))||[];
+  var w=document.getElementById("invWrap");
+  if(!Array.isArray(inv)||!inv.length){w.innerHTML='<p class="muted">No purchases yet — your receipts will appear here after your first top-up.</p>';return;}
+  w.innerHTML='<table><thead><tr><th>Date</th><th>Item</th><th>Credits</th><th>Amount</th><th>Receipt</th></tr></thead><tbody>'+inv.map(function(x){
+    return '<tr><td class="muted">'+esc(String(x.ts||x.created_at||"").slice(0,10))+'</td><td>'+esc(x.pack||x.label||"Credits")+'</td><td>'+(x.credits!=null?x.credits:"—")+'</td><td>'+money(x.amount_cents,x.currency)+'</td><td>'+(x.receipt_url||x.stripe_receipt_url?'<a class="rcpt" href="'+esc(x.receipt_url||x.stripe_receipt_url)+'" target="_blank" rel="noopener">Receipt ↗</a>':"—")+'</td></tr>';
+  }).join("")+'</tbody></table>';
+}
+document.getElementById("saveProfile").onclick=async function(){
+  var msg=document.getElementById("profileMsg"); msg.textContent="Saving…"; msg.className="note";
+  var r=await api("/api/account",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({display_name:document.getElementById("pfName").value.trim()})});
+  msg.textContent=r.ok?"Saved.":((r.data.error&&r.data.error.message)||r.data.message||"Couldn’t save (name changes may need support).");
+  msg.className=r.ok?"note ok":"note err";
+};
+document.getElementById("savePw").onclick=async function(){
+  var msg=document.getElementById("pwMsg"); var np=document.getElementById("pwNew").value;
+  if(np.length<8){msg.textContent="New password must be 8+ characters.";msg.className="note err";return;}
+  msg.textContent="Updating…"; msg.className="note";
+  var r=await api("/api/account/password",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({old_password:document.getElementById("pwOld").value,current_password:document.getElementById("pwOld").value,password:np,new_password:np})});
+  msg.textContent=r.ok?"Password updated.":((r.data.error&&r.data.error.message)||r.data.detail||r.data.message||"Couldn’t update — check your current password.");
+  msg.className=r.ok?"note ok":"note err";
+  if(r.ok){document.getElementById("pwOld").value="";document.getElementById("pwNew").value="";}
+};
+document.getElementById("portalBtn").onclick=async function(){
+  var msg=document.getElementById("portalMsg"); msg.textContent="Opening billing portal…"; msg.className="note";
+  var r=await api("/api/billing/portal",{method:"POST"});
+  if(r.ok&&(r.data.url||r.data.portal_url)){window.location.href=r.data.url||r.data.portal_url;return;}
+  msg.textContent=(r.data.message||"Buy credits once to open your billing portal (card + official receipts).");
+  msg.className="note";
+};
+document.getElementById("logoutBtn").onclick=async function(e){e.preventDefault();await api("/api/auth/logout",{method:"POST"});window.location.href="/";};
+boot();
+</script>
+</body></html>
