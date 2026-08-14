@@ -13,6 +13,13 @@ import os
 SITE = "https://geniemadeit.com"
 OUT = os.path.join(os.path.dirname(__file__), "..")
 
+# Site-wide tracking. Rewardful affiliate tracking must be on EVERY page (incl. these SEO/affiliate
+# landing pages) so a referral is captured no matter where the visitor lands — the exact snippet the
+# core funnel (/, /app) uses. (Analytics like Clarity go in via CLARITY_ID once the CEO creates a project.)
+REWARDFUL = ("<!-- Rewardful affiliate tracking -->\n"
+             "<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>\n"
+             "<script async src='https://r.wdfl.co/rw.js' data-rewardful='3b9f63'></script>")
+
 # Occasion catalog = the live /api/packs, enriched with SEO intent (keyword, title, meta, hero copy).
 # looks: (slug, name) — tiles live at /asset/packs/<id>/<slug>.jpg (served via the engine proxy).
 OCCASIONS = [
@@ -177,6 +184,7 @@ def render(occ):
 <meta name="twitter:description" content="{esc(occ['meta'])}"><meta name="twitter:image" content="{cover}">
 <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700&family=Playfair+Display:ital,wght@0,600;1,600&display=swap" rel="stylesheet">
+{REWARDFUL}
 {ld}
 <style>{BRAND_CSS}</style></head>
 <body>
