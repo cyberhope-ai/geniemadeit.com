@@ -33,6 +33,13 @@ a.lnk{color:var(--gold2)}
 .tabs{display:flex;gap:6px;margin:6px 0 18px;border-bottom:1px solid var(--line)}
 .tab{background:none;border:none;color:var(--faint);font:inherit;font-weight:700;padding:10px 16px;cursor:pointer;border-bottom:2px solid transparent;margin-bottom:-1px}
 .tab:hover{color:var(--ink)} .tab.on{color:var(--gold2);border-bottom-color:var(--gold)}
+.cust-row{cursor:pointer} .cust-row:hover td{background:rgba(245,196,81,.06)}
+.drawer{position:fixed;inset:0;background:rgba(10,6,22,.6);backdrop-filter:blur(3px);z-index:60;display:flex;justify-content:flex-end}
+.drawer-panel{width:min(660px,96vw);height:100%;background:var(--night);border-left:1px solid var(--line);overflow-y:auto;padding:22px}
+.drawer-head{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:6px}
+.drawer-head h2{font-family:var(--serif)}
+.drawer-body h3{font-family:var(--serif);margin:20px 0 8px;font-size:1.1rem;color:var(--gold2)}
+.rcpt{color:var(--gold2)}
 </style></head>
 <body>
 <header>
@@ -74,6 +81,13 @@ a.lnk{color:var(--gold2)}
     <p class="muted" style="margin-top:20px">Read-only. Card numbers are never shown — last 4 digits only.</p>
   </section>
 </main>
+
+<div id="drawer" class="drawer" hidden>
+  <div class="drawer-panel">
+    <div class="drawer-head"><h2 id="dName">Customer</h2><button class="btn ghost" id="dClose">Close ✕</button></div>
+    <div id="dBody" class="drawer-body"><div class="muted">Loading…</div></div>
+  </div>
+</div>
 
 <script>
 var TKEY="gm_admin_token";
@@ -126,10 +140,10 @@ async function loadCustomers(){
     var rows=list.map(function(c){
       var name=c.name||[c.first_name,c.last_name].filter(Boolean).join(" ")||"—";
       var card=c.card_last4?("•••• "+esc(c.card_last4)):"—";
-      return "<tr><td>"+esc(name)+"</td><td class='muted'>"+esc(c.email||"—")+"</td><td>"+esc(c.phone||"—")+"</td><td>"+esc(c.plan||"free")+"</td><td>"+num(c.credits)+"</td><td class='muted'>"+card+"</td><td class='muted'>"+esc((c.created_at||"").slice(0,10))+"</td></tr>";
+      return "<tr class='cust-row' data-cust-id='"+esc(c.id)+"' title='View billing detail'><td>"+esc(name)+"</td><td class='muted'>"+esc(c.email||"—")+"</td><td>"+esc(c.phone||"—")+"</td><td>"+esc(c.plan||"free")+"</td><td>"+num(c.credits)+"</td><td class='muted'>"+card+"</td><td class='muted'>"+esc((c.created_at||"").slice(0,10))+"</td></tr>";
     }).join("");
     document.getElementById("custWrap").innerHTML=list.length
-      ? '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Plan</th><th>Credits</th><th>Card</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table>'
+      ? '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Plan</th><th>Credits</th><th>Card</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted" style="margin-top:8px">Click a customer for full billing &amp; credit accounting.</p>'
       : '<p class="muted">No customers yet.</p>';
     note.textContent="";
   }catch(err){note.className="err";note.textContent="Couldn’t load customers.";}
@@ -164,6 +178,43 @@ async function load(){
   }
 }
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
+
+// ---- per-customer billing/accounting drawer ----
+document.addEventListener("click",function(e){
+  var row=e.target&&e.target.closest&&e.target.closest(".cust-row");
+  if(row){openCustomerDetail(row.getAttribute("data-cust-id"));}
+});
+document.getElementById("dClose").onclick=function(){document.getElementById("drawer").hidden=true;};
+document.getElementById("drawer").addEventListener("click",function(e){if(e.target.id==="drawer")document.getElementById("drawer").hidden=true;});
+async function openCustomerDetail(id){
+  var dr=document.getElementById("drawer"); dr.hidden=false;
+  document.getElementById("dName").textContent="Customer";
+  var body=document.getElementById("dBody"); body.innerHTML='<div class="muted">Loading billing detail…</div>';
+  try{
+    var r=await fetch("/gmadmin/customers/"+encodeURIComponent(id),{headers:{"x-admin-token":token()}});
+    if(r.status===401){dr.hidden=true;showGate("");return;}
+    if(r.status===503){body.innerHTML='<div class="muted">Full billing detail is coming online — the engine detail endpoint isn’t wired up yet. (Purchases, credit ledger, and invoices appear here once it is.)</div>';return;}
+    if(r.status===404){body.innerHTML='<div class="muted">No billing detail for this customer.</div>';return;}
+    var d=null; try{d=await r.json();}catch(e){}
+    if(!r.ok){body.innerHTML='<div class="err">Couldn’t load detail ('+r.status+').</div>';return;}
+    renderDetail(d);
+  }catch(err){body.innerHTML='<div class="err">Couldn’t load detail.</div>';}
+}
+function tbl(head,rows,empty){return rows.length?'<table><thead><tr>'+head.map(function(h){return '<th>'+h+'</th>';}).join("")+'</tr></thead><tbody>'+rows.join("")+'</tbody></table>':'<p class="muted">'+empty+'</p>';}
+function renderDetail(d){
+  var c=d.customer||{}, t=d.totals||{};
+  document.getElementById("dName").textContent=(c.name||c.email||"Customer");
+  var cards=[["Total spent",money(t.total_spent_cents)],["Credits used",num(t.credits_used)],["Credits bought",num(t.credits_purchased)],["Creations",num(t.generations)]];
+  var h='<div class="cards">'+cards.map(function(x){return '<div class="card"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';}).join("")+'</div>';
+  h+='<p class="muted">'+esc(c.email||"")+' · '+esc(c.plan||"free")+' plan · balance '+num(c.credits)+' credits'+(c.card_last4?' · card •••• '+esc(c.card_last4):'')+'</p>';
+  h+='<h3>Purchases</h3>'+tbl(["Date","Item","Amount","Credits","Receipt"],(d.purchases||[]).map(function(x){
+    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.label||x.kind||"—")+'</td><td>'+money(x.amount_cents)+'</td><td>'+num(x.credits)+'</td><td>'+(x.receipt_url?'<a class="rcpt" href="'+esc(x.receipt_url)+'" target="_blank" rel="noopener">Receipt ↗</a>':"—")+'</td></tr>';}),"No purchases yet.");
+  h+='<h3>Credit usage — per creation</h3>'+tbl(["Date","Capability","Credits","Status"],(d.credit_usage||[]).slice(0,150).map(function(x){
+    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.capability||"—")+'</td><td>'+num(x.credits)+'</td><td class="muted">'+esc(x.status||"—")+'</td></tr>';}),"No creations yet.");
+  h+='<h3>Invoices</h3>'+tbl(["Date","#","Amount","Status",""],(d.invoices||[]).map(function(x){
+    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.number||"—")+'</td><td>'+money(x.amount_cents)+'</td><td class="muted">'+esc(x.status||"—")+'</td><td>'+(x.hosted_invoice_url?'<a class="rcpt" href="'+esc(x.hosted_invoice_url)+'" target="_blank" rel="noopener">View ↗</a>':"")+(x.pdf_url?' <a class="rcpt" href="'+esc(x.pdf_url)+'" target="_blank" rel="noopener">PDF</a>':"")+'</td></tr>';}),"No invoices yet.");
+  document.getElementById("dBody").innerHTML=h;
+}
 if(token()){hideGate();load();}else{showGate("");}
 </script>
 </body></html>
