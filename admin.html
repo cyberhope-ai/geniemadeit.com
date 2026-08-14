@@ -193,8 +193,7 @@ async function openCustomerDetail(id){
   try{
     var r=await fetch("/gmadmin/customers/"+encodeURIComponent(id),{headers:{"x-admin-token":token()}});
     if(r.status===401){dr.hidden=true;showGate("");return;}
-    if(r.status===503){body.innerHTML='<div class="muted">Full billing detail is coming online — the engine detail endpoint isn’t wired up yet. (Purchases, credit ledger, and invoices appear here once it is.)</div>';return;}
-    if(r.status===404){body.innerHTML='<div class="muted">No billing detail for this customer.</div>';return;}
+    if(r.status===503||r.status===404){body.innerHTML='<div class="muted">Full billing detail is coming online — the engine detail endpoint isn’t wired up yet. Purchases, the credit-usage ledger, and Stripe invoices/receipts appear here once atlas2 ships <code>GET /api/admin/customers/:id</code>.</div>';return;}
     var d=null; try{d=await r.json();}catch(e){}
     if(!r.ok){body.innerHTML='<div class="err">Couldn’t load detail ('+r.status+').</div>';return;}
     renderDetail(d);
