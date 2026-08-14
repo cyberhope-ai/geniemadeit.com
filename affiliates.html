@@ -83,11 +83,11 @@ footer{border-top:1px solid var(--line);margin-top:20px;padding:26px 0;color:var
     <span class="eyebrow"><span class="spark"></span>Affiliate Program</span>
     <h1>Earn with <em>GenieMade</em></h1>
     <p class="lead">Share the magic and get paid for it. Earn <b style="color:var(--gold2)">recurring commission</b> on every customer you refer — free to join, real-time tracking, fast payouts.</p>
-    <form class="applybox" id="applyForm">
-      <input type="email" id="affEmail" placeholder="you@email.com" required aria-label="Your email">
-      <button class="btn gold" type="submit">Apply to join</button>
-    </form>
-    <div class="note" id="applyNote">Creators, card-lovers, gift & occasion bloggers welcome. We review applications quickly.</div>
+    <div class="cta-row">
+      <a class="btn gold" href="https://cyberhopeai.getrewardful.com/signup" target="_blank" rel="noopener">Become an affiliate →</a>
+      <a class="btn ghost" href="https://cyberhopeai.getrewardful.com/login" target="_blank" rel="noopener">Affiliate login</a>
+    </div>
+    <div class="note">Creators, card-lovers, gift &amp; occasion bloggers welcome. Free to join · real-time tracking · fast payouts.</div>
   </section>
   <section class="sec">
     <h2>Why <em>partner</em> with us</h2>
@@ -96,27 +96,11 @@ footer{border-top:1px solid var(--line);margin-top:20px;padding:26px 0;color:var
       <div class="step"><div class="n">✦</div><h3>Products people share</h3><p>Birthday cards, anniversary portraits, Halloween photos, "Studio You" — high-intent, viral by nature.</p></div>
       <div class="step"><div class="n">↗</div><h3>Real-time tracking</h3><p>Every referral is tracked automatically. See clicks, signups and earnings on your dashboard.</p></div>
     </div>
-    <div class="midcta"><a class="btn gold" href="#applyForm" onclick="document.getElementById('affEmail').focus();return false;">Become an affiliate →</a></div>
+    <div class="midcta"><a class="btn gold" href="https://cyberhopeai.getrewardful.com/signup" target="_blank" rel="noopener">Become an affiliate →</a></div>
   </section>
 </main>
 <footer><div class="wrap foot">
   <div>© GenieMade · a CyberHope AI product</div>
   <div style="display:flex;gap:18px;flex-wrap:wrap"><a href="/make/birthday">Occasions</a><a href="/studio-you">Studio You</a><a href="/verify">Verify a creation</a></div>
 </div></footer>
-<script>
-document.getElementById('applyForm').addEventListener('submit',async function(e){
-  e.preventDefault();
-  var email=document.getElementById('affEmail').value.trim();
-  var note=document.getElementById('applyNote');
-  if(!/^[^@\s]+@[^@\s]+\.[^@\s]+$/.test(email)){note.textContent='Please enter a valid email.';return;}
-  note.textContent='Sending…';
-  try{
-    // Interim capture via the existing waitlist worker (tagged by the /affiliates referer). Swap to a
-    // dedicated /api/affiliates/apply or the Rewardful signup URL once wired (see PR notes).
-    var r=await fetch('/api/waitlist',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({email:email})});
-    if(r.ok){note.textContent='Thanks! We got your application — watch your inbox for your affiliate link.';document.getElementById('affEmail').value='';}
-    else{note.textContent='Something went wrong — please try again in a moment.';}
-  }catch(err){note.textContent='Network hiccup — please try again.';}
-});
-</script>
 </body></html>
