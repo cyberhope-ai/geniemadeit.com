@@ -63,7 +63,8 @@
   .step p{font-size:14px;color:var(--mut)} .step em{color:var(--ink);font-style:italic}
   @media(max-width:780px){.steps{grid-template-columns:1fr}}
   /* pricing */
-  .plans{display:grid;grid-template-columns:repeat(2,minmax(240px,330px));gap:18px;justify-content:center;padding:16px 0}
+  .plans{display:grid;grid-template-columns:repeat(3,minmax(210px,300px));gap:16px;justify-content:center;padding:16px 0}
+  @media(max-width:780px){.plans{grid-template-columns:1fr;max-width:340px;margin:0 auto}}
   .plan{background:var(--panel);border:1px solid var(--line);border-radius:18px;padding:26px 24px}
   .plan.feature{border-color:var(--goldd);box-shadow:0 22px 54px rgba(245,196,81,.14)}
   .pk{font-size:12px;letter-spacing:1.6px;text-transform:uppercase;color:var(--faint)}
@@ -119,8 +120,8 @@
   </section>
 
   <section class="blk" id="looks">
-    <h2>49 signature looks. One <em style="font-style:italic">you</em>.</h2>
-    <p class="sub">Every portrait below is the same real person — one privately trained model. Browse them all, pick your favorites, and we make them yours.</p>
+    <h2>Every look. Any <em style="font-style:italic">you</em>.</h2>
+    <p class="sub">One trained model unlocks every style below — and it works for <b>anyone, at any age</b>: you, your partner, your kids. Browse the looks, pick your favorites, and we make them yours.<br><span style="font-size:.86em;color:var(--faint)">(Examples below are one real person, shown with permission. Your whole family's looks are created the same way.)</span></p>
     <p class="klabel">Professional &amp; Business</p>
     <div class="lookgrid">
       <figure><img src="/assets/studio-you/looks/corporate-headshot.jpg" alt="Corporate Headshot" loading="lazy"><figcaption>💼 Corporate Headshot</figcaption></figure>
@@ -201,7 +202,7 @@
     <h2>How it works</h2>
     <p class="sub">Three steps. A few minutes. Then unlimited.</p>
     <div class="steps">
-      <div class="step"><div class="n">1</div><h3>Add your photos</h3><p>Drop in 3–10 photos — different angles, lighting, expressions. That's it.</p></div>
+      <div class="step"><div class="n">1</div><h3>Upload your photos</h3><p>Add <b>5 to 25 photos</b> — different angles, lighting, and expressions. <em>The more you add, the better the likeness.</em> Works for anyone — you, your partner, your kids at any age.</p></div>
       <div class="step"><div class="n">2</div><h3>We train your private model</h3><p>In a few minutes we build a model of <em>you</em> — not a filter, not a face-swap. Yours alone, sealed in your Vault.</p></div>
       <div class="step"><div class="n">3</div><h3>Shoot forever</h3><p>Create studio-grade, unmistakably-<em>you</em> portraits in any style or setting — instantly, as many as you like.</p></div>
     </div>
@@ -211,16 +212,22 @@
     <h2>Simple, premium pricing</h2>
     <p class="sub">Train once. Every future photo is instant.</p>
     <div class="plans">
+      <div class="plan">
+        <p class="pk">Studio Taster</p>
+        <p class="price"><span class="amt">$19</span><span class="per">one-time</span></p>
+        <ul><li>Your private trained model</li><li><b>6</b> finished photoreal looks</li><li>The easiest way to try it</li><li>Certified &amp; private</li></ul>
+        <a class="btn ghost" href="/app?studio=1&amp;tier=taster">Start for $19</a>
+      </div>
       <div class="plan feature">
-        <p class="pk">Studio Session</p>
+        <p class="pk">Studio Session · most popular</p>
         <p class="price"><span class="amt">$39</span><span class="per">one-time</span></p>
-        <ul><li>Your private trained model</li><li>12 finished photoreal looks — your pick from all 49</li><li>Kept in your Vault, reusable forever</li><li>Certified &amp; private</li></ul>
-        <a class="btn" href="/app?studio=1">Create my Studio</a>
+        <ul><li>Your private trained model</li><li><b>12</b> finished photoreal looks — your pick</li><li>Kept in your Vault, reusable forever</li><li>Certified &amp; private</li></ul>
+        <a class="btn" href="/app?studio=1&amp;tier=session">Create my Studio</a>
       </div>
       <div class="plan">
         <p class="pk">Studio VIP</p>
         <p class="price"><span class="amt">$99</span><span class="per">/month</span></p>
-        <ul><li>Your model kept warm</li><li>100 photos every month</li><li>Any style, any setting, instant</li><li>Priority + all premium features</li></ul>
+        <ul><li>Your model kept warm</li><li><b>100</b> photos every month</li><li>Any style, any setting, instant</li><li>Priority + all premium features</li></ul>
         <a class="btn ghost" href="/#pricing">Go VIP</a>
       </div>
     </div>
