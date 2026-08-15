@@ -100,7 +100,7 @@ async function rw(path){
   if(!r.ok) throw {code:r.status,body:d};
   return d;
 }
-function showGate(msg){document.getElementById("gate").style.display="flex";document.getElementById("app").hidden=true;if(msg)document.getElementById("gateErr").textContent=msg;}
+function showGate(msg){var _dr=document.getElementById("drawer");if(_dr)_dr.hidden=true;document.getElementById("gate").style.display="flex";document.getElementById("app").hidden=true;if(msg)document.getElementById("gateErr").textContent=msg;}
 function hideGate(){document.getElementById("gate").style.display="none";document.getElementById("app").hidden=false;}
 document.getElementById("enterBtn").onclick=function(){
   var v=document.getElementById("pw").value.trim();
@@ -185,19 +185,23 @@ document.addEventListener("click",function(e){
   if(row){openCustomerDetail(row.getAttribute("data-cust-id"));}
 });
 document.getElementById("dClose").onclick=function(){document.getElementById("drawer").hidden=true;};
+document.addEventListener("keydown",function(e){if(e.key==="Escape"){var d=document.getElementById("drawer");if(d)d.hidden=true;}});
 document.getElementById("drawer").addEventListener("click",function(e){if(e.target.id==="drawer")document.getElementById("drawer").hidden=true;});
 async function openCustomerDetail(id){
+  if(!token()){showGate("");return;}          // never open the drawer when not signed in
   var dr=document.getElementById("drawer"); dr.hidden=false;
   document.getElementById("dName").textContent="Customer";
   var body=document.getElementById("dBody"); body.innerHTML='<div class="muted">Loading billing detail…</div>';
+  var _ctl=new AbortController(); var _to=setTimeout(function(){_ctl.abort();},15000);  // never hang on Loading
   try{
-    var r=await fetch("/gmadmin/customers/"+encodeURIComponent(id),{headers:{"x-admin-token":token()}});
+    var r=await fetch("/gmadmin/customers/"+encodeURIComponent(id),{headers:{"x-admin-token":token()},signal:_ctl.signal});
+    clearTimeout(_to);
     if(r.status===401){dr.hidden=true;showGate("");return;}
     if(r.status===503||r.status===404){body.innerHTML='<div class="muted">Full billing detail is coming online — the engine detail endpoint isn’t wired up yet. Purchases, the credit-usage ledger, and Stripe invoices/receipts appear here once atlas2 ships <code>GET /api/admin/customers/:id</code>.</div>';return;}
     var d=null; try{d=await r.json();}catch(e){}
     if(!r.ok){body.innerHTML='<div class="err">Couldn’t load detail ('+r.status+').</div>';return;}
     renderDetail(d);
-  }catch(err){body.innerHTML='<div class="err">Couldn’t load detail.</div>';}
+  }catch(err){clearTimeout(_to);body.innerHTML='<div class="err">Couldn’t load detail'+(err&&err.name==="AbortError"?" (timed out)":"")+'. <button class="btn ghost" onclick="document.getElementById(\'drawer\').hidden=true">Close</button></div>';}
 }
 function tbl(head,rows,empty){return rows.length?'<table><thead><tr>'+head.map(function(h){return '<th>'+h+'</th>';}).join("")+'</tr></thead><tbody>'+rows.join("")+'</tbody></table>':'<p class="muted">'+empty+'</p>';}
 function renderDetail(d){
