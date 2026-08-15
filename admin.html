@@ -98,6 +98,12 @@ a.lnk{color:var(--gold2)}
     <div id="dBody" class="drawer-body"><div class="muted">Loading…</div></div>
   </div>
 </div>
+<div id="recipeBox" class="drawer" hidden style="z-index:70">
+  <div class="drawer-panel" style="width:min(560px,96vw)">
+    <div class="drawer-head"><h2>Image recipe</h2><button class="btn ghost" onclick="document.getElementById('recipeBox').hidden=true">Close ✕</button></div>
+    <div id="recipeBody" class="drawer-body"></div>
+  </div>
+</div>
 
 <script>
 var TKEY="gm_admin_token";
@@ -279,7 +285,8 @@ function renderDetail(d){
     var ev=x.eververify_url?'<a class="rcpt" href="'+esc(x.eververify_url)+'" target="_blank" rel="noopener">Registry ↗</a>':(x.registered?'<span class="muted">private</span>':'<span class="muted">—</span>');
     var nm=x.image_name||"—";
     var badge=(x.tier==="premium")?' <span class="ok" title="Studio You premium'+(x.starring?" · Starring You (face reference)":"")+'">★</span>':'';
-    return '<tr><td>'+img+'</td><td title="'+esc(nm)+' ('+esc(x.capability_name||x.capability||"")+')">'+esc(nm.slice(0,38))+(nm.length>38?"…":"")+badge+'</td><td>'+num(x.list_credits)+'</td><td>'+charged+'</td><td class="muted">'+usd(x.provider_cost_usd)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
+    var recipe=x.job_id?' <a href="#" class="rcpt" style="font-size:.8em" onclick="return showRecipe(event,\''+esc(c.account_number||c.id||"")+'\',\''+esc(x.job_id)+'\')">recipe</a>':'';
+    return '<tr><td>'+img+'</td><td title="'+esc(nm)+' ('+esc(x.capability_name||x.capability||"")+')">'+esc(nm.slice(0,38))+(nm.length>38?"…":"")+badge+recipe+'</td><td>'+num(x.list_credits)+'</td><td>'+charged+'</td><td class="muted">'+usd(x.provider_cost_usd)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
   }),"No creations yet.")+'</div>';
   // ---- purchases (Stripe) ----
   h+='<h3>Purchases · Stripe</h3>'+tbl(["Date","Item","Amount","Credits","Invoice / Session","Receipt"],(d.purchases||[]).map(function(x){
@@ -288,6 +295,25 @@ function renderDetail(d){
   h+='<h3>Credit ledger — per creation</h3><div class="scroll">'+tbl(["Date","Capability","Model","Credits","Cert","Status"],(d.credit_usage||[]).slice(0,200).map(function(x){
     return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.capability||"—")+'</td><td class="muted">'+esc(x.model||"—")+'</td><td>'+num(x.credits)+'</td><td class="mono" title="'+esc(x.cert_id||"")+'">'+sid(x.cert_id,8)+'</td><td class="muted">'+esc(x.status||"—")+'</td></tr>';}),"No usage yet.")+'</div>';
   document.getElementById("dBody").innerHTML=h;
+}
+async function showRecipe(ev,user,gen){
+  if(ev)ev.preventDefault();
+  var box=document.getElementById("recipeBox"), body=document.getElementById("recipeBody");
+  box.hidden=false; body.innerHTML='<div class="muted">Loading recipe…</div>';
+  var TA='width:100%;background:var(--night);color:var(--ink);border:1px solid var(--line);border-radius:8px;font-family:ui-monospace,Menlo,monospace;font-size:.78rem;padding:9px';
+  try{
+    var r=await fetch("/gmadmin/provenance?user="+encodeURIComponent(user)+"&gen="+encodeURIComponent(gen),{headers:{"x-admin-token":token()}});
+    var d=await r.json();
+    if(!d.ok||!d.provenance){body.innerHTML='<p class="muted">No stored recipe for this image — it was made before provenance capture, or generated outside the system (its prompt &amp; settings live in the fal request history).</p>';return false;}
+    var p=d.provenance;
+    var meta=[["Model",p.model],["Endpoint",p.effective_endpoint],["Aspect",p.aspect],["Seed",p.seed==null?"—":p.seed],["Reference used",p.reference_used?"yes":"no"],["Pack / Look",[p.pack,p.look].filter(Boolean).join(" / ")||"—"],["fal request",p.fal_request_id||"—"],["Cert #",p.cert_id||"—"]];
+    var h='<h3 style="margin-top:0">Image recipe · '+esc(String(gen).slice(0,8))+'</h3>';
+    h+='<div style="margin:6px 0"><div class="muted" style="font-size:.78rem;margin-bottom:4px">Prompt (exact — for confirmation &amp; re-creation)</div><textarea readonly rows="5" style="'+TA+'">'+esc(p.engineered_prompt||"")+'</textarea></div>';
+    h+='<table style="margin:8px 0">'+meta.map(function(m){return '<tr><td class="muted">'+esc(m[0])+'</td><td class="mono">'+esc(m[1]==null?"—":String(m[1]))+'</td></tr>';}).join("")+'</table>';
+    if(p.input){h+='<div style="margin:6px 0"><div class="muted" style="font-size:.78rem;margin-bottom:4px">Full settings sent to the model (JSON — paste to re-create)</div><textarea readonly rows="8" style="'+TA+'">'+esc(JSON.stringify(p.input,null,2))+'</textarea></div>';}
+    body.innerHTML=h;
+  }catch(e){body.innerHTML='<p class="err">Couldn’t load recipe.</p>';}
+  return false;
 }
 if(token()){hideGate();load();}else{showGate("");}
 </script>
