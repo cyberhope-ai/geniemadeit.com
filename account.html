@@ -33,6 +33,7 @@ h1{font-family:var(--serif);font-weight:600;font-size:2rem;margin:26px 0 4px}
 .bignum{font-family:var(--serif);font-size:2.6rem;color:var(--gold2)}
 table{width:100%;border-collapse:collapse;font-size:.9rem} th,td{text-align:left;padding:9px 10px;border-bottom:1px solid var(--line)} th{color:var(--faint);font-size:.74rem;text-transform:uppercase;letter-spacing:.05em}
 .rcpt{color:var(--gold2)} .muted{color:var(--faint)} .err{color:#ff9f6f} .ok{color:var(--ok)}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.9em}
 .note{font-size:.82rem;color:var(--faint);margin-top:6px}
 .signin{max-width:420px;margin:80px auto;text-align:center}
 .signin .card{padding:30px}
@@ -66,13 +67,30 @@ table{width:100%;border-collapse:collapse;font-size:.9rem} th,td{text-align:left
 
     <div class="card">
       <h2>Profile</h2>
-      <div class="field"><label>Display name</label><input id="pfName" placeholder="Your name"></div>
+      <div class="row"><div class="k">Account number</div><div class="v"><span class="mono" id="pfAcct">—</span></div></div>
+      <div class="row"><div class="k">Member since</div><div class="v" id="pfSince">—</div></div>
+      <div class="field" style="margin-top:14px"><label>Full name</label><input id="pfFull" placeholder="e.g. Rick Barretto"><span class="ro">Used on your receipts and certificates.</span></div>
+      <div class="field"><label>Display name</label><input id="pfName" placeholder="Your name"><span class="ro">Shown in the Studio header and public registry.</span></div>
       <div class="field"><label>Email</label><input id="pfEmail" disabled><span class="ro">To change your email, contact support.</span></div>
       <button class="btn sm" id="saveProfile">Save profile</button> <span id="profileMsg" class="note"></span>
       <h2 style="margin-top:22px">Change password</h2>
       <div class="field"><label>Current password</label><input id="pwOld" type="password" autocomplete="current-password"></div>
       <div class="field"><label>New password (8+ characters)</label><input id="pwNew" type="password" autocomplete="new-password"></div>
       <button class="btn sm" id="savePw">Update password</button> <span id="pwMsg" class="note"></span>
+    </div>
+
+    <div class="card">
+      <h2>Billing address</h2>
+      <p class="note">Appears on your receipts and certificates of authenticity.</p>
+      <div class="field" style="margin-top:12px"><label>Address line 1</label><input id="adLine1" placeholder="Street address"></div>
+      <div class="field"><label>Address line 2</label><input id="adLine2" placeholder="Apartment, suite, etc. (optional)"></div>
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:12px">
+        <div class="field"><label>City</label><input id="adCity"></div>
+        <div class="field"><label>State / Region</label><input id="adRegion"></div>
+        <div class="field"><label>Postal code</label><input id="adPostal"></div>
+        <div class="field"><label>Country</label><input id="adCountry"></div>
+      </div>
+      <button class="btn sm" id="saveAddr">Save address</button> <span id="addrMsg" class="note"></span>
     </div>
 
     <div class="card">
@@ -97,13 +115,26 @@ async function boot(){
   }
   show("boot",false); show("acct",true);
   document.getElementById("logoutBtn").style.display="";
-  loadAccount(); loadCredits(); loadInvoices();
+  loadAccount(); loadCredits(); loadInvoices(); loadAddress();
 }
 async function loadAccount(){
   var a=await api("/api/account"); var u=(a.data&&(a.data.account||a.data.user||a.data))||{};
   document.getElementById("hello").textContent=(u.email?("Signed in as "+u.email):"");
+  document.getElementById("pfFull").value=u.full_name||"";
   document.getElementById("pfName").value=u.display_name||u.name||"";
   document.getElementById("pfEmail").value=u.email||"";
+  document.getElementById("pfAcct").textContent=u.id||"—";
+  var since=u.created_at?new Date(u.created_at):null;
+  document.getElementById("pfSince").textContent=(since&&!isNaN(since))?since.toLocaleDateString(undefined,{year:"numeric",month:"long",day:"numeric"}):"—";
+}
+async function loadAddress(){
+  var r=await api("/api/settings/address"); var a=(r.data&&r.data.address)||{};
+  document.getElementById("adLine1").value=a.line1||"";
+  document.getElementById("adLine2").value=a.line2||"";
+  document.getElementById("adCity").value=a.city||"";
+  document.getElementById("adRegion").value=a.region||"";
+  document.getElementById("adPostal").value=a.postal_code||"";
+  document.getElementById("adCountry").value=a.country||"";
 }
 async function loadCredits(){
   var c=await api("/api/credits"); var d=c.data||{};
@@ -119,8 +150,15 @@ async function loadInvoices(){
 }
 document.getElementById("saveProfile").onclick=async function(){
   var msg=document.getElementById("profileMsg"); msg.textContent="Saving…"; msg.className="note";
-  var r=await api("/api/account",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({display_name:document.getElementById("pfName").value.trim()})});
+  var r=await api("/api/account",{method:"PATCH",headers:{"content-type":"application/json"},body:JSON.stringify({display_name:document.getElementById("pfName").value.trim(),full_name:document.getElementById("pfFull").value.trim()})});
   msg.textContent=r.ok?"Saved.":((r.data.error&&r.data.error.message)||r.data.message||"Couldn’t save (name changes may need support).");
+  msg.className=r.ok?"note ok":"note err";
+};
+document.getElementById("saveAddr").onclick=async function(){
+  var msg=document.getElementById("addrMsg"); msg.textContent="Saving…"; msg.className="note";
+  var body={line1:document.getElementById("adLine1").value.trim(),line2:document.getElementById("adLine2").value.trim(),city:document.getElementById("adCity").value.trim(),region:document.getElementById("adRegion").value.trim(),postal_code:document.getElementById("adPostal").value.trim(),country:document.getElementById("adCountry").value.trim()};
+  var r=await api("/api/settings/address",{method:"PUT",headers:{"content-type":"application/json"},body:JSON.stringify(body)});
+  msg.textContent=r.ok?"Address saved.":((r.data.error&&r.data.error.message)||r.data.message||"Couldn’t save your address.");
   msg.className=r.ok?"note ok":"note err";
 };
 document.getElementById("savePw").onclick=async function(){

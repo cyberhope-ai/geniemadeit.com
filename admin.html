@@ -40,6 +40,15 @@ a.lnk{color:var(--gold2)}
 .drawer-head h2{font-family:var(--serif)}
 .drawer-body h3{font-family:var(--serif);margin:20px 0 8px;font-size:1.1rem;color:var(--gold2)}
 .rcpt{color:var(--gold2)}
+.idblock{display:grid;grid-template-columns:1fr 1fr;gap:6px 20px;margin:12px 0 4px;font-size:.9rem}
+.idblock>div{overflow-wrap:anywhere}
+.idblock .lbl{color:var(--faint);display:inline-block;min-width:76px}
+.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em}
+.ok{color:#54e39b}
+.scroll{overflow-x:auto;-webkit-overflow-scrolling:touch}
+.scroll table{font-size:.82rem;min-width:640px}
+.scroll td,.scroll th{padding:8px 9px}
+@media(max-width:560px){.idblock{grid-template-columns:1fr}}
 </style></head>
 <body>
 <header>
@@ -204,18 +213,41 @@ async function openCustomerDetail(id){
   }catch(err){clearTimeout(_to);body.innerHTML='<div class="err">Couldn’t load detail'+(err&&err.name==="AbortError"?" (timed out)":"")+'. <button class="btn ghost" onclick="document.getElementById(\'drawer\').hidden=true">Close</button></div>';}
 }
 function tbl(head,rows,empty){return rows.length?'<table><thead><tr>'+head.map(function(h){return '<th>'+h+'</th>';}).join("")+'</tr></thead><tbody>'+rows.join("")+'</tbody></table>':'<p class="muted">'+empty+'</p>';}
+function sid(s,n){s=s||"";n=n||10;return s.length>n+1?esc(s.slice(0,n))+"…":esc(s);}
 function renderDetail(d){
   var c=d.customer||{}, t=d.totals||{};
-  document.getElementById("dName").textContent=(c.name||c.email||"Customer");
-  var cards=[["Total spent",money(t.total_spent_cents)],["Credits used",num(t.credits_used)],["Credits bought",num(t.credits_purchased)],["Creations",num(t.generations)]];
+  document.getElementById("dName").textContent=(c.full_name||c.name||c.email||"Customer");
+  var bal=(t.credits_balance!=null?t.credits_balance:c.credits);
+  var cards=[["Total spent",money(t.total_spent_cents)],["Credits used",num(t.credits_used)],["Balance",num(bal)],["Creations",num(t.creations_total!=null?t.creations_total:t.generations)],["Certified",num(t.creations_certified)]];
   var h='<div class="cards">'+cards.map(function(x){return '<div class="card"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';}).join("")+'</div>';
-  h+='<p class="muted">'+esc(c.email||"")+' · '+esc(c.plan||"free")+' plan · balance '+num(c.credits)+' credits'+(c.card_last4?' · card •••• '+esc(c.card_last4):'')+'</p>';
-  h+='<h3>Purchases</h3>'+tbl(["Date","Item","Amount","Credits","Receipt"],(d.purchases||[]).map(function(x){
-    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.label||x.kind||"—")+'</td><td>'+money(x.amount_cents)+'</td><td>'+num(x.credits)+'</td><td>'+(x.receipt_url?'<a class="rcpt" href="'+esc(x.receipt_url)+'" target="_blank" rel="noopener">Receipt ↗</a>':"—")+'</td></tr>';}),"No purchases yet.");
-  h+='<h3>Credit usage — per creation</h3>'+tbl(["Date","Capability","Credits","Status"],(d.credit_usage||[]).slice(0,150).map(function(x){
-    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.capability||"—")+'</td><td>'+num(x.credits)+'</td><td class="muted">'+esc(x.status||"—")+'</td></tr>';}),"No creations yet.");
-  h+='<h3>Invoices</h3>'+tbl(["Date","#","Amount","Status",""],(d.invoices||[]).map(function(x){
-    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.number||"—")+'</td><td>'+money(x.amount_cents)+'</td><td class="muted">'+esc(x.status||"—")+'</td><td>'+(x.hosted_invoice_url?'<a class="rcpt" href="'+esc(x.hosted_invoice_url)+'" target="_blank" rel="noopener">View ↗</a>':"")+(x.pdf_url?' <a class="rcpt" href="'+esc(x.pdf_url)+'" target="_blank" rel="noopener">PDF</a>':"")+'</td></tr>';}),"No invoices yet.");
+  // ---- identity ----
+  h+='<div class="idblock">';
+  h+='<div><span class="lbl">Account #</span> <span class="mono">'+esc(c.account_number||c.id||"—")+'</span></div>';
+  h+='<div><span class="lbl">Full name</span> '+esc(c.full_name||c.name||"—")+'</div>';
+  h+='<div><span class="lbl">Email</span> '+esc(c.email||"—")+'</div>';
+  h+='<div><span class="lbl">Plan</span> '+esc(c.plan||"free")+(c.card_last4?' · card •••• '+esc(c.card_last4):'')+'</div>';
+  if(c.stripe_customer_id) h+='<div><span class="lbl">Stripe ID</span> <span class="mono">'+esc(c.stripe_customer_id)+'</span></div>';
+  if(c.address_text) h+='<div><span class="lbl">Address</span> '+esc(c.address_text).replace(/\n/g,"<br>")+'</div>';
+  h+='</div>';
+  // ---- forensic proof ledger (the retained proof of every creation) ----
+  h+='<h3>Creations · forensic proof ledger</h3>';
+  h+='<p class="muted">'+num(t.creations_total)+' created · '+num(t.creations_certified)+' QSeal-certified · '+num(t.creations_registered)+' in EverVerify registry · '+num(t.creations_anchored)+' Bitcoin-anchored. Every field below is retained in our database as the customer’s tamper-proof record.</p>';
+  h+='<div class="scroll">'+tbl(["Image","Name","Cr","Certified · cert #","Tamper-proof ID (SHA-256)","Seal","Bitcoin","EverVerify"],(d.creations||[]).map(function(x){
+    var img=x.image_url?'<a href="'+esc(x.image_url)+'" target="_blank" rel="noopener" title="Open image"><img src="'+esc(x.thumb_url||x.image_url)+'" width="40" height="40" loading="lazy" style="object-fit:cover;border-radius:6px;display:block" onerror="this.replaceWith(document.createTextNode(String.fromCharCode(8599)))"></a>':"—";
+    var cert=x.certified?'<span class="ok">✓</span> <span class="mono" title="'+esc(x.certificate_number||"")+'">'+sid(x.certificate_number,8)+'</span>':'<span class="muted">—</span>';
+    var hash=x.tamper_proof_id?'<span class="mono" title="'+esc(x.tamper_proof_id)+'">'+sid(x.tamper_proof_id,12)+'</span>':'<span class="muted">—</span>';
+    var seal=x.seal?'<span class="ok" title="signer '+esc(x.seal.signer||"")+' · sig '+esc((x.seal.signature||"").slice(0,20))+'…">✓ #'+num(x.seal.seq)+'</span>':'<span class="muted">—</span>';
+    var anc=x.anchor?'<span class="'+(x.anchor.status==="confirmed"?"ok":"muted")+'" title="'+esc(x.anchor.chain||"bitcoin")+(x.anchor.block_height?" · block "+num(x.anchor.block_height):"")+'">'+esc(x.anchor.status)+'</span>':'<span class="muted">—</span>';
+    var ev=x.eververify_url?'<a class="rcpt" href="'+esc(x.eververify_url)+'" target="_blank" rel="noopener">Registry ↗</a>':(x.registered?'<span class="muted">private</span>':'<span class="muted">—</span>');
+    var nm=x.image_name||"—";
+    return '<tr><td>'+img+'</td><td title="'+esc(nm)+'">'+esc(nm.slice(0,40))+(nm.length>40?"…":"")+'</td><td>'+num(x.credits)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
+  }),"No creations yet.")+'</div>';
+  // ---- purchases (Stripe) ----
+  h+='<h3>Purchases · Stripe</h3>'+tbl(["Date","Item","Amount","Credits","Invoice / Session","Receipt"],(d.purchases||[]).map(function(x){
+    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.label||x.kind||"—")+'</td><td>'+money(x.amount_cents)+' '+esc((x.currency||"").toUpperCase())+'</td><td>'+num(x.credits)+'</td><td class="mono" title="'+esc(x.stripe_invoice_id||x.checkout_session_id||"")+'">'+sid(x.stripe_invoice_id||x.checkout_session_id,12)+'</td><td>'+(x.receipt_url?'<a class="rcpt" href="'+esc(x.receipt_url)+'" target="_blank" rel="noopener">Receipt ↗</a>':"—")+'</td></tr>';}),"No purchases yet.");
+  // ---- credit ledger ----
+  h+='<h3>Credit ledger — per creation</h3><div class="scroll">'+tbl(["Date","Capability","Model","Credits","Cert","Status"],(d.credit_usage||[]).slice(0,200).map(function(x){
+    return '<tr><td class="muted">'+esc((x.ts||"").slice(0,10))+'</td><td>'+esc(x.capability||"—")+'</td><td class="muted">'+esc(x.model||"—")+'</td><td>'+num(x.credits)+'</td><td class="mono" title="'+esc(x.cert_id||"")+'">'+sid(x.cert_id,8)+'</td><td class="muted">'+esc(x.status||"—")+'</td></tr>';}),"No usage yet.")+'</div>';
   document.getElementById("dBody").innerHTML=h;
 }
 if(token()){hideGate();load();}else{showGate("");}

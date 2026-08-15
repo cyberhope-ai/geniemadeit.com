@@ -22,6 +22,7 @@
     // The Vault is the real user's creations from /api/gallery — never seeded. Empty for new accounts.
     vault: [],
     signedIn: LS.getItem("gm_user") || "",
+    name: LS.getItem("gm_name") || "",   // display name (from the engine) — the greeting, not the email prefix
   };
   const saveVault = () => {}; // no local persistence — /api/gallery is the source of truth
 
@@ -301,7 +302,14 @@
   }
   function paintAccount() {
     const b = $("#accountBtn");
-    b.textContent = state.signedIn ? state.signedIn.split("@")[0] : "Sign in";
+    // Prefer the real display name (matches the /account panel); fall back to the email local-part.
+    b.textContent = state.signedIn ? (state.name || state.signedIn.split("@")[0]) : "Sign in";
+  }
+  // Capture the engine's display name so the header greeting matches the account page ("Rick", not "rick").
+  function setName(u) {
+    const n = (u && (u.display_name || u.full_name || u.name)) ? String(u.display_name || u.full_name || u.name).trim() : "";
+    state.name = n;
+    if (n) LS.setItem("gm_name", n); else LS.removeItem("gm_name");
   }
 
   // ---- auth (real email + Google session via the engine) ----
@@ -346,7 +354,7 @@
       const j = await r.json().catch(() => ({}));
       if (!r.ok || j.ok === false) { authErr(AUTH_MSG[j.error] || j.error || "That didn't work — check your details."); if (authMode === "signup") renderTurnstile(); return; }
       const u = j.user || {};
-      LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email;
+      LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email; setName(u);
       if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }
       paintAccount(); paintCredits(); closeModals(); loadGallery(); maybeWelcome();
     } catch (_) { authErr("Something went wrong. Try again."); }
@@ -543,7 +551,7 @@
     $("#accountBtn").onclick = async () => {
       if (state.signedIn) {
         try { await fetch("/api/auth/logout", { method: "POST", credentials: "same-origin" }); } catch (_) {}
-        LS.removeItem("gm_user"); LS.removeItem("gm_vault"); state.signedIn = ""; state.vault = []; renderVault(); paintAccount(); hydrate();
+        LS.removeItem("gm_user"); LS.removeItem("gm_vault"); LS.removeItem("gm_name"); state.signedIn = ""; state.name = ""; state.vault = []; renderVault(); paintAccount(); hydrate();
       } else openAuth("signin");
     };
     $("#authSubmit").onclick = doAuth;
@@ -597,8 +605,8 @@
       const j = await r.json();
       const u = j && j.user;
       if (u && typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); paintCredits(); }
-      if (j && j.authenticated && u && u.email) { LS.setItem("gm_user", u.email); state.signedIn = u.email; }
-      else { LS.removeItem("gm_user"); state.signedIn = ""; }
+      if (j && j.authenticated && u && u.email) { LS.setItem("gm_user", u.email); state.signedIn = u.email; setName(u); }
+      else { LS.removeItem("gm_user"); state.signedIn = ""; setName(null); }
       if (u && u.plan) state.plan = u.plan;
       paintAccount();
       loadGallery();
