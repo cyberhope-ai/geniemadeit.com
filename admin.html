@@ -103,6 +103,8 @@ a.lnk{color:var(--gold2)}
 var TKEY="gm_admin_token";
 function token(){return sessionStorage.getItem(TKEY)||"";}
 function money(cents){return "$"+((Number(cents)||0)/100).toFixed(2);}
+function usd(v){var n=Number(v)||0;return "$"+n.toFixed(n&&n<0.1?4:2);}
+var REASON_LABEL={unlimited_plan:"plan",free_capability:"free",promo:"promo",founder:"founder",paid:"paid"};
 async function rw(path){
   var r=await fetch("/rwadmin/"+path,{headers:{"x-admin-token":token()}});
   if(r.status===401){throw {code:401};}
@@ -219,7 +221,8 @@ function renderDetail(d){
   var c=d.customer||{}, t=d.totals||{};
   document.getElementById("dName").textContent=(c.full_name||c.name||c.email||"Customer");
   var bal=(t.credits_balance!=null?t.credits_balance:c.credits);
-  var cards=[["Total spent",money(t.total_spent_cents)],["Credits used",num(t.credits_used)],["Balance",num(bal)],["Creations",num(t.creations_total!=null?t.creations_total:t.generations)],["Certified",num(t.creations_certified)]];
+  var ca=d.cost_accounting||{};
+  var cards=[["Total spent",money(t.total_spent_cents)],["Creations",num(t.creations_total!=null?t.creations_total:t.generations)],["Certified",num(t.creations_certified)],["Our model cost",usd(ca.provider_cost_usd_total)],["Comped credits",num(ca.comped_credits_total)]];
   var h='<div class="cards">'+cards.map(function(x){return '<div class="card"><div class="k">'+x[0]+'</div><div class="v">'+x[1]+'</div></div>';}).join("")+'</div>';
   // ---- identity ----
   h+='<div class="idblock">';
@@ -230,18 +233,29 @@ function renderDetail(d){
   if(c.stripe_customer_id) h+='<div><span class="lbl">Stripe ID</span> <span class="mono">'+esc(c.stripe_customer_id)+'</span></div>';
   if(c.address_text) h+='<div><span class="lbl">Address</span> '+esc(c.address_text).replace(/\n/g,"<br>")+'</div>';
   h+='</div>';
+  // ---- cost accounting (list value vs charged vs what WE pay providers) ----
+  var comped=[]; var cbr=ca.comped_by_reason||{}; for(var k in cbr){comped.push((cbr[k])+' '+((REASON_LABEL[k]||k)));}
+  h+='<h3>Cost accounting · every image, paid or free</h3>';
+  h+='<div class="idblock">';
+  h+='<div><span class="lbl">List value</span> <b>'+num(ca.list_credits_total)+'</b> credits ('+money(ca.list_value_cents_total)+' retail)</div>';
+  h+='<div><span class="lbl">Charged</span> <b>'+num(ca.charged_credits_total)+'</b> credits</div>';
+  h+='<div><span class="lbl">Comped</span> <b>'+num(ca.comped_credits_total)+'</b> credits'+(comped.length?' <span class="muted">('+comped.join(" · ")+')</span>':'')+'</div>';
+  h+='<div><span class="lbl">Our cost</span> <b class="ok">'+usd(ca.provider_cost_usd_total)+'</b> <span class="muted">paid to model providers</span></div>';
+  h+='</div>';
   // ---- forensic proof ledger (the retained proof of every creation) ----
   h+='<h3>Creations · forensic proof ledger</h3>';
-  h+='<p class="muted">'+num(t.creations_total)+' created · '+num(t.creations_certified)+' QSeal-certified · '+num(t.creations_registered)+' in EverVerify registry · '+num(t.creations_anchored)+' Bitcoin-anchored. Every field below is retained in our database as the customer’s tamper-proof record.</p>';
-  h+='<div class="scroll">'+tbl(["Image","Name","Cr","Certified · cert #","Tamper-proof ID (SHA-256)","Seal","Bitcoin","EverVerify"],(d.creations||[]).map(function(x){
+  h+='<p class="muted">'+num(t.creations_total)+' created · '+num(t.creations_certified)+' QSeal-certified · '+num(t.creations_registered)+' in EverVerify registry · '+num(t.creations_anchored)+' Bitcoin-anchored. List = normal site price · Charged = what they paid · Our $ = what we pay the model. Every field is retained in our database.</p>';
+  h+='<div class="scroll">'+tbl(["Image","Name","List","Charged","Our $","Certified · cert #","Tamper-proof ID (SHA-256)","Seal","Bitcoin","EverVerify"],(d.creations||[]).map(function(x){
     var img=x.image_url?'<a href="'+esc(x.image_url)+'" target="_blank" rel="noopener" title="Open image"><img src="'+esc(x.thumb_url||x.image_url)+'" width="40" height="40" loading="lazy" style="object-fit:cover;border-radius:6px;display:block" onerror="this.replaceWith(document.createTextNode(String.fromCharCode(8599)))"></a>':"—";
+    var reason=(REASON_LABEL[x.charge_reason]||x.charge_reason||"");
+    var charged=(x.charged_credits<x.list_credits)?'<span class="ok">'+num(x.charged_credits)+'</span> <span class="muted" title="reason: '+esc(x.charge_reason||"")+'">'+esc(reason)+'</span>':num(x.charged_credits);
     var cert=x.certified?'<span class="ok">✓</span> <span class="mono" title="'+esc(x.certificate_number||"")+'">'+sid(x.certificate_number,8)+'</span>':'<span class="muted">—</span>';
     var hash=x.tamper_proof_id?'<span class="mono" title="'+esc(x.tamper_proof_id)+'">'+sid(x.tamper_proof_id,12)+'</span>':'<span class="muted">—</span>';
     var seal=x.seal?'<span class="ok" title="signer '+esc(x.seal.signer||"")+' · sig '+esc((x.seal.signature||"").slice(0,20))+'…">✓ #'+num(x.seal.seq)+'</span>':'<span class="muted">—</span>';
     var anc=x.anchor?'<span class="'+(x.anchor.status==="confirmed"?"ok":"muted")+'" title="'+esc(x.anchor.chain||"bitcoin")+(x.anchor.block_height?" · block "+num(x.anchor.block_height):"")+'">'+esc(x.anchor.status)+'</span>':'<span class="muted">—</span>';
     var ev=x.eververify_url?'<a class="rcpt" href="'+esc(x.eververify_url)+'" target="_blank" rel="noopener">Registry ↗</a>':(x.registered?'<span class="muted">private</span>':'<span class="muted">—</span>');
     var nm=x.image_name||"—";
-    return '<tr><td>'+img+'</td><td title="'+esc(nm)+'">'+esc(nm.slice(0,40))+(nm.length>40?"…":"")+'</td><td>'+num(x.credits)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
+    return '<tr><td>'+img+'</td><td title="'+esc(nm)+'">'+esc(nm.slice(0,40))+(nm.length>40?"…":"")+'</td><td>'+num(x.list_credits)+'</td><td>'+charged+'</td><td class="muted">'+usd(x.provider_cost_usd)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
   }),"No creations yet.")+'</div>';
   // ---- purchases (Stripe) ----
   h+='<h3>Purchases · Stripe</h3>'+tbl(["Date","Item","Amount","Credits","Invoice / Session","Receipt"],(d.purchases||[]).map(function(x){
