@@ -233,6 +233,11 @@
     $("#certTime").textContent = fmtTime(item.certificate.issued_at);
     $("#certHash").textContent = shortHash(item.certificate.hash);
     $("#certC2pa").textContent = item.certificate.c2pa ? "C2PA embedded" : "—";
+    (function(){ var rid = item.certificate && item.certificate.receipt_id;
+      if (!rid) return; var ev = "https://eververify.org/r/" + encodeURIComponent(rid);
+      var l = document.getElementById("everVerifyLink"); if (l) { l.href = ev; l.style.display = ""; }
+      var b = document.getElementById("everVerifyBadge"); if (b) { b.href = ev; var im = b.querySelector("img"); if (im) im.src = "https://eververify.org/badge/" + encodeURIComponent(rid) + ".svg"; b.style.display = ""; }
+    })();
     els.result.classList.add("on");
     $("#dlBtn").onclick = () => window.open(item.url, "_blank");
     els.result.scrollIntoView({ behavior: "smooth", block: "center" });

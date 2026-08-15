@@ -329,7 +329,7 @@ def render(occ):
 <footer><div class="wrap foot">
   <div>© GenieMade · a CyberHope AI product</div>
   <div style="display:flex;gap:18px;flex-wrap:wrap">
-    <a href="/studio-you">Studio You</a><a href="/verify">Verify a creation</a>
+    <a href="/studio-you">Studio You</a><a href="https://eververify.org/verify" target="_blank" rel="noopener">Verify a creation</a>
     <a class="aff" href="/affiliates">Earn with GenieMade →</a>
   </div>
 </div></footer>
