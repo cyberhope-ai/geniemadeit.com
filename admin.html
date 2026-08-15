@@ -242,6 +242,29 @@ function renderDetail(d){
   h+='<div><span class="lbl">Comped</span> <b>'+num(ca.comped_credits_total)+'</b> credits'+(comped.length?' <span class="muted">('+comped.join(" · ")+')</span>':'')+'</div>';
   h+='<div><span class="lbl">Our cost</span> <b class="ok">'+usd(ca.provider_cost_usd_total)+'</b> <span class="muted">paid to model providers</span></div>';
   h+='</div>';
+  // ---- premium (Studio You) vs standard, by capability ----
+  var bt=ca.by_tier||{};
+  h+='<h3>Premium (Studio You) vs standard · in-system generations</h3>';
+  h+='<div class="scroll">'+tbl(["Tier","Images","List credits","Charged","Our cost"],["premium","standard","utility"].filter(function(k){return bt[k]&&bt[k].count;}).map(function(k){
+    var v=bt[k];return '<tr><td>'+(k==="premium"?'<b class="ok">premium</b>':'<b>'+k+'</b>')+'</td><td>'+num(v.count)+'</td><td>'+num(v.list_credits)+'</td><td>'+num(v.charged_credits)+'</td><td class="muted">'+usd(v.provider_cost_usd)+'</td></tr>';
+  }),"No in-system generations.")+'</div>';
+  if((ca.by_capability||[]).length){
+    h+='<div class="scroll" style="margin-top:6px">'+tbl(["Capability","Tier","Count","Credits each","List total","Our cost"],ca.by_capability.map(function(b){
+      return '<tr><td>'+esc(b.name)+'</td><td>'+(b.tier==="premium"?'<span class="ok">premium</span>':'<span class="muted">'+esc(b.tier)+'</span>')+'</td><td>'+num(b.count)+'</td><td>'+num(b.list_credits_each)+' cr</td><td>'+num(b.list_credits)+'</td><td class="muted">'+usd(b.provider_cost_usd)+'</td></tr>';
+    }),"—")+'</div>';
+  }
+  // ---- rate card: what each pack/subscription buys ----
+  var rc=d.rate_card||{};
+  if(rc.packages&&rc.capabilities){
+    h+='<h3>What each package buys</h3>';
+    h+='<p class="muted">Images (or revisions) you can make per package — premium Studio You reads high, everyday images low.</p>';
+    var head=["Capability","Tier","Cost","Our $"].concat(rc.packages.map(function(p){return esc(p.label.replace("GenieMade","").replace("(monthly)","").trim())+'<br><span class="muted">$'+(p.price_cents/100).toFixed(0)+' · '+p.credits+'cr</span>';}));
+    var rows=rc.capabilities.map(function(cap){
+      var cells=rc.packages.map(function(p){return '<td>'+Math.floor(p.credits/(cap.credits||1))+'</td>';}).join("");
+      return '<tr><td>'+esc(cap.name)+'</td><td>'+(cap.tier==="premium"?'<span class="ok">prem</span>':'<span class="muted">'+esc(cap.tier)+'</span>')+'</td><td>'+num(cap.credits)+' cr</td><td class="muted">'+usd(cap.our_cost_usd)+'</td>'+cells+'</tr>';
+    });
+    h+='<div class="scroll">'+tbl(head,rows,"—")+'</div>';
+  }
   // ---- forensic proof ledger (the retained proof of every creation) ----
   h+='<h3>Creations · forensic proof ledger</h3>';
   h+='<p class="muted">'+num(t.creations_total)+' created · '+num(t.creations_certified)+' QSeal-certified · '+num(t.creations_registered)+' in EverVerify registry · '+num(t.creations_anchored)+' Bitcoin-anchored. List = normal site price · Charged = what they paid · Our $ = what we pay the model. Every field is retained in our database.</p>';
@@ -255,7 +278,8 @@ function renderDetail(d){
     var anc=x.anchor?'<span class="'+(x.anchor.status==="confirmed"?"ok":"muted")+'" title="'+esc(x.anchor.chain||"bitcoin")+(x.anchor.block_height?" · block "+num(x.anchor.block_height):"")+'">'+esc(x.anchor.status)+'</span>':'<span class="muted">—</span>';
     var ev=x.eververify_url?'<a class="rcpt" href="'+esc(x.eververify_url)+'" target="_blank" rel="noopener">Registry ↗</a>':(x.registered?'<span class="muted">private</span>':'<span class="muted">—</span>');
     var nm=x.image_name||"—";
-    return '<tr><td>'+img+'</td><td title="'+esc(nm)+'">'+esc(nm.slice(0,40))+(nm.length>40?"…":"")+'</td><td>'+num(x.list_credits)+'</td><td>'+charged+'</td><td class="muted">'+usd(x.provider_cost_usd)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
+    var badge=(x.tier==="premium")?' <span class="ok" title="Studio You premium'+(x.starring?" · Starring You (face reference)":"")+'">★</span>':'';
+    return '<tr><td>'+img+'</td><td title="'+esc(nm)+' ('+esc(x.capability_name||x.capability||"")+')">'+esc(nm.slice(0,38))+(nm.length>38?"…":"")+badge+'</td><td>'+num(x.list_credits)+'</td><td>'+charged+'</td><td class="muted">'+usd(x.provider_cost_usd)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
   }),"No creations yet.")+'</div>';
   // ---- purchases (Stripe) ----
   h+='<h3>Purchases · Stripe</h3>'+tbl(["Date","Item","Amount","Credits","Invoice / Session","Receipt"],(d.purchases||[]).map(function(x){
