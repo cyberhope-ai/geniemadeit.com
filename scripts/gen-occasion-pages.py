@@ -486,7 +486,7 @@ def render_index():
         '<footer><div class="wrap foot"><div>© GenieMade · a CyberHope AI product</div>'
         '<div style="display:flex;gap:18px;flex-wrap:wrap"><a href="/studio-you">Studio You</a>'
         '<a href="https://eververify.org/verify" target="_blank" rel="noopener">Verify a creation</a>'
-        '<a class="aff" href="/affiliates">Earn with GenieMade →</a></div></div></footer></body></html>")
+        '<a class="aff" href="/affiliates">Earn with GenieMade →</a></div></div></footer></body></html>')
     return head + body
 
 
