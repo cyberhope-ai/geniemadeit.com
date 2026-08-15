@@ -73,6 +73,11 @@
   .plan .btn{width:100%;text-align:center}
   .certline{text-align:center;max-width:640px;margin:26px auto 0;color:var(--mut);font-size:15px}
   .certline b{color:var(--ink)}
+  .lookgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:11px;margin-bottom:24px}
+  .lookgrid figure{position:relative;border-radius:11px;overflow:hidden;border:1px solid var(--line)}
+  .lookgrid img{width:100%;aspect-ratio:3/4;object-fit:cover;display:block}
+  .lookgrid figcaption{position:absolute;left:0;right:0;bottom:0;padding:16px 8px 7px;font-size:11.5px;background:linear-gradient(transparent,rgba(0,0,0,.8))}
+  @media(max-width:780px){.lookgrid{grid-template-columns:repeat(3,1fr)}}
   section.blk{padding:44px 0;border-top:1px solid var(--line)}
   footer{border-top:1px solid var(--line);padding:26px 0;text-align:center;color:var(--faint);font-size:12px;margin-top:30px}
 </style>
@@ -85,7 +90,7 @@
 <body>
 <header><div class="bar">
   <a class="brand" href="/"><svg class="lamp" viewBox="0 0 48 48"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/></svg><span>Genie<b>Made</b></span></a>
-  <div class="links"><a href="/#examples">Examples</a><a href="/studio-you">Studio You</a><a href="/#pricing">Pricing</a><a href="/import">Import</a><a href="/verify.html">Verify</a></div>
+  <div class="links"><a href="/#examples">Examples</a><a href="/studio-you">Studio You</a><a href="/studio-you#looks">The Looks</a><a href="/#pricing">Pricing</a><a href="/import">Import</a><a href="/verify.html">Verify</a></div>
   <div class="spacer"></div>
   <a class="btn" href="/app">Open the Studio</a>
 </div></header>
@@ -113,6 +118,85 @@
     <p class="certline" style="margin-top:16px">Real GenieMade Studio results — created and certified on GenieMade, shown with permission.</p>
   </section>
 
+  <section class="blk" id="looks">
+    <h2>49 signature looks. One <em style="font-style:italic">you</em>.</h2>
+    <p class="sub">Every portrait below is the same real person — one privately trained model. Browse them all, pick your favorites, and we make them yours.</p>
+    <p class="klabel">Professional &amp; Business</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/corporate-headshot.jpg" alt="Corporate Headshot" loading="lazy"><figcaption>💼 Corporate Headshot</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/linkedin-exec.jpg" alt="LinkedIn Executive" loading="lazy"><figcaption>🧑‍💼 LinkedIn Executive</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/startup-founder.jpg" alt="Startup Founder" loading="lazy"><figcaption>🚀 Startup Founder</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/doctor.jpg" alt="In the White Coat" loading="lazy"><figcaption>🩺 In the White Coat</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/attorney.jpg" alt="Sharp Attorney" loading="lazy"><figcaption>⚖️ Sharp Attorney</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/realtor.jpg" alt="Real Estate Pro" loading="lazy"><figcaption>🏡 Real Estate Pro</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/creative-director.jpg" alt="Creative Director" loading="lazy"><figcaption>🎨 Creative Director</figcaption></figure>
+    </div>
+    <p class="klabel">Glamour &amp; Editorial</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/red-carpet.jpg" alt="Red Carpet" loading="lazy"><figcaption>🌟 Red Carpet</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/vogue-cover.jpg" alt="Magazine Cover" loading="lazy"><figcaption>📸 Magazine Cover</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/golden-hour-glam.jpg" alt="Golden Hour Glam" loading="lazy"><figcaption>🌅 Golden Hour Glam</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/black-tie-gala.jpg" alt="Black-Tie Gala" loading="lazy"><figcaption>🥂 Black-Tie Gala</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/old-hollywood.jpg" alt="Old Hollywood" loading="lazy"><figcaption>🎬 Old Hollywood</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/beach-editorial.jpg" alt="Beach Getaway" loading="lazy"><figcaption>🏖️ Beach Getaway</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/boudoir-elegant.jpg" alt="Satin Glamour" loading="lazy"><figcaption>🌹 Satin Glamour</figcaption></figure>
+    </div>
+    <p class="klabel">Fantasy &amp; Myth</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/royal-monarch.jpg" alt="King / Queen" loading="lazy"><figcaption>👑 King / Queen</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/sorcerer.jpg" alt="Sorcerer / Sorceress" loading="lazy"><figcaption>🔮 Sorcerer / Sorceress</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/warrior.jpg" alt="Warrior" loading="lazy"><figcaption>⚔️ Warrior</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/elf-royalty.jpg" alt="Elven Royalty" loading="lazy"><figcaption>🧝 Elven Royalty</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/celestial-angel.jpg" alt="Celestial Angel" loading="lazy"><figcaption>😇 Celestial Angel</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/superhero.jpg" alt="Superhero" loading="lazy"><figcaption>🦸 Superhero</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/fairy.jpg" alt="Enchanted Fairy" loading="lazy"><figcaption>🧚 Enchanted Fairy</figcaption></figure>
+    </div>
+    <p class="klabel">Historical &amp; Period</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/renaissance-noble.jpg" alt="Renaissance Noble" loading="lazy"><figcaption>🎭 Renaissance Noble</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/victorian.jpg" alt="Victorian Aristocrat" loading="lazy"><figcaption>🕰️ Victorian Aristocrat</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/gatsby-1920s.jpg" alt="1920s Gatsby" loading="lazy"><figcaption>🍸 1920s Gatsby</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/egyptian-royalty.jpg" alt="Egyptian Royalty" loading="lazy"><figcaption>🏺 Egyptian Royalty</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/roman-emperor.jpg" alt="Roman Emperor/Empress" loading="lazy"><figcaption>🏛️ Roman Emperor/Empress</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/samurai.jpg" alt="Samurai" loading="lazy"><figcaption>🗡️ Samurai</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/wild-west.jpg" alt="Wild West" loading="lazy"><figcaption>🤠 Wild West</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/pirate.jpg" alt="Swashbuckling Pirate" loading="lazy"><figcaption>🏴‍☠️ Swashbuckling Pirate</figcaption></figure>
+    </div>
+    <p class="klabel">Holidays &amp; Milestones</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/christmas-card.jpg" alt="Christmas Card" loading="lazy"><figcaption>🎄 Christmas Card</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/halloween.jpg" alt="Halloween" loading="lazy"><figcaption>🎃 Halloween</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/valentine.jpg" alt="Valentine" loading="lazy"><figcaption>💝 Valentine</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/birthday.jpg" alt="Birthday Star" loading="lazy"><figcaption>🎂 Birthday Star</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/new-years.jpg" alt="New Year&#x27;s Eve" loading="lazy"><figcaption>🎉 New Year&#x27;s Eve</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/graduation.jpg" alt="Graduation" loading="lazy"><figcaption>🎓 Graduation</figcaption></figure>
+    </div>
+    <p class="klabel">Adventure &amp; Career</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/rockstar.jpg" alt="Rockstar" loading="lazy"><figcaption>🎸 Rockstar</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/athlete.jpg" alt="Pro Athlete" loading="lazy"><figcaption>🏆 Pro Athlete</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/astronaut.jpg" alt="Astronaut" loading="lazy"><figcaption>👨‍🚀 Astronaut</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/chef.jpg" alt="Master Chef" loading="lazy"><figcaption>👨‍🍳 Master Chef</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/traveler.jpg" alt="World Traveler" loading="lazy"><figcaption>✈️ World Traveler</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/fitness.jpg" alt="Fitness Cover" loading="lazy"><figcaption>💪 Fitness Cover</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/race-driver.jpg" alt="Race Car Driver" loading="lazy"><figcaption>🏎️ Race Car Driver</figcaption></figure>
+    </div>
+    <p class="klabel">Pop Culture &amp; Stylized</p>
+    <div class="lookgrid">
+      <figure><img src="/assets/studio-you/looks/anime.jpg" alt="Anime Hero" loading="lazy"><figcaption>🌸 Anime Hero</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/videogame.jpg" alt="Video-Game Hero" loading="lazy"><figcaption>🎮 Video-Game Hero</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/movie-poster.jpg" alt="Movie Poster" loading="lazy"><figcaption>🎥 Movie Poster</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/cyberpunk.jpg" alt="Cyberpunk" loading="lazy"><figcaption>🌃 Cyberpunk</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/steampunk.jpg" alt="Steampunk" loading="lazy"><figcaption>⚙️ Steampunk</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/disco-70s.jpg" alt="Disco 70s" loading="lazy"><figcaption>🕺 Disco 70s</figcaption></figure>
+      <figure><img src="/assets/studio-you/looks/cartoon-3d.jpg" alt="3D Cartoon You" loading="lazy"><figcaption>🧸 3D Cartoon You</figcaption></figure>
+    </div>
+    <div style="text-align:center;margin-top:30px">
+      <a class="btn" href="/app?studio=1">Get your Studio Session — $39</a>
+      <p class="micro" style="margin-top:10px">Your trained model + your favorite looks, finished and certified — kept in your Vault forever.</p>
+    </div>
+  </section>
+
   <section class="blk">
     <h2>How it works</h2>
     <p class="sub">Three steps. A few minutes. Then unlimited.</p>
@@ -130,7 +214,7 @@
       <div class="plan feature">
         <p class="pk">Studio Session</p>
         <p class="price"><span class="amt">$39</span><span class="per">one-time</span></p>
-        <ul><li>Your private trained model</li><li>20 finished photoreal portraits</li><li>Kept in your Vault, reusable forever</li><li>Certified &amp; private</li></ul>
+        <ul><li>Your private trained model</li><li>12 finished photoreal looks — your pick from all 49</li><li>Kept in your Vault, reusable forever</li><li>Certified &amp; private</li></ul>
         <a class="btn" href="/app?studio=1">Create my Studio</a>
       </div>
       <div class="plan">
