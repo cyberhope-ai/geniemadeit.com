@@ -12,6 +12,9 @@
   body{background:radial-gradient(1000px 560px at 80% -8%,rgba(245,196,81,.14),transparent 62%),linear-gradient(178deg,var(--night2),var(--night));color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
   a{color:inherit}.wrap{max-width:680px;margin:0 auto;padding:0 22px 70px}
   header{padding:20px 0;display:flex;align-items:center;gap:10px}
+  .links{display:flex;gap:18px;margin-left:auto;font-size:14px}
+  .links a{color:var(--mut);text-decoration:none} .links a:hover{color:var(--ink)}
+  @media(max-width:700px){.links{gap:12px;font-size:13px}}
   .lamp{width:28px;height:28px;filter:drop-shadow(0 3px 10px rgba(245,196,81,.5))}
   .wm{font-family:var(--serif);font-size:1.25rem;font-weight:600}.wm b{color:var(--gold)}
   .eyebrow{display:inline-flex;align-items:center;gap:9px;font-size:.74rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);border:1px solid var(--goldd);background:rgba(245,196,81,.07);border-radius:30px;padding:5px 13px;margin-top:26px}
@@ -45,6 +48,7 @@
   <header>
     <svg class="lamp" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/></svg>
     <a href="/" style="text-decoration:none"><span class="wm">Genie<b>Made</b></span></a>
+    <nav class="links"><a href="/">Home</a><a href="/studio-you">Studio You</a><a href="/#pricing">Pricing</a><a href="/app">Studio</a></nav>
   </header>
 
   <span class="eyebrow">Provenance check</span>
