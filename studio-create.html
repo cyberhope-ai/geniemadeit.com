@@ -48,6 +48,9 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 .mini.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
 .hidden{display:none!important}
 .counter{float:right;color:var(--gold2);font-size:.9rem}
+.samplegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px;margin-top:14px}
+.samplegrid figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
+.samplegrid img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
 </style>
 <style id="gm-header-css">
 .gm-header{position:sticky;top:0;z-index:50;background:rgba(19,10,38,.85);backdrop-filter:blur(10px);border-bottom:1px solid #3a2a6b}
@@ -111,6 +114,53 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
     <div class="grid" id="results"></div>
     <p class="note">Finished photos are also in <a href="/app" style="color:var(--gold2)">your Vault</a> — downloadable full-res with their certificate.</p>
   </div>
+
+  <!-- HOW IT WORKS (illustrated) -->
+  <section style="margin-top:60px">
+    <h2 style="font-family:var(--serif);font-size:1.8rem;text-align:center;margin-bottom:4px">How it works</h2>
+    <p class="sub" style="text-align:center;margin:0 auto 6px;max-width:46rem">Three simple steps. <b style="color:var(--ink)">Train once</b>, then create studio-grade, unmistakably-<em style="color:var(--gold)">you</em> portraits in any style — forever. Every photo comes back sealed with your certificate.</p>
+
+    <div class="card">
+      <h2>1 · Upload your photos</h2>
+      <p class="note" style="margin-bottom:4px">Add <b>5–25 photos</b> of one person — a mix of angles, lighting and expressions (a few good selfies from your phone is perfect). <b>The more variety you add, the stronger the likeness.</b> Works for you, your partner, or your kids at any age. No prompt-writing, no editing — we handle everything.</p>
+      <div class="samplegrid">
+        <figure><img src="/assets/studio-you/headshot.jpg" loading="lazy"></figure>
+        <figure><img src="/assets/studio-you/garden.jpg" loading="lazy"></figure>
+        <figure><img src="/assets/studio-you/goldenhour.jpg" loading="lazy"></figure>
+        <figure><img src="/assets/studio-you/bw.jpg" loading="lazy"></figure>
+        <figure><img src="/assets/studio-you/gala.jpg" loading="lazy"></figure>
+        <figure><img src="/assets/studio-you/crusader.jpg" loading="lazy"></figure>
+      </div>
+      <p class="note">↑ Just drop them in — that's the whole upload.</p>
+    </div>
+
+    <div class="card">
+      <h2>2 · We train your private model</h2>
+      <p class="note">In a few minutes we build a private AI model of <b>you</b> — it learns your real, unique features. <b>Not a filter, not a face-swap</b> — a genuine model of your face, sealed in your Vault and yours alone. You only train once; every future photo after that is instant.</p>
+      <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:4px">
+        <img src="/assets/studio-you/goldenhour.jpg" style="width:150px;aspect-ratio:4/5;object-fit:cover;border-radius:12px;border:1px solid var(--line)" loading="lazy">
+        <div style="flex:1;min-width:230px"><p class="note" style="line-height:1.9">✦ <b style="color:var(--ink)">Private &amp; certified</b> — your model and every photo are provably yours.<br>✦ <b style="color:var(--ink)">Reusable forever</b> — come back any time for brand-new looks.<br>✦ <b style="color:var(--ink)">Truly you</b> — built from your real photos, so it actually looks like you.</p></div>
+      </div>
+    </div>
+
+    <div class="card">
+      <h2>3 · Pick your looks</h2>
+      <p class="note" style="margin-bottom:6px">One trained model unlocks <b>every style</b> — professional headshots, sports, fantasy, sci-fi, historical, holidays and more. Browse the categories, tap the looks you love, and we make them <em>you</em>. Here's a taste (these are one real person, shown with permission — yours are made the same way):</p>
+      <div class="samplegrid">
+        <figure><img src="/assets/studio-you/looks/corporate-headshot.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">💼 Corporate</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/doctor.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🩺 Doctor</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/attorney.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">⚖️ Attorney</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/black-tie-gala.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🥂 Black-Tie</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/astronaut.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🚀 Astronaut</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/cyberpunk.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🌆 Cyberpunk</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/elf-royalty.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🧝 Fantasy</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/athlete.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🏆 Athlete</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/chef.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">👨‍🍳 Chef</figcaption></figure>
+        <figure><img src="/assets/studio-you/looks/christmas-card.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🎄 Holiday</figcaption></figure>
+      </div>
+      <p class="note">…and dozens more across every category. Pick your favourites and they land in your Vault, certified and downloadable full-res.</p>
+    </div>
+  </section>
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
