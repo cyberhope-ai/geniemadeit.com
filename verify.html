@@ -10,7 +10,23 @@
   :root{--night:#130a26;--night2:#1c1140;--panel:#231553;--panel2:#2b1b63;--line:#3a2a6b;--ink:#f7f1ff;--mut:#c6b6ea;--faint:#8f7fbb;--gold:#f5c451;--gold2:#ffe390;--goldd:#c88f2c;--magic:#66e3e8;--serif:ui-serif,"Iowan Old Style",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
   *{box-sizing:border-box}html,body{margin:0;min-height:100%}
   body{background:radial-gradient(1000px 560px at 80% -8%,rgba(245,196,81,.14),transparent 62%),linear-gradient(178deg,var(--night2),var(--night));color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
-  a{color:inherit}.wrap{max-width:680px;margin:0 auto;padding:0 22px 70px}
+  a{color:inherit}.wrap{max-width:1040px;margin:0 auto;padding:0 22px 80px}
+  .hero{max-width:680px}
+  .checker{max-width:680px}
+  .section{margin-top:56px}
+  .section h2{font-family:var(--serif);font-weight:600;font-size:clamp(1.5rem,3.4vw,2.1rem);margin:0 0 6px}
+  .section p.lead{color:var(--mut);max-width:52rem;margin:0 0 6px}
+  .steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(240px,1fr));gap:16px;margin-top:22px}
+  .step{background:linear-gradient(135deg,rgba(35,21,83,.7),rgba(43,27,99,.5));border:1px solid var(--line);border-radius:16px;padding:20px}
+  .step .n{display:inline-flex;align-items:center;justify-content:center;width:30px;height:30px;border-radius:9px;background:rgba(245,196,81,.12);border:1px solid var(--goldd);color:var(--gold2);font-weight:800;font-size:.9rem}
+  .step h3{font-family:var(--serif);font-size:1.12rem;margin:12px 0 6px}
+  .step p{color:var(--mut);font-size:.92rem;margin:0}
+  .ev{background:linear-gradient(135deg,rgba(45,27,99,.9),rgba(35,21,83,.7));border:1px solid var(--goldd);border-radius:18px;padding:26px;margin-top:24px;display:flex;gap:20px;flex-wrap:wrap;align-items:flex-start}
+  .ev .evbadge{font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);border:1px solid var(--goldd);border-radius:30px;padding:5px 12px;white-space:nowrap}
+  .ev h2{font-family:var(--serif);font-weight:600;font-size:1.5rem;margin:0 0 8px}
+  .ev p{color:var(--mut);margin:0 0 10px;max-width:60rem}
+  .why p{color:var(--mut);max-width:56rem}
+  .why strong{color:var(--ink)}
   header{padding:20px 0;display:flex;align-items:center;gap:10px}
   .links{display:flex;gap:18px;margin-left:auto;font-size:14px}
   .links a{color:var(--mut);text-decoration:none} .links a:hover{color:var(--ink)}
@@ -56,28 +72,57 @@
 .gm-cta{background:linear-gradient(180deg,#ffe390,#f5c451);color:#2a1c04;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 8px 22px rgba(245,196,81,.22)}
 .gm-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(245,196,81,.32)}
 .gm-cta:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.gm-signout{color:#c6b6ea;text-decoration:none;font-size:14px;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:8px 15px;border:1px solid #3a2a6b;border-radius:999px;transition:color .18s,border-color .18s;white-space:nowrap;cursor:pointer}.gm-signout:hover{color:#fff;border-color:#f5c451}
 @media(max-width:640px){.gm-nav{gap:14px}.gm-nav a{font-size:13px}.gm-hide-sm{display:none}}
 </style>
 </head>
-<body><header class="gm-header"><div class="gm-bar"><a class="gm-brand" href="/"><svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gmlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#gmlg)"/></svg><span>Genie<b>Made</b></span></a><nav class="gm-nav" aria-label="Main navigation"><a href="/studio-you">Studio You</a><a href="/make">Occasions</a><a class="gm-hide-sm" href="/#examples">Examples</a><a href="/#pricing">Pricing</a><a class="gm-hide-sm" href="/verify">Verify</a></nav><span class="gm-spacer"></span><a class="gm-cta" href="/app">Open the Studio</a></div></header>
+<body><header class="gm-header"><div class="gm-bar"><a class="gm-brand" href="/"><svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gmlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#gmlg)"/></svg><span>Genie<b>Made</b></span></a><nav class="gm-nav" aria-label="Main navigation"><a href="/studio-you">Studio You</a><a href="/make">Occasions</a><a class="gm-hide-sm" href="/#examples">Examples</a><a href="/#pricing">Pricing</a><a class="gm-hide-sm" href="/verify">Verify</a></nav><span class="gm-spacer"></span><a class="gm-signout" id="gmSignout" href="#" style="display:none">Sign out</a><a class="gm-cta" href="/app">Open the Studio</a></div></header>
 <div class="wrap">
-  
-
-  <span class="eyebrow">Provenance check</span>
-  <h1>Is this <em>real?</em></h1>
-  <p class="sub">Every GenieMade creation carries a certificate of authenticity. Paste its receipt ID (or drop the image) and we'll show you when, how, and by whom it was made.</p>
-
-  <div class="box">
-    <label for="rid">Certificate receipt ID</label>
-    <input id="rid" placeholder="GM-XXXXXXXX-XXX" autocomplete="off">
-    <div class="drop" id="drop">…or drop a GenieMade image here to read its embedded credentials</div>
-    <input id="file" type="file" accept="image/*" style="display:none">
-    <button id="check">Verify authenticity</button>
-    <div class="verdict" id="verdict"></div>
+  <div class="hero">
+    <span class="eyebrow">Provenance check</span>
+    <h1>Is this <em>real?</em></h1>
+    <p class="sub">Deepfakes and unsigned AI images are everywhere. GenieMade takes the opposite stance: every image we create is <strong style="color:var(--ink)">signed, sealed, and publicly registered</strong> the moment it's made — so anyone can prove it's genuine, who created it, and exactly how. Paste a certificate receipt (or drop the image) to check any creation.</p>
   </div>
 
+  <div class="checker">
+    <div class="box">
+      <label for="rid">Certificate receipt ID</label>
+      <input id="rid" placeholder="GM-XXXXXXXX-XXX" autocomplete="off">
+      <div class="drop" id="drop">…or drop a GenieMade image here to read its embedded credentials</div>
+      <input id="file" type="file" accept="image/*" style="display:none">
+      <button id="check">Verify authenticity</button>
+      <div class="verdict" id="verdict"></div>
+    </div>
+  </div>
+
+  <section class="section">
+    <h2>How every creation is verified</h2>
+    <p class="lead">Authenticity isn't a badge we print — it's a chain of independent proofs, laid down automatically the instant your image is generated. Four layers, each one checkable on its own.</p>
+    <div class="steps">
+      <div class="step"><span class="n">1</span><h3>Content Credentials (C2PA)</h3><p>Every file is stamped with tamper-evident C2PA metadata — the open industry standard from the Content Authenticity Initiative, the same "nutrition label" for media adopted across the industry. Alter the pixels and the credential breaks.</p></div>
+      <div class="step"><span class="n">2</span><h3>Sealed in your Vault (QSeal)</h3><p>The creation is sealed into a PrecognitionOS Vault with a cryptographic, hash-linked chain (QSeal). Each seal references the one before it, so a record can't be altered, removed, or back-dated after the fact.</p></div>
+      <div class="step"><span class="n">3</span><h3>Registered on EverVerify</h3><p>The certificate's content hash is written to <strong style="color:var(--ink)">EverVerify</strong>, our sister company's independent public authenticity registry — an authoritative record that stands on its own, even away from GenieMade.</p></div>
+      <div class="step"><span class="n">4</span><h3>Anchored to Bitcoin</h3><p>The hash is timestamped onto the Bitcoin blockchain via OpenTimestamps — a permanent, world-verifiable proof of the exact moment your creation existed, that no one (not even us) can rewrite.</p></div>
+    </div>
+  </section>
+
+  <section class="section ev">
+    <span class="evbadge">Sister company</span>
+    <div>
+      <h2>Backed by EverVerify</h2>
+      <p><strong style="color:var(--ink)">EverVerify</strong> runs the independent public registry of record that stands behind every GenieMade certificate. Because it's a separate, authoritative service — not just a line in our own database — a creation's proof lives on beyond GenieMade itself: verifiable by third parties, buyers, marketplaces, platforms, and courts.</p>
+      <p style="margin:0">One creation, sealed in your private Vault and mirrored to a public registry anyone can query. That's the difference between <em>claiming</em> something is real and being able to <em>prove</em> it.</p>
+    </div>
+  </section>
+
+  <section class="section why">
+    <h2>Why this matters</h2>
+    <p>As AI images flood the internet, "is this real?" becomes the question that matters — for artists proving their work is theirs, for buyers confirming a licensed asset, for families protecting a likeness, for anyone who needs to stand behind what they share.</p>
+    <p><strong>Provenance is the answer.</strong> A GenieMade certificate doesn't just assert that an image is authentic — it shows the receipt: when it was made, by whom, with which model and prompt, and a chain of independent proofs anyone can re-check. Authenticity you can hand to someone else, and they can confirm it without taking your word for it.</p>
+  </section>
+
   <footer>
-    <span>© 2026 GenieMade</span><span class="dot">·</span><a href="/app.html">Studio</a><span class="dot">·</span><a href="/">Home</a>
+    <span>© 2026 GenieMade</span><span class="dot">·</span><a href="/verify">Verify</a><span class="dot">·</span><a href="/app">Studio</a><span class="dot">·</span><a href="/">Home</a>
   </footer>
 </div>
 <script>
@@ -109,5 +154,6 @@
   $('#drop').onclick=()=>$('#file').click();
   $('#file').onchange=()=>{ $('#drop').textContent='Reading embedded credentials in the browser isn\'t available yet — paste the receipt ID above to verify.'; };
 </script>
+<script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
 </html>

@@ -187,6 +187,23 @@
 </style>
 <!-- Microsoft Clarity -->
 <script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","y21d6q7oku");</script>
+<style id="gm-header-css">
+.gm-header{position:sticky;top:0;z-index:50;background:rgba(19,10,38,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #3a2a6b}
+.gm-header *{box-sizing:border-box}
+.gm-bar{max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+.gm-brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f7f1ff;font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:20px;font-weight:600;white-space:nowrap}
+.gm-brand b{color:#ffe390}
+.gm-nav{display:flex;align-items:center;gap:22px;margin-left:8px;flex-wrap:wrap}
+.gm-nav a{color:#c6b6ea;text-decoration:none;font-size:14px;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;transition:color .18s;padding:4px 0}
+.gm-nav a:hover{color:#fff}
+.gm-nav a:focus-visible{outline:2px solid #f5c451;outline-offset:3px;border-radius:3px}
+.gm-spacer{flex:1}
+.gm-cta{background:linear-gradient(180deg,#ffe390,#f5c451);color:#2a1c04;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 8px 22px rgba(245,196,81,.22)}
+.gm-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(245,196,81,.32)}
+.gm-cta:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.gm-signout{color:#c6b6ea;text-decoration:none;font-size:14px;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:8px 15px;border:1px solid #3a2a6b;border-radius:999px;transition:color .18s,border-color .18s;white-space:nowrap;cursor:pointer}.gm-signout:hover{color:#fff;border-color:#f5c451}
+@media(max-width:640px){.gm-nav{gap:14px}.gm-nav a{font-size:13px}.gm-hide-sm{display:none}}
+</style>
 </head>
 <body>
 <canvas id="dust"></canvas>
@@ -378,5 +395,6 @@
 
 <script src="assets/studio.js?v=20260814a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
+<script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
 </html>

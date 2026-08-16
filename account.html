@@ -37,12 +37,26 @@ table{width:100%;border-collapse:collapse;font-size:.9rem} th,td{text-align:left
 .note{font-size:.82rem;color:var(--faint);margin-top:6px}
 .signin{max-width:420px;margin:80px auto;text-align:center}
 .signin .card{padding:30px}
-</style></head>
+</style><style id="gm-header-css">
+.gm-header{position:sticky;top:0;z-index:50;background:rgba(19,10,38,.85);backdrop-filter:blur(10px);-webkit-backdrop-filter:blur(10px);border-bottom:1px solid #3a2a6b}
+.gm-header *{box-sizing:border-box}
+.gm-bar{max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+.gm-brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f7f1ff;font-family:ui-serif,"Iowan Old Style",Georgia,serif;font-size:20px;font-weight:600;white-space:nowrap}
+.gm-brand b{color:#ffe390}
+.gm-nav{display:flex;align-items:center;gap:22px;margin-left:8px;flex-wrap:wrap}
+.gm-nav a{color:#c6b6ea;text-decoration:none;font-size:14px;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;transition:color .18s;padding:4px 0}
+.gm-nav a:hover{color:#fff}
+.gm-nav a:focus-visible{outline:2px solid #f5c451;outline-offset:3px;border-radius:3px}
+.gm-spacer{flex:1}
+.gm-cta{background:linear-gradient(180deg,#ffe390,#f5c451);color:#2a1c04;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;text-decoration:none;white-space:nowrap;cursor:pointer;transition:transform .18s,box-shadow .18s;box-shadow:0 8px 22px rgba(245,196,81,.22)}
+.gm-cta:hover{transform:translateY(-1px);box-shadow:0 10px 26px rgba(245,196,81,.32)}
+.gm-cta:focus-visible{outline:2px solid #fff;outline-offset:2px}
+.gm-signout{color:#c6b6ea;text-decoration:none;font-size:14px;font-family:ui-sans-serif,system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;padding:8px 15px;border:1px solid #3a2a6b;border-radius:999px;transition:color .18s,border-color .18s;white-space:nowrap;cursor:pointer}.gm-signout:hover{color:#fff;border-color:#f5c451}
+@media(max-width:640px){.gm-nav{gap:14px}.gm-nav a{font-size:13px}.gm-hide-sm{display:none}}
+</style>
+</head>
 <body>
-<header><div class="wrap nav">
-  <a class="wm" href="/">Genie<b>Made</b></a>
-  <nav class="links"><a href="/studio-you">Studio You</a><a href="/make/birthday">Occasions</a><a href="/app">Studio</a><a href="/#pricing">Pricing</a><a class="btn sm" id="logoutBtn" href="#" style="display:none">Sign out</a></nav>
-</div></header>
+<header class="gm-header"><div class="gm-bar"><a class="gm-brand" href="/"><svg width="28" height="28" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="gmlg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs><path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#gmlg)"/></svg><span>Genie<b>Made</b></span></a><nav class="gm-nav" aria-label="Main navigation"><a href="/studio-you">Studio You</a><a href="/make">Occasions</a><a class="gm-hide-sm" href="/#examples">Examples</a><a href="/#pricing">Pricing</a><a class="gm-hide-sm" href="/verify">Verify</a></nav><span class="gm-spacer"></span><a class="gm-signout" id="gmSignout" href="#" style="display:none">Sign out</a><a class="gm-cta" href="/app">Open the Studio</a></div></header>
 
 <main class="wrap" id="app">
   <div class="muted" id="boot" style="padding:40px 0">Loading your account…</div>
@@ -69,7 +83,7 @@ table{width:100%;border-collapse:collapse;font-size:.9rem} th,td{text-align:left
       <h2>Profile</h2>
       <div class="row"><div class="k">Account number</div><div class="v"><span class="mono" id="pfAcct">—</span></div></div>
       <div class="row"><div class="k">Member since</div><div class="v" id="pfSince">—</div></div>
-      <div class="field" style="margin-top:14px"><label>Full name</label><input id="pfFull" placeholder="e.g. Rick Barretto"><span class="ro">Used on your receipts and certificates.</span></div>
+      <div class="field" style="margin-top:14px"><label>Full name</label><input id="pfFull" placeholder="e.g. Your Full Name"><span class="ro">Used on your receipts and certificates.</span></div>
       <div class="field"><label>Display name</label><input id="pfName" placeholder="Your name"><span class="ro">Shown in the Studio header and public registry.</span></div>
       <div class="field"><label>Email</label><input id="pfEmail" disabled><span class="ro">To change your email, contact support.</span></div>
       <button class="btn sm" id="saveProfile">Save profile</button> <span id="profileMsg" class="note"></span>
@@ -114,7 +128,7 @@ async function boot(){
     show("boot",false); show("signedout",true); return;
   }
   show("boot",false); show("acct",true);
-  document.getElementById("logoutBtn").style.display="";
+  document.getElementById("gmSignout").style.display="";
   loadAccount(); loadCredits(); loadInvoices(); loadAddress();
 }
 async function loadAccount(){
@@ -177,7 +191,8 @@ document.getElementById("portalBtn").onclick=async function(){
   msg.textContent=(r.data.message||"Buy credits once to open your billing portal (card + official receipts).");
   msg.className="note";
 };
-document.getElementById("logoutBtn").onclick=async function(e){e.preventDefault();await api("/api/auth/logout",{method:"POST"});window.location.href="/";};
+document.getElementById("gmSignout").onclick=async function(e){e.preventDefault();await api("/api/auth/logout",{method:"POST"});window.location.href="/";};
 boot();
 </script>
+<script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body></html>
