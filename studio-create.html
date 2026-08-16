@@ -77,46 +77,8 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
     <div class="stp" id="s3"><b>3 · Create</b>pick your looks</div>
   </div>
 
-  <!-- gate messages -->
-  <div class="card hidden" id="gate"><h2 id="gateTitle"></h2><p class="sub" id="gateMsg"></p><div id="gateAct" style="margin-top:14px"></div></div>
-
-  <!-- STEP 1: upload -->
-  <div class="card hidden" id="stepUpload">
-    <h2>Add your photos</h2>
-    <p class="note">5–25 clear photos of one person — different angles, lighting and expressions. The more you add, the better the likeness. Works for you, your partner, or your kids.</p>
-    <div class="drop" id="drop">📷 <b>Drop photos here</b> or click to choose<br><span class="note">JPG / PNG / WebP · up to 25</span></div>
-    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple class="hidden">
-    <div class="thumbs" id="thumbs"></div>
-    <div class="row">
-      <div class="field"><label>Their age</label><input id="ageInput" type="number" min="1" max="110" placeholder="e.g. 34"></div>
-      <div class="field"><label>Hair colour (optional)</label><input id="hairInput" type="text" maxlength="24" placeholder="e.g. dark brown, blonde"></div>
-    </div>
-    <p class="note" id="upMsg"></p>
-    <div style="margin-top:16px"><button class="btn" id="trainBtn" disabled>Train my model →</button></div>
-  </div>
-
-  <!-- STEP 2: training -->
-  <div class="card hidden" id="stepTrain">
-    <h2>Training your private model…</h2>
-    <p class="sub">This takes a few minutes. You can keep this tab open — we'll move you to the fun part automatically.</p>
-    <div class="prog"><i id="trainBar"></i></div>
-    <p class="note" id="trainMsg">Starting…</p>
-  </div>
-
-  <!-- STEP 3: create -->
-  <div class="card hidden" id="stepCreate">
-    <h2>Pick your looks <span class="counter" id="looksCounter"></span></h2>
-    <p class="note">Tap a look and we'll create it as you. Each finished photo lands in your Vault, certified.</p>
-    <div class="cats" id="cats"></div>
-    <div class="looks" id="looks"></div>
-    <p class="note" id="createMsg"></p>
-    <h2 style="margin-top:26px">Your photos</h2>
-    <div class="grid" id="results"></div>
-    <p class="note">Finished photos are also in <a href="/app" style="color:var(--gold2)">your Vault</a> — downloadable full-res with their certificate.</p>
-  </div>
-
   <!-- HOW IT WORKS (illustrated) -->
-  <section style="margin-top:60px">
+  <section style="margin-top:30px">
     <h2 style="font-family:var(--serif);font-size:1.8rem;text-align:center;margin-bottom:4px">How it works</h2>
     <p class="sub" style="text-align:center;margin:0 auto 6px;max-width:46rem">Three simple steps. <b style="color:var(--ink)">Train once</b>, then create studio-grade, unmistakably-<em style="color:var(--gold)">you</em> portraits in any style — forever. Every photo comes back sealed with your certificate.</p>
 
@@ -165,6 +127,45 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
       <p class="note">…and dozens more across every category. Pick your favourites and they land in your Vault, certified and downloadable full-res.</p>
     </div>
   </section>
+
+  <!-- gate messages -->
+  <div class="card hidden" id="gate"><h2 id="gateTitle"></h2><p class="sub" id="gateMsg"></p><div id="gateAct" style="margin-top:14px"></div></div>
+
+  <!-- STEP 1: upload -->
+  <div class="card hidden" id="stepUpload">
+    <h2>Add your photos</h2>
+    <p class="note">5–25 clear photos of one person — different angles, lighting and expressions. The more you add, the better the likeness. Works for you, your partner, or your kids.</p>
+    <div class="drop" id="drop">📷 <b>Drop photos here</b> or click to choose<br><span class="note">JPG / PNG / WebP · up to 25</span></div>
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple class="hidden">
+    <div class="thumbs" id="thumbs"></div>
+    <div class="row">
+      <div class="field"><label>Their age</label><input id="ageInput" type="number" min="1" max="110" placeholder="e.g. 34"></div>
+      <div class="field"><label>Hair colour (optional)</label><input id="hairInput" type="text" maxlength="24" placeholder="e.g. dark brown, blonde"></div>
+    </div>
+    <p class="note" id="upMsg"></p>
+    <div style="margin-top:16px"><button class="btn" id="trainBtn" disabled>Train my model →</button></div>
+  </div>
+
+  <!-- STEP 2: training -->
+  <div class="card hidden" id="stepTrain">
+    <h2>Training your private model…</h2>
+    <p class="sub">This takes a few minutes. You can keep this tab open — we'll move you to the fun part automatically.</p>
+    <div class="prog"><i id="trainBar"></i></div>
+    <p class="note" id="trainMsg">Starting…</p>
+  </div>
+
+  <!-- STEP 3: create -->
+  <div class="card hidden" id="stepCreate">
+    <h2>Pick your looks <span class="counter" id="looksCounter"></span></h2>
+    <p class="note">Tap a look and we'll create it as you. Each finished photo lands in your Vault, certified.</p>
+    <div class="cats" id="cats"></div>
+    <div class="looks" id="looks"></div>
+    <p class="note" id="createMsg"></p>
+    <h2 style="margin-top:26px">Your photos</h2>
+    <div class="grid" id="results"></div>
+    <p class="note">Finished photos are also in <a href="/app" style="color:var(--gold2)">your Vault</a> — downloadable full-res with their certificate.</p>
+  </div>
+
 </div>
 
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
