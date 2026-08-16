@@ -114,7 +114,7 @@
   .step h4{font-size:1.05rem;margin:8px 0 4px}.step p{color:var(--mut);font-size:.9rem;margin:0}
 
   /* pricing */
-  .plans{display:grid;grid-template-columns:repeat(4,1fr);gap:16px;margin-top:38px}
+  .plans{display:grid;grid-template-columns:repeat(3,minmax(230px,330px));gap:16px;margin-top:38px;justify-content:center}
   @media(max-width:920px){.plans{grid-template-columns:1fr 1fr}}@media(max-width:520px){.plans{grid-template-columns:1fr}}
   .plan{border:1px solid var(--line);border-radius:18px;padding:24px;background:linear-gradient(160deg,rgba(35,21,83,.7),rgba(27,17,64,.55));display:flex;flex-direction:column}
   .plan.hot{border-color:var(--gold);box-shadow:0 0 0 1px var(--goldd),0 30px 70px -40px rgba(245,196,81,.5)}
