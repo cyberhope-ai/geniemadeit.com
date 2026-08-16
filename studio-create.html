@@ -1,0 +1,246 @@
+<!doctype html><html lang="en">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Create — GenieMade Studio You</title>
+<meta name="description" content="Upload your photos, train your private model, and create studio-grade certified portraits of you.">
+<meta name="robots" content="noindex">
+<style>
+:root{--night:#130a26;--night2:#1c1140;--panel:#231553;--panel2:#2b1b63;--line:#3a2a6b;--ink:#f7f1ff;--mut:#c6b6ea;--faint:#8f7fbb;--gold:#f5c451;--gold2:#ffe390;--goldd:#c88f2c;--magic:#66e3e8;--ok:#66e3a0;--serif:ui-serif,"Iowan Old Style",Georgia,serif;--sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}html,body{margin:0;min-height:100%}
+body{background:radial-gradient(1000px 560px at 80% -8%,rgba(245,196,81,.13),transparent 62%),linear-gradient(178deg,var(--night2),var(--night));color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+a{color:inherit}.wrap{max-width:1040px;margin:0 auto;padding:0 22px 80px}
+h1{font-family:var(--serif);font-weight:600;font-size:clamp(1.8rem,4.4vw,2.6rem);line-height:1.1;margin:.5em 0 .25em}
+h1 em{font-style:italic;color:var(--gold)}h2{font-family:var(--serif);font-weight:600;font-size:1.4rem;margin:0 0 4px}
+.eyebrow{display:inline-block;font-size:.72rem;letter-spacing:.14em;text-transform:uppercase;color:var(--gold2);border:1px solid var(--goldd);background:rgba(245,196,81,.07);border-radius:30px;padding:5px 13px;margin-top:26px}
+.sub{color:var(--mut);max-width:52rem}
+.card{background:linear-gradient(135deg,rgba(35,21,83,.9),rgba(43,27,99,.72));border:1px solid var(--line);border-radius:18px;padding:22px;margin-top:22px}
+.btn{border:none;border-radius:12px;padding:12px 20px;font:inherit;font-weight:750;font-size:1rem;cursor:pointer;color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold));transition:transform .1s}
+.btn:hover{transform:translateY(-1px)}.btn:disabled{opacity:.5;cursor:default;transform:none}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink)}
+.steps{display:flex;gap:10px;flex-wrap:wrap;margin-top:24px}
+.stp{flex:1;min-width:150px;border:1px solid var(--line);border-radius:12px;padding:11px 14px;font-size:.86rem;color:var(--faint)}
+.stp.on{border-color:var(--goldd);color:var(--gold2);background:rgba(245,196,81,.06)}
+.stp b{display:block;color:var(--ink);font-size:.95rem}
+.drop{margin-top:16px;border:2px dashed var(--line);border-radius:16px;padding:30px;text-align:center;color:var(--faint);cursor:pointer;transition:.15s}
+.drop.hot{border-color:var(--gold);color:var(--ink);background:rgba(245,196,81,.05)}
+.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(84px,1fr));gap:9px;margin-top:14px}
+.thumbs figure{margin:0;position:relative;border-radius:9px;overflow:hidden;aspect-ratio:1/1;border:1px solid var(--line)}
+.thumbs img{width:100%;height:100%;object-fit:cover;display:block}
+.thumbs .x{position:absolute;top:3px;right:3px;background:rgba(8,4,18,.8);border:none;color:#fff;border-radius:7px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1}
+.field{margin-top:14px}label{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:5px}
+input,select{background:rgba(10,6,22,.5);border:1px solid var(--line);border-radius:11px;padding:12px 14px;color:var(--ink);font:inherit;outline:none;width:100%}
+input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+@media(max-width:520px){.row{grid-template-columns:1fr}}
+.note{font-size:.85rem;color:var(--faint);margin-top:8px}.err{color:#ff9ab0}.ok{color:var(--ok)}
+.prog{height:9px;border-radius:6px;background:rgba(255,255,255,.08);overflow:hidden;margin-top:16px}.prog i{display:block;height:100%;width:20%;background:linear-gradient(90deg,var(--gold2),var(--gold));transition:width .6s;border-radius:6px}
+.cats{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0 4px}
+.cat{font-size:.82rem;color:var(--mut);border:1px solid var(--line);background:rgba(255,255,255,.03);border-radius:30px;padding:6px 13px;cursor:pointer}
+.cat.on{border-color:var(--gold);color:var(--ink);background:rgba(245,196,81,.08)}
+.looks{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:11px;margin-top:10px}
+.look{border:1px solid var(--line);border-radius:13px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;background:rgba(255,255,255,.02)}
+.look:hover{border-color:var(--gold);transform:translateY(-2px)}.look .e{font-size:1.7rem}.look .n{font-size:.82rem;margin-top:5px;color:var(--mut)}
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:16px}
+.res{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
+.res img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+.res .b{padding:9px 11px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.res .cap{font-size:.84rem;flex:1}
+.mini{border:none;border-radius:9px;padding:6px 11px;font:inherit;font-size:.8rem;font-weight:700;cursor:pointer;color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold))}
+.mini.ghost{background:rgba(255,255,255,.06);border:1px solid var(--line);color:var(--ink)}
+.hidden{display:none!important}
+.counter{float:right;color:var(--gold2);font-size:.9rem}
+</style>
+<style id="gm-header-css">
+.gm-header{position:sticky;top:0;z-index:50;background:rgba(19,10,38,.85);backdrop-filter:blur(10px);border-bottom:1px solid #3a2a6b}
+.gm-bar{max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:18px}
+.gm-brand{display:flex;align-items:center;gap:9px;text-decoration:none;color:#f7f1ff;font-family:ui-serif,Georgia,serif;font-size:20px;font-weight:600}
+.gm-brand b{color:#ffe390}.gm-nav{display:flex;gap:22px;margin-left:8px;flex-wrap:wrap}
+.gm-nav a{color:#c6b6ea;text-decoration:none;font-size:14px}.gm-nav a:hover{color:#fff}.gm-spacer{flex:1}
+.gm-cta{background:linear-gradient(180deg,#ffe390,#f5c451);color:#2a1c04;font-weight:800;font-size:14px;padding:9px 20px;border-radius:999px;text-decoration:none}
+.gm-signout{color:#c6b6ea;text-decoration:none;font-size:14px;padding:8px 15px;border:1px solid #3a2a6b;border-radius:999px;cursor:pointer;display:none}
+@media(max-width:640px){.gm-nav{gap:14px}}
+</style>
+</head>
+<body>
+<header class="gm-header"><div class="gm-bar"><a class="gm-brand" href="/">🪄 Genie<b>Made</b></a><nav class="gm-nav"><a href="/studio-you">Studio You</a><a href="/app">Studio</a><a href="/#pricing">Pricing</a><a href="/verify">Verify</a></nav><span class="gm-spacer"></span><a class="gm-signout" id="gmSignout" href="#">Sign out</a><a class="gm-cta" href="/app">Open the Studio</a></div></header>
+
+<div class="wrap">
+  <span class="eyebrow">Studio You · Create</span>
+  <h1>Your private <em>photo studio</em></h1>
+  <p class="sub">Upload your photos, we train a private model of you, then you pick your looks. Every photo is studio-grade and comes back sealed with your certificate.</p>
+
+  <div class="steps">
+    <div class="stp" id="s1"><b>1 · Upload</b>5–25 photos</div>
+    <div class="stp" id="s2"><b>2 · Train</b>your private model</div>
+    <div class="stp" id="s3"><b>3 · Create</b>pick your looks</div>
+  </div>
+
+  <!-- gate messages -->
+  <div class="card hidden" id="gate"><h2 id="gateTitle"></h2><p class="sub" id="gateMsg"></p><div id="gateAct" style="margin-top:14px"></div></div>
+
+  <!-- STEP 1: upload -->
+  <div class="card hidden" id="stepUpload">
+    <h2>Add your photos</h2>
+    <p class="note">5–25 clear photos of one person — different angles, lighting and expressions. The more you add, the better the likeness. Works for you, your partner, or your kids.</p>
+    <div class="drop" id="drop">📷 <b>Drop photos here</b> or click to choose<br><span class="note">JPG / PNG / WebP · up to 25</span></div>
+    <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple class="hidden">
+    <div class="thumbs" id="thumbs"></div>
+    <div class="row">
+      <div class="field"><label>Their age</label><input id="ageInput" type="number" min="1" max="110" placeholder="e.g. 34"></div>
+      <div class="field"><label>Hair colour (optional)</label><input id="hairInput" type="text" maxlength="24" placeholder="e.g. dark brown, blonde"></div>
+    </div>
+    <p class="note" id="upMsg"></p>
+    <div style="margin-top:16px"><button class="btn" id="trainBtn" disabled>Train my model →</button></div>
+  </div>
+
+  <!-- STEP 2: training -->
+  <div class="card hidden" id="stepTrain">
+    <h2>Training your private model…</h2>
+    <p class="sub">This takes a few minutes. You can keep this tab open — we'll move you to the fun part automatically.</p>
+    <div class="prog"><i id="trainBar"></i></div>
+    <p class="note" id="trainMsg">Starting…</p>
+  </div>
+
+  <!-- STEP 3: create -->
+  <div class="card hidden" id="stepCreate">
+    <h2>Pick your looks <span class="counter" id="looksCounter"></span></h2>
+    <p class="note">Tap a look and we'll create it as you. Each finished photo lands in your Vault, certified.</p>
+    <div class="cats" id="cats"></div>
+    <div class="looks" id="looks"></div>
+    <p class="note" id="createMsg"></p>
+    <h2 style="margin-top:26px">Your photos</h2>
+    <div class="grid" id="results"></div>
+    <p class="note">Finished photos are also in <a href="/app" style="color:var(--gold2)">your Vault</a> — downloadable full-res with their certificate.</p>
+  </div>
+</div>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script>
+const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
+const api=(p,o)=>fetch(p,Object.assign({credentials:"same-origin"},o||{}));
+const jpost=(p,body)=>api(p,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body||{})}).then(r=>r.json().catch(()=>({})));
+let CFG={min_photos:5,max_photos:25,looks:12}, photos=[], LOOKS=[], usedLook=new Set(), looksUsed=0, looksTotal=12;
+
+function show(id){["gate","stepUpload","stepTrain","stepCreate"].forEach(x=>$("#"+x).classList.toggle("hidden",x!==id));}
+function setStep(n){[1,2,3].forEach(i=>$("#s"+i).classList.toggle("on",i===n));}
+function gate(title,msg,actHtml){ $("#gateTitle").textContent=title; $("#gateMsg").textContent=msg; $("#gateAct").innerHTML=actHtml||""; show("gate"); }
+
+async function boot(){
+  // signed in?
+  const me=await api("/api/auth/me").then(r=>r.ok?r.json():null).catch(()=>null);
+  if(!me||!(me.user||me.email||me.id)){ setStep(1); return gate("Sign in to start","Create your account (or sign in) in the Studio, then come back here.",'<a class="btn" href="/app">Go to the Studio →</a>'); }
+  const sg=$("#gmSignout"); if(sg){ sg.style.display=""; sg.onclick=e=>{e.preventDefault();api("/api/auth/logout",{method:"POST"}).then(()=>location.href="/");}; }
+  // session + model
+  const s=await api("/api/studio/session").then(r=>r.json()).catch(()=>({}));
+  if(s&&s.config){ CFG=s.config; }
+  if(!s||!s.session){
+    setStep(1);
+    gate("Choose your Studio package","Train your private model and create your looks. Cancel anytime — every photo is certified.",
+      '<button class="btn" data-tier="taster">Taster · $19 — 6 looks</button> <button class="btn ghost" data-tier="session">Session · $39 — 12 looks</button>');
+    $$("#gateAct [data-tier]").forEach(b=>b.onclick=()=>startCheckout(b.dataset.tier));
+    return;
+  }
+  looksTotal=s.session.looks_total||CFG.looks; looksUsed=s.session.looks_used||0;
+  const m=s.model;
+  if(!m){ setStep(1); return startUpload(); }
+  if(m.status==="ready"){ setStep(3); return startCreate(s); }
+  // training in progress
+  setStep(2); show("stepTrain"); pollTrain();
+}
+
+async function startCheckout(tier){
+  $("#gateMsg").textContent="Opening secure checkout…";
+  const r=await jpost("/api/billing/checkout",{product:"studio_session",tier,return_url:location.origin});
+  if(r&&r.url){ location.href=r.url; return; }
+  if(r&&(r.error==="auth_required")){ return gate("Sign in first","Create your account in the Studio, then choose your package here.",'<a class="btn" href="/app">Go to the Studio →</a>'); }
+  $("#gateMsg").innerHTML='<span class="err">'+((r&&(r.message||r.error))||"Couldn't start checkout — try again.")+'</span>';
+}
+
+/* ---------- STEP 1 ---------- */
+function startUpload(){ show("stepUpload"); renderThumbs(); }
+$("#drop").onclick=()=>$("#fileInput").click();
+["dragover","dragenter"].forEach(e=>$("#drop").addEventListener(e,ev=>{ev.preventDefault();$("#drop").classList.add("hot");}));
+["dragleave","drop"].forEach(e=>$("#drop").addEventListener(e,ev=>{ev.preventDefault();$("#drop").classList.remove("hot");}));
+$("#drop").addEventListener("drop",ev=>addFiles(ev.dataTransfer.files));
+$("#fileInput").addEventListener("change",e=>addFiles(e.target.files));
+function addFiles(list){
+  for(const f of list){ if(!/^image\//.test(f.type)) continue; if(photos.length>=CFG.max_photos) break; photos.push(f); }
+  renderThumbs();
+}
+function renderThumbs(){
+  $("#thumbs").innerHTML=photos.map((f,i)=>`<figure><img src="${URL.createObjectURL(f)}"><button class="x" data-i="${i}">×</button></figure>`).join("");
+  $$("#thumbs .x").forEach(b=>b.onclick=()=>{photos.splice(+b.dataset.i,1);renderThumbs();});
+  const ok=photos.length>=CFG.min_photos;
+  $("#trainBtn").disabled=!ok;
+  $("#upMsg").innerHTML= photos.length? `${photos.length} photo${photos.length>1?"s":""} added${ok?' <span class="ok">— ready to train</span>':` — add ${CFG.min_photos-photos.length} more`}` : "";
+}
+$("#trainBtn").onclick=async()=>{
+  const age=parseInt($("#ageInput").value,10);
+  if(!age||age<1){ $("#upMsg").innerHTML='<span class="err">Please enter the age.</span>'; $("#ageInput").focus(); return; }
+  $("#trainBtn").disabled=true; $("#upMsg").textContent="Zipping your photos…";
+  try{
+    const zip=new JSZip(); photos.forEach((f,i)=>zip.file(`p${String(i).padStart(2,"0")}_${(f.name||"photo").replace(/[^\w.\-]+/g,"")}`,f));
+    const blob=await zip.generateAsync({type:"blob"});
+    $("#upMsg").textContent="Uploading…";
+    const fd=new FormData(); fd.append("file",new File([blob],"photos.zip",{type:"application/zip"}));
+    const up=await api("/api/upload",{method:"POST",body:fd}).then(r=>r.json());
+    if(!up.ok){ throw new Error(up.message||"upload failed"); }
+    const zurl=location.origin+up.url;
+    $("#upMsg").textContent="Starting training…";
+    const tr=await jpost("/api/studio/train",{images_zip_url:zurl,age,hair_color:$("#hairInput").value.trim(),source_count:photos.length});
+    if(!tr.ok){ throw new Error(tr.message||tr.error||"training failed"); }
+    setStep(2); show("stepTrain"); pollTrain();
+  }catch(e){ $("#upMsg").innerHTML='<span class="err">'+(e.message||"Something went wrong — try again.")+'</span>'; $("#trainBtn").disabled=false; }
+};
+
+/* ---------- STEP 2 ---------- */
+let trainPct=12;
+async function pollTrain(){
+  $("#trainBar").style.width=Math.min(92,trainPct)+"%"; trainPct+=6;
+  const st=await api("/api/studio/train/status").then(r=>r.json()).catch(()=>({}));
+  if(st&&st.status==="ready"){ $("#trainBar").style.width="100%"; $("#trainMsg").innerHTML='<span class="ok">Your model is ready!</span>'; setTimeout(()=>boot(),700); return; }
+  $("#trainMsg").textContent="Training… (this takes a few minutes)";
+  setTimeout(pollTrain,8000);
+}
+
+/* ---------- STEP 3 ---------- */
+async function startCreate(s){
+  show("stepCreate");
+  (s.session.looks||[]).forEach(l=>{ if(l.look_id) usedLook.add(l.look_id); addResult(l,true); });
+  updateCounter();
+  const d=await api("/api/studio/looks").then(r=>r.json()).catch(()=>({}));
+  LOOKS=(d&&d.looks)||[]; renderCats(); renderLooks("all");
+}
+function updateCounter(){ $("#looksCounter").textContent=`${looksUsed} / ${looksTotal} looks used`; }
+let curCat="all";
+function renderCats(){
+  const cats=["all",...[...new Set(LOOKS.map(l=>l.category).filter(Boolean))]];
+  $("#cats").innerHTML=cats.map(c=>`<span class="cat ${c===curCat?"on":""}" data-c="${c}">${c==="all"?"All":c}</span>`).join("");
+  $$("#cats .cat").forEach(x=>x.onclick=()=>{curCat=x.dataset.c;renderCats();renderLooks(curCat);});
+}
+function renderLooks(cat){
+  const list=LOOKS.filter(l=>cat==="all"||l.category===cat);
+  $("#looks").innerHTML=list.map(l=>`<div class="look" data-id="${l.id}"><div class="e">${l.emoji||"✨"}</div><div class="n">${l.name}</div></div>`).join("");
+  $$("#looks .look").forEach(el=>el.onclick=()=>createLook(el.dataset.id,el));
+}
+async function createLook(look_id,el){
+  if(looksUsed>=looksTotal){ $("#createMsg").innerHTML='<span class="err">You\'ve used all your looks. Add more from your saved model any time.</span>'; return; }
+  el.style.opacity=.5; $("#createMsg").textContent="Creating your photo… (about a minute)";
+  const r=await jpost("/api/studio/look",{look_id});
+  el.style.opacity=1;
+  if(!r.ok){ $("#createMsg").innerHTML='<span class="err">'+(r.message||r.error||"Couldn\'t create that one.")+'</span>'; return; }
+  looksUsed=r.looks_used||looksUsed+1; updateCounter(); $("#createMsg").innerHTML='<span class="ok">Done — added to your photos + Vault.</span>';
+  addResult(r.look,false);
+}
+function addResult(look,existing){
+  if(!look||!look.url) return;
+  const name=(look.look_name||"Studio look");
+  const div=document.createElement("div"); div.className="res";
+  div.innerHTML=`<img src="${look.url}"><div class="b"><span class="cap">${name}</span>`+
+    `<button class="mini" data-dl>Download</button></div>`;
+  div.querySelector("[data-dl]").onclick=()=>{ const a=document.createElement("a"); const sep=look.url.includes("?")?"&":"?"; a.href=look.url+sep+"download=1&name="+encodeURIComponent(name.replace(/[^\w \-]+/g,"")); document.body.appendChild(a); a.click(); a.remove(); };
+  $("#results").prepend(div);
+}
+boot();
+</script>
+</body>
+</html>
