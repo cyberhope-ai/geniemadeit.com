@@ -240,7 +240,8 @@
       var b = document.getElementById("everVerifyBadge"); if (b) { b.href = ev; var im = b.querySelector("img"); if (im) im.src = "https://eververify.org/badge/" + encodeURIComponent(rid) + ".svg"; b.style.display = ""; }
     })();
     els.result.classList.add("on");
-    $("#dlBtn").onclick = () => window.open(item.url, "_blank");
+    $("#dlBtn").onclick = () => gmDownload(item);
+    var dc = $("#dlCertBtn"); if (dc) dc.onclick = () => gmDownloadCert(item);
     els.result.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 
@@ -264,7 +265,67 @@
     $("#lbReceipt").textContent = item.certificate.receipt_id;
     $("#lbTime").textContent = fmtTime(item.certificate.issued_at);
     $("#lbHash").textContent = shortHash(item.certificate.hash);
+    var d1 = $("#lbDl"); if (d1) d1.onclick = () => gmDownload(item);
+    var d2 = $("#lbCert"); if (d2) d2.onclick = () => gmDownloadCert(item);
+    var d3 = $("#lbDelete"); if (d3) d3.onclick = () => openDelete(item);
     $("#lightbox").classList.add("on");
+  }
+
+  // ---- downloads + delete ----
+  function niceName(item){ return (((item && (item.look_name || item.prompt)) || "GenieMade") + "").replace(/[^\w \-]+/g, "").trim().slice(0, 60) || "GenieMade"; }
+  function gmDownload(item){
+    if (!item || !item.url) return;
+    var sep = item.url.indexOf("?") >= 0 ? "&" : "?";
+    var a = document.createElement("a");
+    a.href = item.url + sep + "download=1&name=" + encodeURIComponent(niceName(item));
+    a.rel = "noopener"; document.body.appendChild(a); a.click(); a.remove();
+  }
+  function gmCertHtml(item){
+    var c = (item && item.certificate) || {}, rid = c.receipt_id || "";
+    var ev = rid ? "https://eververify.org/r/" + encodeURIComponent(rid) : "";
+    return "<!doctype html><meta charset=utf-8><title>GenieMade Certificate — " + escapeHtml(rid) + "</title>" +
+    "<div style=\"font-family:Georgia,serif;max-width:640px;margin:40px auto;padding:34px;border:2px solid #c88f2c;border-radius:16px;background:#130a26;color:#f7f1ff\">" +
+    "<div style=\"font-size:22px;color:#ffe390\">GenieMade — Certificate of Authenticity</div>" +
+    "<p style=\"color:#c6b6ea\">This confirms the creation below was made on GenieMade and sealed in a PrecognitionOS Vault.</p>" +
+    "<img src=\"" + item.url + "\" style=\"width:100%;border-radius:10px;margin:12px 0\">" +
+    "<table style=\"width:100%;font-size:14px;color:#eaf1ff;border-collapse:collapse\">" +
+    "<tr><td style=\"color:#8f7fbb;padding:5px 0\">Title</td><td>" + escapeHtml(((item.look_name || item.prompt) || "").slice(0, 80)) + "</td></tr>" +
+    "<tr><td style=\"color:#8f7fbb;padding:5px 0\">Receipt</td><td>" + escapeHtml(rid) + "</td></tr>" +
+    "<tr><td style=\"color:#8f7fbb;padding:5px 0\">Engine</td><td>" + escapeHtml(item.model || "") + "</td></tr>" +
+    "<tr><td style=\"color:#8f7fbb;padding:5px 0\">Sealed</td><td>" + escapeHtml(c.issued_at || "") + "</td></tr>" +
+    "<tr><td style=\"color:#8f7fbb;padding:5px 0\">Content hash (SHA-256)</td><td style=\"font-family:monospace;font-size:11px;word-break:break-all\">" + escapeHtml(c.hash || "") + "</td></tr>" +
+    "<tr><td style=\"color:#8f7fbb;padding:5px 0\">Content credentials</td><td>" + (c.c2pa ? "C2PA embedded" : "—") + "</td></tr></table>" +
+    (ev ? "<p style=\"margin-top:16px\"><a href=\"" + ev + "\" style=\"color:#66e3e8\">Verify on EverVerify</a> — independent public registry (our sister company).</p>" : "") +
+    "<p style=\"color:#8f7fbb;font-size:12px;margin-top:18px\">(c) 2026 GenieMade — portable copy; the authoritative record lives at geniemadeit.com/verify and on EverVerify.</p></div>";
+  }
+  function gmDownloadCert(item){
+    if (!item || !item.certificate) return;
+    var blob = new Blob([gmCertHtml(item)], { type: "text/html" });
+    var url = URL.createObjectURL(blob), a = document.createElement("a");
+    a.href = url; a.download = "GenieMade-Certificate-" + (item.certificate.receipt_id || "receipt") + ".html";
+    document.body.appendChild(a); a.click(); a.remove(); setTimeout(function(){ URL.revokeObjectURL(url); }, 2000);
+  }
+  var _delItem = null;
+  function openDelete(item){
+    _delItem = item; if (!item || !item.id) return;
+    var w = $("#delWhat"); if (w) w.textContent = "“" + ((item.look_name || item.prompt || "") + "").slice(0, 50) + "”";
+    var k = $("#delKeepOriginal"); if (k) k.checked = false;
+    var m = $("#delMsg"); if (m) m.textContent = "";
+    var c = $("#delConfirm"); if (c) c.onclick = doDelete;
+    openModal("deleteModal");
+  }
+  async function doDelete(){
+    if (!_delItem || !_delItem.id) return;
+    var keep = $("#delKeepOriginal") && $("#delKeepOriginal").checked;
+    var m = $("#delMsg"); if (m) m.textContent = "Deleting…";
+    try {
+      var r = await fetch("/api/vault/delete", { method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin", body: JSON.stringify({ id: _delItem.id, keep_original: !!keep }) });
+      var d = await r.json().catch(function(){ return {}; });
+      if (r.ok && d.ok) {
+        state.vault = (state.vault || []).filter(function(g){ return g.id !== _delItem.id; });
+        renderVault(); closeModals(); $("#lightbox").classList.remove("on"); _delItem = null;
+      } else if (m) { m.textContent = d.message || d.error || "Couldn't delete."; }
+    } catch (e) { if (m) m.textContent = "Network error — try again."; }
   }
 
   // ---- modals ----

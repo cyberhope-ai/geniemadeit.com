@@ -47,6 +47,10 @@
   .btn.gold:hover{transform:translateY(-1px)}
   .btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink)}
   .btn.ghost:hover{border-color:var(--gold)}
+  .btn.danger{background:rgba(255,80,110,.08);border:1px solid #7a2a3f;color:#ff9ab0}
+  .btn.danger:hover{border-color:#ff6a8a;color:#ffbccb}
+  .keepwrap{display:flex;align-items:flex-start;gap:9px;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:11px;padding:11px 13px;margin:14px 0;text-align:left;cursor:pointer}
+  .keepwrap input{margin-top:3px}.keepwrap .kt{font-size:.9rem}.keepwrap .ks{color:var(--faint);font-size:.8rem}
   .btn:disabled{opacity:.5;cursor:default;transform:none}
 
   /* ---- create studio ---- */
@@ -303,7 +307,8 @@
             <dt>Fingerprint</dt><dd id="certHash">—</dd>
           </dl>
           <div class="cert-actions">
-            <button class="btn gold" id="dlBtn">Download</button>
+            <button class="btn gold" id="dlBtn">Download full-res</button>
+            <button class="btn ghost" id="dlCertBtn">Certificate</button>
             <button class="btn ghost" id="againBtn">Make another</button>
             <a class="btn ghost" id="everVerifyLink" href="#" target="_blank" rel="noopener" style="display:none">Verify on EverVerify ↗</a>
           </div>
@@ -361,6 +366,24 @@
   </div>
 </div>
 
+<!-- delete a creation -->
+<div class="modal" id="deleteModal">
+  <div class="sheet" style="position:relative;max-width:440px">
+    <button class="x" data-close>×</button>
+    <h3>Delete this creation?</h3>
+    <p id="delWhat" class="fine" style="margin:2px 0 4px"></p>
+    <p>It will be removed from your Vault. Its certificate stays on record as proof it once existed.</p>
+    <label class="keepwrap"><input type="checkbox" id="delKeepOriginal">
+      <span><span class="kt">Keep the original full-res file on the server</span><br>
+      <span class="ks">Unlists it from your Vault but keeps your master file safe (recoverable). Leave unchecked to delete the file too.</span></span></label>
+    <div class="cert-actions" style="margin-top:6px">
+      <button class="btn danger" id="delConfirm">Delete</button>
+      <button class="btn ghost" data-close>Cancel</button>
+    </div>
+    <p class="fine" id="delMsg" style="margin-top:10px"></p>
+  </div>
+</div>
+
 <!-- first-run welcome -->
 <div class="modal" id="welcomeModal">
   <div class="sheet" style="position:relative;text-align:center;max-width:460px">
@@ -388,12 +411,17 @@
         <dt>Sealed</dt><dd id="lbTime"></dd>
         <dt>Fingerprint</dt><dd id="lbHash"></dd>
       </dl>
-      <div class="cert-actions"><button class="btn ghost" data-close>Close</button></div>
+      <div class="cert-actions">
+        <button class="btn gold" id="lbDl">Download full-res</button>
+        <button class="btn ghost" id="lbCert">Certificate</button>
+        <button class="btn danger" id="lbDelete">Delete…</button>
+        <button class="btn ghost" data-close>Close</button>
+      </div>
     </div>
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260814a"></script>
+<script src="assets/studio.js?v=20260816a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
