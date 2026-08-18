@@ -240,6 +240,7 @@
     <h1>Describe it. GenieMade <em>makes it real.</em></h1>
     <div id="onboardBanner" style="display:none;margin:0 0 16px;padding:12px 16px;border:1px solid var(--gold);border-radius:12px;background:rgba(245,196,81,.09);font-size:.95rem">✨ Your <b><span id="obN">3</span> free wishes</b> are ready — describe anything below and hit <b>Make a wish</b> to create your first. <a href="#" id="obMore" style="color:var(--gold);white-space:nowrap">Need more later? →</a></div>
     <div id="buyBanner" style="display:none;margin:0 0 16px;padding:12px 16px;border:1px solid var(--magic);border-radius:12px;background:rgba(102,227,232,.09);font-size:.95rem">🎉 You're topped up — <b><span id="buyN"></span> credits</b> ready to spend. Describe your next wish below.</div>
+    <div id="remBanner" style="display:none;margin:0 0 16px;padding:12px 16px;border:1px solid var(--gold);border-radius:12px;background:rgba(245,196,81,.09);font-size:.95rem;align-items:center;gap:12px"></div>
 
     <div class="composer">
       <div id="packBanner" style="display:none;margin:0 0 12px;padding:12px 14px;border:1px solid var(--gold);border-radius:14px;background:rgba(245,196,81,.09);align-items:center;gap:12px;flex-wrap:wrap">
@@ -435,7 +436,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260818c"></script>
+<script src="assets/studio.js?v=20260818d"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

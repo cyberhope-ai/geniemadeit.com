@@ -424,7 +424,7 @@
       const u = j.user || {};
       LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email; setName(u);
       if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }
-      paintAccount(); paintCredits(); closeModals(); loadGallery(); loadMyPhotos(); maybeWelcome();
+      paintAccount(); paintCredits(); closeModals(); loadGallery(); loadMyPhotos(); loadReminderBanner(); maybeWelcome();
     } catch (_) { authErr("Something went wrong. Try again."); }
     finally { btn.textContent = label; btn.disabled = false; }
   }
@@ -530,6 +530,37 @@
     try {
       const r = await fetch("/api/photos/delete", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) });
       const j = await r.json().catch(() => ({})); if (j && j.photos) renderMyPhotos(j.photos);
+    } catch (_) {}
+  }
+  // ---- Reminder banner: surface the soonest upcoming person-occasion right in the Studio ----
+  async function loadReminderBanner() {
+    if (!state.signedIn) return;
+    var box = $("#remBanner"); if (!box) return;
+    try {
+      var r = await fetch("/api/reminders?days=30", { credentials: "same-origin" });
+      var d = await r.json(); var rem = (d && d.reminders) || [];
+      if (!rem.length) { box.style.display = "none"; return; }
+      var x = rem[0];
+      var when = x.days_away === 0 ? "today" : x.days_away === 1 ? "tomorrow" : ("in " + x.days_away + " days");
+      var icon = x.kind === "birthday" ? "🎂" : "🎉";
+      var first = (x.name || "them").split(" ")[0];
+      box.innerHTML = '<span>' + icon + ' <b>' + escHtml(x.name || "Someone") + "'s " + escHtml(x.label) + '</b> is ' + when + ' — put ' + escHtml(first) + ' in the scene.</span>' +
+        '<button class="btn gold" id="remGo" style="margin-left:auto;white-space:nowrap">Make ' + escHtml(first) + "'s card →</button>";
+      box.style.display = "flex";
+      var pk = x.kind === "birthday" ? "birthday" : "congrats";
+      $("#remGo").onclick = function () {
+        if (x.photo) useSavedPhoto(x.photo);
+        var p = (PACKS && PACKS.find) ? PACKS.find(function (pp) { return pp.id === pk; }) : null;
+        if (p && p.looks && p.looks[0]) applyPack(p, p.looks[0]);
+        var comp = document.querySelector(".composer"); if (comp) comp.scrollIntoView({ behavior: "smooth", block: "center" });
+      };
+    } catch (_) {}
+  }
+  // ?ref=<url> deep-link (from /people "make their card") — pre-load that person's photo as the reference
+  function checkRefParam() {
+    try {
+      var ref = new URLSearchParams(location.search).get("ref");
+      if (ref && /^(\/asset\/|%2Fasset)/.test(ref)) useSavedPhoto(decodeURIComponent(ref));
     } catch (_) {}
   }
   function selectCapability(id) {
@@ -761,6 +792,8 @@
       paintAccount();
       loadGallery();
       loadMyPhotos();
+      loadReminderBanner();
+      checkRefParam();
       maybeWelcome();
       checkPurchaseReturn();
     } catch (_) { /* engine offline — keep local */ }

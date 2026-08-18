@@ -140,7 +140,8 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
         var when=r.days_away===0?"today!":r.days_away===1?"tomorrow":("in "+r.days_away+" days");
         var icon=r.kind==="birthday"?"🎂":"🎉";
         var pk=r.kind==="birthday"?"birthday":"congrats";
-        return '<div class="rem"><div class="rph">'+ph+'</div><div class="ri"><b>'+icon+' '+esc(r.name||"Someone")+"'s "+esc(r.label)+'</b><span class="rw">'+when+'</span></div><a class="rbtn" href="/app?pack='+pk+'">Make their card →</a></div>';
+        var href='/app?pack='+pk+(r.photo?'&ref='+encodeURIComponent(r.photo):'');
+        return '<div class="rem"><div class="rph">'+ph+'</div><div class="ri"><b>'+icon+' '+esc(r.name||"Someone")+"'s "+esc(r.label)+'</b><span class="rw">'+when+'</span></div><a class="rbtn" href="'+href+'">Make their card →</a></div>';
       }).join("");
       box.innerHTML='<div class="upwrap"><div class="uphd">⏰ Coming up</div><div class="uprow">'+cards+'</div></div>';
     }).catch(function(){});
