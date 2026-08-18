@@ -582,6 +582,17 @@
       const li = armed ? +armed.dataset.li : 0;
       if (p && p.looks[li]) applyPack(p, p.looks[li]);
     });
+    // Deep-link: /app?pack=<id> lands on a specific theme (from the /make theme links) — scroll + highlight.
+    const wantPack = new URLSearchParams(location.search).get("pack");
+    if (wantPack) {
+      const pi = PACKS.findIndex((p) => p.id === wantPack);
+      const card = pi >= 0 ? grid.children[pi] : null;
+      if (card) {
+        setTimeout(() => card.scrollIntoView({ behavior: "smooth", block: "center" }), 300);
+        card.classList.add("deeplinked");
+        setTimeout(() => card.classList.remove("deeplinked"), 2800);
+      }
+    }
   }
 
   // Seed the composer from a pack look. The prompt is a trade secret held by the engine — we never

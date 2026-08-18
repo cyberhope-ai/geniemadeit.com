@@ -90,6 +90,8 @@
   .packcard{border:1px solid var(--line);border-radius:18px;overflow:hidden;
     background:linear-gradient(135deg,var(--panel),var(--panel2));display:flex;flex-direction:column;transition:border-color .2s}
   .packcard:hover{border-color:var(--goldd)}
+  .packcard.deeplinked{border-color:var(--gold2);box-shadow:0 0 0 3px rgba(245,196,81,.35),0 12px 40px -10px rgba(245,196,81,.5);animation:deeplinkpulse 2.6s ease}
+  @keyframes deeplinkpulse{0%,100%{box-shadow:0 0 0 3px rgba(245,196,81,.35)}30%{box-shadow:0 0 0 5px rgba(245,196,81,.6),0 12px 44px -8px rgba(245,196,81,.7)}}
   .packcard .cover{position:relative;aspect-ratio:1/1;overflow:hidden}
   .packcard .cover img{width:100%;height:100%;object-fit:cover;object-position:center top;display:block;transition:transform .35s}
   .packcard:hover .cover img{transform:scale(1.045)}
@@ -425,7 +427,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260817c"></script>
+<script src="assets/studio.js?v=20260818a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

@@ -6,15 +6,21 @@
   // ---- examples gallery ----
   // Seeded with the sample creations; a curated set from the engine drops in via /api/examples when available.
   const SEED = [
-    { url: "assets/sample_1.png", prompt: "a regal fox in a velvet coat" },
-    { url: "assets/sample_2.png", prompt: "a glowing perfume bottle on wet stone" },
-    { url: "assets/sample_3.png", prompt: "a floating island city at golden hour" },
-    { url: "assets/sample_1.png", prompt: "a cinematic portrait, volumetric light" },
-    { url: "assets/sample_3.png", prompt: "a fantasy metropolis in the clouds" },
-    { url: "assets/sample_2.png", prompt: "luxury product shot, macro detail" },
-    { url: "assets/sample_1.png", prompt: "storybook character, painterly" },
-    { url: "assets/sample_3.png", prompt: "concept art, epic scale" },
-    { url: "assets/sample_2.png", prompt: "editorial still life, moody" },
+    { url: "/asset/packs/magazine-covers-3/icon-of-year.jpg", prompt: "📰 Magazine Covers Vol. 3 — Icon of the Year" },
+    { url: "/asset/packs/movie-moments-2/singing-rain.jpg", prompt: "🎬 Movie Scenes Vol. 2 — Singin' in the Rain" },
+    { url: "/asset/packs/memes-2/this-is-fine.jpg", prompt: "😂 Memes Vol. 2 — This Is Fine" },
+    { url: "/asset/packs/exotic-cars/supercar.jpg", prompt: "🚗 Exotic Dream Cars — The Supercar" },
+    { url: "/asset/packs/space-explorer/orbit.jpg", prompt: "🚀 Space Explorer — In Orbit" },
+    { url: "/asset/packs/music-icon/rockstar.jpg", prompt: "🎸 Music Icon — Rock Star" },
+    { url: "/asset/packs/album-covers/crosswalk.jpg", prompt: "💿 Legendary Album Covers — The Crosswalk" },
+    { url: "/asset/packs/ancient-legends/gladiator.jpg", prompt: "🏛️ Ancient Legends — Gladiator" },
+    { url: "/asset/packs/monster-mash/frankenstein.jpg", prompt: "🧟 Monster Mash — The Monster" },
+    { url: "/asset/packs/wedding-romance/wedding-glam.jpg", prompt: "💍 Wedding & Romance — The Big Day" },
+    { url: "/asset/packs/underwater-world/scuba.jpg", prompt: "🐠 Underwater World — Scuba Dive" },
+    { url: "/asset/packs/you-as-art/oil-painting.jpg", prompt: "🎨 You As Art — Oil Painting" },
+    { url: "/asset/packs/gangster-era/boss.jpg", prompt: "🎩 Gangster Era — The Boss" },
+    { url: "/asset/packs/magazine-covers-2/fashion.jpg", prompt: "📰 Magazine Covers Vol. 2 — Fashion Cover" },
+    { url: "/asset/packs/memes-4/roll-safe.jpg", prompt: "🔥 Memes Vol. 4 — Roll Safe" },
   ];
   function renderGallery(items) {
     const g = $("#gallery");
