@@ -1,0 +1,22 @@
+{"packs":[
+{"id":"st-patricks","name":"St. Patrick's Day","emoji":"☘️","face":"f1","blurb":"Luck of the Irish — go green for the parade.","looks":[
+ {"id":"parade","name":"The Parade","prompt":"celebrating at a festive St. Patrick's Day parade in green attire with shamrocks and green beads, joyful and lively"},
+ {"id":"pub-cheers","name":"Cheers!","prompt":"raising a toast in a cozy Irish pub decorated with shamrocks and green bunting, cheerful and festive"},
+ {"id":"lucky","name":"Lucky Charm","prompt":"in a stylish green outfit with a four-leaf clover and a leprechaun hat by a rainbow, playful and lucky"}]},
+{"id":"easter","name":"Easter","emoji":"🐰","face":"f2","blurb":"Hoppy Easter — spring, bunnies and egg hunts.","looks":[
+ {"id":"bunny","name":"Bunny Ears","prompt":"in a cute Easter bunny costume with fluffy ears surrounded by colorful decorated eggs and spring flowers, adorable and cheerful"},
+ {"id":"egg-hunt","name":"Egg Hunt","prompt":"joyfully hunting for colorful Easter eggs in a sunny spring garden with pastel decorations, playful and bright"},
+ {"id":"spring-bonnet","name":"Spring Bonnet","prompt":"in a lovely pastel spring outfit and a floral Easter bonnet in a blooming garden, elegant and fresh"}]},
+{"id":"cinco-de-mayo","name":"Cinco de Mayo","emoji":"🌮","face":"m3","blurb":"¡Fiesta! Colorful celebration and mariachi.","looks":[
+ {"id":"fiesta","name":"The Fiesta","prompt":"celebrating at a vibrant Cinco de Mayo fiesta with colorful papel picado banners and a sombrero, festive and lively"},
+ {"id":"mariachi","name":"Mariachi","prompt":"as a charismatic mariachi musician in a decorated charro suit with a guitar, colorful and spirited"},
+ {"id":"celebration","name":"Celebration","prompt":"dancing at a festive Cinco de Mayo street celebration with bright decorations and confetti, joyful and energetic"}]},
+{"id":"july-4th","name":"Independence Day","emoji":"🎆","face":"m1","blurb":"Red, white and boom — 4th of July.","looks":[
+ {"id":"fireworks","name":"Fireworks","prompt":"celebrating 4th of July under a sky full of dazzling fireworks with patriotic red-white-and-blue decorations, festive and exciting"},
+ {"id":"bbq","name":"BBQ Master","prompt":"as the grill master at a fun summer 4th of July backyard barbecue with patriotic bunting, cheerful and relaxed"},
+ {"id":"parade","name":"The Parade","prompt":"waving at a festive Independence Day parade with red-white-and-blue streamers and balloons, joyful and patriotic"}]},
+{"id":"hanukkah","name":"Hanukkah","emoji":"🕎","face":"m2","blurb":"Festival of Lights — eight nights of joy.","looks":[
+ {"id":"menorah","name":"Lighting the Menorah","prompt":"warmly lighting a glowing menorah at a cozy Hanukkah celebration with blue and silver decorations, peaceful and joyful"},
+ {"id":"dreidel","name":"Dreidel","prompt":"playfully spinning a dreidel at a festive Hanukkah gathering with gelt and blue-and-white decor, cheerful and fun"},
+ {"id":"festive","name":"Festival of Lights","prompt":"in elegant festive attire at a warm Hanukkah celebration with candles and glowing lights, joyful and radiant"}]}
+]}
