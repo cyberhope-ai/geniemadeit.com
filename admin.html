@@ -210,9 +210,18 @@ async function loadConsumption(){
     if(r.status===401){showGate("Session expired — sign in again.");return;}
     var d=await r.json();
     if(!d||!d.ok){note.textContent="Couldn't load consumption.";return;}
-    note.textContent=""; var t=d.totals||{};
+    var t=d.totals||{}, f=d.fal||{};
     var cards=document.getElementById("conCards"); cards.hidden=false;
-    cards.innerHTML=conCard("Credits consumed",(t.credits||0).toLocaleString())+conCard("Provider cost",usd(t.cost_usd))+conCard("Creations",(t.jobs||0).toLocaleString())+conCard("Active customers",(t.users||0).toLocaleString());
+    cards.innerHTML=conCard("Credits consumed",(t.credits||0).toLocaleString())
+      +conCard("Our cost estimate",usd(t.cost_usd))
+      +(f.real_spend_period!=null?conCard("Actual fal spend ⟵ auto",usd(f.real_spend_period)):"")
+      +(f.balance!=null?conCard("Fal balance (live)",usd(f.balance)):"")
+      +conCard("Creations",(t.jobs||0).toLocaleString())
+      +conCard("Active customers",(t.users||0).toLocaleString());
+    note.innerHTML = (f.real_spend_period!=null)
+      ? ('✓ Real fal spend auto-pulled from balance: <b style="color:#ffe390">'+usd(f.real_spend_period)+'</b> for this range · our estimate '+usd(t.cost_usd)+' · live balance '+usd(f.balance)+(f.account?' ('+conEsc(f.account)+')':''))
+      : (f.balance!=null ? ('Fal live balance: <b style="color:#ffe390">'+usd(f.balance)+'</b> — exact per-range spend fills in as daily balance snapshots accrue. Itemized invoice: export fal dashboard Usage CSV (no API).')
+      : '');
     document.getElementById("conCapWrap").innerHTML='<table><thead><tr><th>Capability</th><th>Jobs</th><th>Credits</th><th>Provider cost</th></tr></thead><tbody>'+
       (d.by_capability||[]).map(function(c){return '<tr><td>'+conEsc(c.capability)+'</td><td>'+(c.jobs||0)+'</td><td>'+(c.credits||0)+'</td><td>'+usd(c.cost_usd)+'</td></tr>';}).join("")+'</tbody></table>';
     document.getElementById("conUserWrap").innerHTML='<table><thead><tr><th>Customer</th><th>Plan</th><th>Credits used</th><th>Credits left</th><th>Provider cost</th></tr></thead><tbody>'+
