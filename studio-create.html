@@ -79,6 +79,18 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 .samplegrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(122px,1fr));gap:10px;margin-top:14px}
 .samplegrid figure{margin:0;background:var(--panel);border:1px solid var(--line);border-radius:11px;overflow:hidden}
 .samplegrid img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
+
+.gm-dd{position:relative}
+.gm-dd-t{display:inline-flex;align-items:center;gap:5px}
+.gm-caret{font-size:.7em;opacity:.8}
+.gm-dd-menu{position:absolute;top:100%;left:0;min-width:230px;background:#1c1140;border:1px solid #3a2a6b;border-radius:12px;
+  padding:8px;display:grid;gap:2px;box-shadow:0 18px 44px -12px rgba(0,0,0,.6);opacity:0;visibility:hidden;transform:translateY(6px);
+  transition:opacity .16s,transform .16s,visibility .16s;z-index:60;max-height:70vh;overflow:auto}
+.gm-dd:hover .gm-dd-menu,.gm-dd:focus-within .gm-dd-menu{opacity:1;visibility:visible;transform:translateY(4px)}
+.gm-dd-menu a{display:block;padding:8px 12px;border-radius:8px;color:#d9ccf5;font-size:14px;white-space:nowrap}
+.gm-dd-menu a:hover{background:#2b1b63;color:#fff}
+@media(max-width:860px){.gm-dd-menu{position:static;opacity:1;visibility:visible;transform:none;box-shadow:none;display:none;border:none;padding:4px 0 4px 14px;background:transparent}
+  .gm-dd:focus-within .gm-dd-menu{display:grid}}
 </style>
 <style id="gm-header-css">
 .gm-header{position:sticky;top:0;z-index:50;background:rgba(19,10,38,.85);backdrop-filter:blur(10px);border-bottom:1px solid #3a2a6b}
@@ -92,7 +104,7 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 </style>
 </head>
 <body>
-<header class="gm-header"><div class="gm-bar"><a class="gm-brand" href="/">🪄 Genie<b>Made</b></a><nav class="gm-nav"><a href="/studio-you">Studio You</a><a href="/app">Studio</a><a href="/#pricing">Pricing</a><a href="/verify">Verify</a></nav><span class="gm-spacer"></span><a class="gm-signout" id="gmSignout" href="#">Sign out</a><a class="gm-cta" href="/app">Open the Studio</a></div></header>
+<header class="gm-header"><div class="gm-bar"><a class="gm-brand" href="/">🪄 Genie<b>Made</b></a><nav class="gm-nav" aria-label="Main navigation"><a href="/studio-you">Studio You</a><div class="gm-dd"><a class="gm-dd-t" href="/holidays">Holidays <span class="gm-caret">▾</span></a><div class="gm-dd-menu"><a href="/holidays/new-year">🎆 New Year</a><a href="/holidays/valentines">💝 Valentine&#x27;s Day</a><a href="/holidays/st-patricks">☘️ St. Patrick&#x27;s Day</a><a href="/holidays/easter">🐰 Easter</a><a href="/holidays/cinco-de-mayo">🌮 Cinco de Mayo</a><a href="/holidays/mothers-day">💐 Mother&#x27;s Day</a><a href="/holidays/fathers-day">👔 Father&#x27;s Day</a><a href="/holidays/july-4th">🎆 Independence Day</a><a href="/holidays/halloween">🎃 Halloween</a><a href="/holidays/thanksgiving">🦃 Thanksgiving</a><a href="/holidays/hanukkah">🕎 Hanukkah</a><a href="/holidays/christmas">🎄 Christmas</a></div></div><div class="gm-dd"><a class="gm-dd-t" href="/make">Occasions <span class="gm-caret">▾</span></a><div class="gm-dd-menu"><a href="/make/birthday">🎂 Birthday</a><a href="/make/love">💘 Love &amp; Anniversary</a><a href="/make/congrats">🏆 Congrats</a><a href="/make/graduation">🎓 Graduation</a><a href="/make/cheer-up">☀️ Cheer Up</a><a href="/make/thank-you">🙏 Thank You</a><a href="/make/dance">🕺 Dance Floor</a><a href="/make/game-on">🎮 Game On</a><a href="/make/icons">🧠 Hall of Icons</a><a href="/make/legends">⚡ Epic Legends</a><a href="/make/queens">👑 Icon Queens</a></div></div><div class="gm-dd"><a class="gm-dd-t" href="/invitations">Invitations <span class="gm-caret">▾</span></a><div class="gm-dd-menu"><a href="/invitations/birthday-party">🎂 Birthday Party</a><a href="/invitations/wedding">💍 Wedding</a><a href="/invitations/engagement">💞 Engagement</a><a href="/invitations/anniversary">🥂 Anniversary</a><a href="/invitations/baby-shower">👶 Baby Shower</a><a href="/invitations/graduation-party">🎓 Graduation Party</a><a href="/invitations/halloween-party">🎃 Halloween Party</a><a href="/invitations/holiday-party">🎉 Holiday Party</a><a href="/invitations/dinner-party">🍷 Dinner Party</a><a href="/invitations/cookout">🍔 BBQ &amp; Cookout</a><a href="/invitations/retirement">🏆 Retirement</a><a href="/invitations/housewarming">🏡 Housewarming</a></div></div><a href="/#pricing">Pricing</a><a class="gm-hide-sm" href="/verify">Verify</a></nav><span class="gm-spacer"></span><a class="gm-signout" id="gmSignout" href="#">Sign out</a><a class="gm-cta" href="/app">Open the Studio</a></div></header>
 
 <div class="wrap">
   <span class="eyebrow">Studio You · Create</span>
