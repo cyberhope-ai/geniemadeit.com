@@ -105,12 +105,14 @@
   .looktile:hover{transform:translateY(-2px);border-color:var(--gold)}
   .looktile.armed{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
   .packcard .cover{cursor:zoom-in}
-  .packcard .starron{background:none;border:none;cursor:pointer;font:inherit}
-  .packcard .starron:hover{color:var(--gold)}
+  .packcard .starron{display:flex;align-items:center;justify-content:center;gap:7px;margin-top:12px;width:100%;
+    padding:11px 14px;border:none;border-radius:12px;cursor:pointer;font:inherit;font-weight:800;font-size:.95rem;
+    color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold));box-shadow:0 8px 20px -8px rgba(245,196,81,.55);transition:transform .12s}
+  .packcard .starron:hover{transform:translateY(-1px)}
   .looktile img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
   .looktile .ln{position:absolute;left:0;right:0;bottom:0;padding:15px 5px 5px;font-size:.63rem;font-weight:700;
     color:#fff;text-align:center;background:linear-gradient(transparent,rgba(10,6,22,.92));line-height:1.15}
-  .packcard .starron{display:inline-flex;align-items:center;gap:6px;margin-top:11px;font-size:.74rem;color:var(--gold2)}
+  .packcard .starsub{text-align:center;font-size:.7rem;color:var(--faint);margin-top:7px}
   @media(max-width:520px){.packgrid{grid-template-columns:1fr}}
 
   /* ---- stage (progress + result) ---- */
@@ -342,6 +344,10 @@
   <section class="vault">
     <h2>Your Vault</h2>
     <div class="vsub">Every creation, sealed and provably yours. Tap any to see its certificate.</div>
+    <div class="vaultbar" style="display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px">
+      <a class="btn gold" href="/import" style="text-decoration:none;display:inline-flex;align-items:center;gap:7px">⬆ Import an image or video</a>
+      <a class="btn ghost" href="/verify" style="text-decoration:none;display:inline-flex;align-items:center;gap:7px">◈ Verify a creation</a>
+    </div>
     <div class="grid" id="grid"></div>
   </section>
 
@@ -436,7 +442,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260818d"></script>
+<script src="assets/studio.js?v=20260818e"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

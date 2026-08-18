@@ -643,7 +643,8 @@
                 <img loading="lazy" src="${escAttr(l.tile)}" alt="${escAttr(l.name)}"><span class="ln">${escHtml(l.name)}</span>
               </button>`).join("")}
           </div>
-          <button class="starron" data-pi="${pi}">✦ Add your face → Starring You, certified</button>
+          <button class="starron" data-pi="${pi}">✦ Create My Image →</button>
+          <div class="starsub">Add your face · Starring You · certified</div>
         </div>
       </div>`).join("");
     // Tile click: JUST swap it into the big cover (preview) + arm it — no scroll/applyPack (that's the button's job)
