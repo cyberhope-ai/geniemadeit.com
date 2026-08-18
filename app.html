@@ -277,6 +277,13 @@
         </div>
         <span id="refHint" style="font-size:.8rem;color:var(--faint,#8b959f)"></span>
       </div>
+      <div id="myPhotos" style="display:none;margin-top:11px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+          <span style="font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold2,#ffe390);font-weight:600">★ Your photos</span>
+          <span style="font-size:.78rem;color:var(--faint,#8b959f)">tap one to reuse — no hunting on your device</span>
+        </div>
+        <div id="myPhotosRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:4px"></div>
+      </div>
       <div class="chips" id="chips">
         <span class="chip">a glowing perfume bottle on wet stone</span>
         <span class="chip">a floating island city at golden hour</span>
@@ -428,7 +435,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260818b"></script>
+<script src="assets/studio.js?v=20260818c"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

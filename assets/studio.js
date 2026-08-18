@@ -424,7 +424,7 @@
       const u = j.user || {};
       LS.setItem("gm_user", u.email || email); state.signedIn = u.email || email; setName(u);
       if (typeof u.credits === "number") { LS.setItem("gm_credits", String(u.credits)); }
-      paintAccount(); paintCredits(); closeModals(); loadGallery(); maybeWelcome();
+      paintAccount(); paintCredits(); closeModals(); loadGallery(); loadMyPhotos(); maybeWelcome();
     } catch (_) { authErr("Something went wrong. Try again."); }
     finally { btn.textContent = label; btn.disabled = false; }
   }
@@ -475,6 +475,7 @@
       if (prev) prev.style.display = "flex";
       if (btn) $("#refBtnLabel").textContent = "Change photo";
       setRefHint("");
+      savePhoto(j.url); // remember it in My Photos so they never re-find it on their device
     } catch (_) { setRefHint("Upload failed — try again."); }
     finally { state.uploading = false; }
   }
@@ -488,6 +489,49 @@
     setRefHint(m.hint);
   }
   function setRefHint(t) { const h = $("#refHint"); if (h) h.textContent = t || ""; }
+  // ---- My Photos: the customer's saved reference photos, reusable without re-finding on device ----
+  async function loadMyPhotos() {
+    if (!state.signedIn) { const w0 = $("#myPhotos"); if (w0) w0.style.display = "none"; return; }
+    try {
+      const r = await fetch("/api/photos", { credentials: "same-origin", headers: { accept: "application/json" } });
+      const j = await r.json().catch(() => ({}));
+      renderMyPhotos((j && j.photos) || []);
+    } catch (_) {}
+  }
+  function renderMyPhotos(list) {
+    const wrap = $("#myPhotos"), row = $("#myPhotosRow");
+    if (!wrap || !row) return;
+    if (!list.length) { wrap.style.display = "none"; return; }
+    wrap.style.display = "";
+    row.innerHTML = list.map((ph) => `
+      <div class="myph" data-id="${ph.id}" data-url="${escAttr(ph.url)}" style="position:relative;flex:0 0 auto">
+        <img src="${escAttr(ph.url)}" alt="saved photo" style="width:58px;height:58px;object-fit:cover;border-radius:12px;border:1px solid var(--line);cursor:pointer;display:block">
+        <button class="myphdel" title="Remove" style="position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#2a1140;color:#ffb3c6;font-size:12px;line-height:1;cursor:pointer">✕</button>
+      </div>`).join("");
+    $$(".myph img", row).forEach((im) => im.onclick = () => useSavedPhoto(im.parentNode.dataset.url));
+    $$(".myphdel", row).forEach((b) => b.onclick = (e) => { e.stopPropagation(); deletePhoto(b.parentNode.dataset.id); });
+  }
+  function useSavedPhoto(url) {
+    state.refUrl = url;
+    const thumb = $("#refThumb"), prev = $("#refPreview");
+    if (thumb) thumb.src = url;
+    if (prev) prev.style.display = "flex";
+    if ($("#refBtnLabel")) $("#refBtnLabel").textContent = "Change photo";
+    setRefHint("Using your saved photo — hit Make a wish.");
+  }
+  async function savePhoto(url) {
+    if (!url) return;
+    try {
+      const r = await fetch("/api/photos", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ url }) });
+      const j = await r.json().catch(() => ({})); if (j && j.photos) renderMyPhotos(j.photos);
+    } catch (_) {}
+  }
+  async function deletePhoto(id) {
+    try {
+      const r = await fetch("/api/photos/delete", { method: "POST", credentials: "same-origin", headers: { "content-type": "application/json" }, body: JSON.stringify({ id }) });
+      const j = await r.json().catch(() => ({})); if (j && j.photos) renderMyPhotos(j.photos);
+    } catch (_) {}
+  }
   function selectCapability(id) {
     state.capability = id;
     $$("#typeSeg button").forEach((x) => x.setAttribute("aria-pressed", String(x.dataset.cap === id)));
@@ -716,6 +760,7 @@
       if (u && u.plan) state.plan = u.plan;
       paintAccount();
       loadGallery();
+      loadMyPhotos();
       maybeWelcome();
       checkPurchaseReturn();
     } catch (_) { /* engine offline — keep local */ }
