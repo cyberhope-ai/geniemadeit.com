@@ -91,6 +91,7 @@ a.lnk{color:var(--gold2)}
   <div class="tabs">
     <button class="tab on" data-tab="affiliates">Affiliates</button>
     <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab" data-tab="consumption">Consumption</button>
     <button class="tab" data-tab="jobs">Studio Jobs</button>
   </div>
 
@@ -117,6 +118,21 @@ a.lnk{color:var(--gold2)}
     <div class="cards" id="jobsCards" hidden></div>
     <div class="scroll" id="jobsWrap"></div>
     <p class="muted" style="margin-top:16px">Live view of every Studio You session in flight. <b>Training</b> = building the model · <b>Rendering</b> = creating looks one-by-one (the every-minute cron advances one look per tick) · <b>Done</b> = all looks made and the customer notified. Phone numbers show last 4 only.</p>
+  </section>
+
+  <section id="view-consumption" hidden>
+    <div class="tools" style="justify-content:space-between;margin-bottom:8px">
+      <div class="muted" id="conNote">Loading consumption…</div>
+      <select id="conRange" style="background:#1c1140;color:#f7f1ff;border:1px solid #3a2a6b;border-radius:8px;padding:6px 10px">
+        <option value="7d">Last 7 days</option><option value="30d">Last 30 days</option><option value="90d">Last 90 days</option><option value="all" selected>All time</option>
+      </select>
+    </div>
+    <div class="cards" id="conCards" hidden></div>
+    <h2 class="sec">What's driving cost (by capability)</h2>
+    <div class="scroll" id="conCapWrap"></div>
+    <h2 class="sec">Per customer — credits used vs. left</h2>
+    <div class="scroll" id="conUserWrap"></div>
+    <p class="muted" style="margin-top:16px">Credits consumed and our estimated provider cost across every account. Read-only. Provider cost is our per-model estimate (reconcile to the exact fal invoice via the Usage CSV).</p>
   </section>
 </main>
 
@@ -168,7 +184,9 @@ document.querySelectorAll(".tab").forEach(function(t){
     document.getElementById("view-affiliates").hidden=(tab!=="affiliates");
     document.getElementById("view-customers").hidden=(tab!=="customers");
     document.getElementById("view-jobs").hidden=(tab!=="jobs");
-    document.getElementById("statusTag").textContent=(tab==="customers"?"Customers":tab==="jobs"?"Studio Jobs":"Rewardful");
+    document.getElementById("view-consumption").hidden=(tab!=="consumption");
+    document.getElementById("statusTag").textContent=(tab==="customers"?"Customers":tab==="jobs"?"Studio Jobs":tab==="consumption"?"Consumption":"Rewardful");
+    if(tab==="consumption"){loadConsumption();}
     if(tab==="customers"&&!custLoaded){loadCustomers();}
     if(tab==="jobs"){loadJobs();}
   };
@@ -180,6 +198,26 @@ function jobStage(j){
   if(j.notified) return {label:"Done",cls:"active"};
   if(j.status!=="ready") return {label:"Training",cls:"other"};
   return {label:"Rendering "+j.looks_done+"/"+j.looks_total,cls:"other"};
+}
+function conEsc(s){return String(s==null?"":s).replace(/[&<>"]/g,function(m){return{"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;"}[m];});}
+function conCard(label,val){return '<div style="background:#1c1140;border:1px solid #3a2a6b;border-radius:14px;padding:14px 16px;min-width:150px"><div style="color:#8f7fbb;font-size:.74rem;text-transform:uppercase;letter-spacing:.08em">'+label+'</div><div style="font-size:1.5rem;font-weight:800;color:#ffe390;margin-top:4px">'+val+'</div></div>';}
+async function loadConsumption(){
+  var note=document.getElementById("conNote"); note.textContent="Loading consumption…";
+  var sel=document.getElementById("conRange"); if(sel&&!sel._wired){sel._wired=true;sel.onchange=loadConsumption;}
+  var range=(sel&&sel.value)||"all";
+  try{
+    var r=await fetch("/gmadmin/consumption?range="+range,{headers:{"x-admin-token":token()}});
+    if(r.status===401){showGate("Session expired — sign in again.");return;}
+    var d=await r.json();
+    if(!d||!d.ok){note.textContent="Couldn't load consumption.";return;}
+    note.textContent=""; var t=d.totals||{};
+    var cards=document.getElementById("conCards"); cards.hidden=false;
+    cards.innerHTML=conCard("Credits consumed",(t.credits||0).toLocaleString())+conCard("Provider cost",usd(t.cost_usd))+conCard("Creations",(t.jobs||0).toLocaleString())+conCard("Active customers",(t.users||0).toLocaleString());
+    document.getElementById("conCapWrap").innerHTML='<table><thead><tr><th>Capability</th><th>Jobs</th><th>Credits</th><th>Provider cost</th></tr></thead><tbody>'+
+      (d.by_capability||[]).map(function(c){return '<tr><td>'+conEsc(c.capability)+'</td><td>'+(c.jobs||0)+'</td><td>'+(c.credits||0)+'</td><td>'+usd(c.cost_usd)+'</td></tr>';}).join("")+'</tbody></table>';
+    document.getElementById("conUserWrap").innerHTML='<table><thead><tr><th>Customer</th><th>Plan</th><th>Credits used</th><th>Credits left</th><th>Provider cost</th></tr></thead><tbody>'+
+      (d.by_user||[]).map(function(u){return '<tr><td>'+conEsc(u.email||u.user_id)+'</td><td>'+conEsc(u.plan||"")+'</td><td>'+(u.credits||0)+'</td><td>'+(u.credits_left==null?"—":Number(u.credits_left).toLocaleString())+'</td><td>'+usd(u.cost_usd)+'</td></tr>';}).join("")+'</tbody></table>';
+  }catch(e){note.textContent="Error loading consumption.";}
 }
 async function loadJobs(){
   var note=document.getElementById("jobsNote"); note.className="muted";
