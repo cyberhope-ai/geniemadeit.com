@@ -526,6 +526,19 @@
   const escHtml = (s) => String(s == null ? "" : s).replace(/[&<>]/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;" }[c]));
   const escAttr = (s) => String(s == null ? "" : s).replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c]));
   let PACKS = [];
+  // simple fullscreen image lightbox (pack cover / tile enlarge)
+  function showImgLightbox(src, alt) {
+    let ov = document.getElementById("imgLight");
+    if (!ov) {
+      ov = document.createElement("div"); ov.id = "imgLight";
+      ov.style.cssText = "position:fixed;inset:0;z-index:95;background:rgba(8,4,18,.92);display:flex;align-items:center;justify-content:center;padding:24px;cursor:zoom-out";
+      ov.innerHTML = '<img style="max-width:92vw;max-height:92vh;border-radius:12px;box-shadow:0 20px 60px rgba(0,0,0,.6)">';
+      ov.onclick = () => { ov.style.display = "none"; };
+      document.body.appendChild(ov);
+    }
+    ov.querySelector("img").src = src; ov.querySelector("img").alt = alt || "";
+    ov.style.display = "flex";
+  }
   async function renderPacks() {
     const grid = $("#packGrid"), sect = $("#packs");
     if (!grid) return;
@@ -538,22 +551,36 @@
     if (sect) sect.style.display = "";
     grid.innerHTML = PACKS.map((p, pi) => `
       <div class="packcard">
-        <div class="cover"><img loading="lazy" src="${escAttr(p.cover)}" alt="${escAttr(p.title)}">
+        <div class="cover" data-pi="${pi}" title="Click to enlarge"><img id="pcover-${pi}" loading="lazy" src="${escAttr(p.cover)}" alt="${escAttr(p.title)}">
           <div class="title">${escHtml(p.emoji || "✨")} ${escHtml(p.title)}</div></div>
         <div class="body">
           <p class="blurb">${escHtml(p.blurb || "")}</p>
           <div class="packlooks">
             ${(p.looks || []).map((l, li) => `
-              <button class="looktile" data-pi="${pi}" data-li="${li}" title="${escAttr(l.name)} — add your photo to star in this">
+              <button class="looktile" data-pi="${pi}" data-li="${li}" title="${escAttr(l.name)} — click to preview, then Add your face">
                 <img loading="lazy" src="${escAttr(l.tile)}" alt="${escAttr(l.name)}"><span class="ln">${escHtml(l.name)}</span>
               </button>`).join("")}
           </div>
-          <div class="starron">✦ Add your face → Starring You, certified</div>
+          <button class="starron" data-pi="${pi}">✦ Add your face → Starring You, certified</button>
         </div>
       </div>`).join("");
+    // Tile click: JUST swap it into the big cover (preview) + arm it — no scroll/applyPack (that's the button's job)
     $$("#packGrid .looktile").forEach((b) => b.onclick = () => {
-      const p = PACKS[+b.dataset.pi]; const l = p && p.looks[+b.dataset.li];
-      if (l) applyPack(p, l);
+      const pi = +b.dataset.pi, li = +b.dataset.li, p = PACKS[pi], l = p && p.looks[li];
+      if (!l) return;
+      const cov = document.getElementById("pcover-" + pi); if (cov) cov.src = l.tile;
+      $$(`#packGrid .looktile[data-pi="${pi}"]`).forEach((x) => x.classList.toggle("armed", +x.dataset.li === li));
+    });
+    // Cover click: enlarge in a lightbox
+    $$("#packGrid .cover").forEach((c) => c.onclick = () => {
+      const img = c.querySelector("img"); if (img) showImgLightbox(img.src, img.alt);
+    });
+    // "Add your face" starts the currently-armed (or first) look of that pack
+    $$("#packGrid .starron").forEach((b) => b.onclick = () => {
+      const pi = +b.dataset.pi, p = PACKS[pi];
+      const armed = document.querySelector(`#packGrid .looktile[data-pi="${pi}"].armed`);
+      const li = armed ? +armed.dataset.li : 0;
+      if (p && p.looks[li]) applyPack(p, p.looks[li]);
     });
   }
 

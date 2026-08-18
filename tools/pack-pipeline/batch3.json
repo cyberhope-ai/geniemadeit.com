@@ -1,0 +1,24 @@
+{"packs":[
+{"id":"masterpiece","name":"Masterpiece Paintings","emoji":"🖼️","face":"f3","blurb":"Step into the world's most famous paintings — you, immortalized as a classic masterpiece.","looks":[
+ {"id":"mona-lisa","name":"The Mona Lisa","prompt":"as the subject of a Mona Lisa style Renaissance oil painting with a mysterious subtle smile, soft sfumato, distant landscape background"},
+ {"id":"pearl-earring","name":"Pearl Earring","prompt":"as the subject of a Dutch golden-age oil painting turning to look over the shoulder wearing a blue-and-gold turban and a pearl earring, dark background"},
+ {"id":"american-gothic","name":"American Gothic","prompt":"as a stern figure in an American Gothic style painting in front of a white farmhouse, holding a pitchfork, plain rural"},
+ {"id":"the-scream","name":"The Scream","prompt":"as an expressive figure clutching the face with an open mouth on a bridge under a swirling orange sky, expressionist painting style"},
+ {"id":"starry-portrait","name":"Starry Night","prompt":"an oil-painting portrait in the swirling bold brushstroke post-impressionist style of a starry night, dramatic blue and gold"}]},
+{"id":"yearbook","name":"Decades Yearbook","emoji":"📸","face":"m3","blurb":"Throwback! Your yearbook photo through the decades — big hair, bold styles and all.","looks":[
+ {"id":"seventies","name":"1970s","prompt":"a 1970s high-school yearbook portrait with feathered hair and a wide-collar shirt, warm faded vintage film tones, studio laser background"},
+ {"id":"eighties","name":"1980s","prompt":"an 1980s yearbook portrait with big volumized hair and bold fashion, classic laser-beam studio backdrop, retro"},
+ {"id":"nineties","name":"1990s","prompt":"a 1990s yearbook portrait with a casual grunge look, mottled blue studio backdrop, nostalgic film grain"},
+ {"id":"two-thousands","name":"2000s","prompt":"an early 2000s yearbook portrait with frosted tips or straightened hair, glossy studio look, nostalgic"}]},
+{"id":"time-traveler","name":"Time Traveler","emoji":"🕰️","face":"m2","blurb":"Journey through history — walk through the greatest eras of humankind.","looks":[
+ {"id":"ancient-rome","name":"Ancient Rome","prompt":"as a noble ancient Roman in a toga in a grand marble forum, warm classical light, cinematic"},
+ {"id":"medieval","name":"Medieval Knight","prompt":"as a medieval knight in shining plate armor before a stone castle, dramatic overcast light"},
+ {"id":"wild-west","name":"Wild West","prompt":"as a rugged wild-west gunslinger in a dusty frontier town at high noon, cinematic sepia"},
+ {"id":"roaring-20s","name":"Roaring 20s","prompt":"as a glamorous 1920s figure in art-deco attire at a jazz-age party, sparkling golden light"},
+ {"id":"victorian","name":"Victorian","prompt":"as an elegant Victorian aristocrat in ornate period dress in a lavish drawing room, gaslit ambiance"}]},
+{"id":"red-carpet","name":"Red Carpet","emoji":"🌟","face":"f2","blurb":"Arrive like a star — premieres, award shows and flashing cameras.","looks":[
+ {"id":"premiere","name":"Movie Premiere","prompt":"on a glamorous red carpet at a movie premiere in stunning formal wear, flashing camera bokeh and step-and-repeat backdrop"},
+ {"id":"award-show","name":"Award Winner","prompt":"holding a golden award trophy on stage at a glittering award show, spotlights and applause, triumphant"},
+ {"id":"photocall","name":"The Photocall","prompt":"posing confidently at a celebrity photocall before a wall of photographers with flashing cameras, glamorous"},
+ {"id":"talk-show","name":"Talk Show","prompt":"as a charming celebrity guest on a bright talk-show set couch, warm studio lighting, engaging smile"}]}
+]}

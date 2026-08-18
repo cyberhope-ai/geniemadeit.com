@@ -1,0 +1,24 @@
+{"packs":[
+{"id":"sports-legends","name":"Sports Legends","emoji":"🥊","face":"m3","blurb":"Be the hero of the game — champion moments across every sport.","looks":[
+ {"id":"boxing-champ","name":"Boxing Champ","prompt":"a victorious boxer with gloves raised overhead in a spotlit ring, sweat and glory, dramatic"},
+ {"id":"football-hero","name":"Football Hero","prompt":"a football player mid-action under stadium lights, dynamic and powerful, cheering crowd"},
+ {"id":"slam-dunk","name":"Slam Dunk","prompt":"a basketball player soaring for a slam dunk in a packed arena, explosive energy"},
+ {"id":"race-winner","name":"Race Winner","prompt":"a triumphant race-car driver spraying champagne on the podium in a racing suit, confetti"},
+ {"id":"soccer-star","name":"Soccer Star","prompt":"a soccer star celebrating a goal on a floodlit pitch, arms wide, roaring crowd"}]},
+{"id":"fairytale","name":"Fairytale","emoji":"🧜","face":"f3","blurb":"Once upon a time — step into a storybook as royalty, a mermaid, or a legend.","looks":[
+ {"id":"royalty","name":"Prince & Princess","prompt":"as fairytale royalty in a shimmering gown or regal attire in an enchanted castle ballroom, magical glow"},
+ {"id":"mermaid","name":"Mermaid","prompt":"as a beautiful mermaid with an iridescent tail among glowing coral in a sunlit underwater kingdom"},
+ {"id":"snow-queen","name":"Snow Queen","prompt":"as a majestic ice-and-snow queen in a glittering crystalline gown in a frozen palace, cool blue magic"},
+ {"id":"fairy","name":"Woodland Fairy","prompt":"as a delicate woodland fairy with glowing wings in an enchanted glowing forest, sparkling magic"},
+ {"id":"genie","name":"Genie of the Lamp","prompt":"as a magical genie emerging from a glowing golden lamp in swirls of blue smoke, whimsical magic"}]},
+{"id":"on-stage","name":"On Stage","emoji":"🎤","face":"f2","blurb":"Own the spotlight — singer, DJ, comedian or conductor.","looks":[
+ {"id":"pop-diva","name":"Pop Diva","prompt":"a dazzling pop performer belting into a mic under sweeping colorful stage lights, glamorous and dynamic"},
+ {"id":"star-dj","name":"Superstar DJ","prompt":"a superstar DJ behind a glowing turntable deck at a massive festival with lasers and a huge crowd"},
+ {"id":"comedian","name":"Stand-Up","prompt":"a confident stand-up comedian mid-joke under a single spotlight on a brick-wall comedy club stage, mic in hand"},
+ {"id":"conductor","name":"Maestro","prompt":"an elegant orchestra conductor mid-flourish with a baton before a grand symphony hall, dramatic"}]},
+{"id":"celebrity-chef","name":"Celebrity Chef","emoji":"🍳","face":"m2","blurb":"Fire up the kitchen — cooking-show star, Michelin chef, and more.","looks":[
+ {"id":"tv-chef","name":"TV Chef","prompt":"a charismatic celebrity chef on a bright TV cooking-show set with dishes and flames, apron, big smile"},
+ {"id":"michelin","name":"Michelin Chef","prompt":"a refined chef in whites plating an elegant gourmet dish in a sleek professional kitchen, focused"},
+ {"id":"pizza-toss","name":"Pizza Master","prompt":"a fun pizzaiolo tossing pizza dough in a rustic wood-fired pizzeria, flour and flair"},
+ {"id":"bbq-king","name":"BBQ King","prompt":"a proud pitmaster at a smoky outdoor barbecue with flames and ribs, apron, hearty grin"}]}
+]}

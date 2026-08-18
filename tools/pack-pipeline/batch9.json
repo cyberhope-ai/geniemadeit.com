@@ -1,0 +1,26 @@
+{"packs":[
+{"id":"dream-vacations","name":"Dream Vacations","emoji":"🏝️","face":"f1","blurb":"Passport to paradise — you, everywhere you've dreamed of.","looks":[
+ {"id":"tropical","name":"Tropical Beach","prompt":"relaxing on a stunning tropical beach with palm trees and turquoise water at golden hour, vacation vibes"},
+ {"id":"euro-cafe","name":"European Cafe","prompt":"sitting at a charming European sidewalk cafe on a sunny cobblestone street, stylish and relaxed"},
+ {"id":"safari","name":"Safari Sunset","prompt":"on an African safari at golden sunset with acacia trees and distant wildlife, adventurous"},
+ {"id":"ski-chalet","name":"Ski Chalet","prompt":"on a cozy ski chalet balcony overlooking snowy mountain peaks, warm winter style"},
+ {"id":"cruise","name":"Cruise Deck","prompt":"on the deck of a luxury cruise ship at sea with the open ocean behind, elegant and carefree"}]},
+{"id":"you-as-art","name":"You As Art","emoji":"🎨","face":"m2","blurb":"Become a masterpiece — rendered in timeless art styles.","looks":[
+ {"id":"oil-painting","name":"Oil Painting","prompt":"as a classical oil painting portrait with rich brushstrokes and warm gallery lighting, fine art"},
+ {"id":"pop-art","name":"Pop Art","prompt":"in a vibrant bold pop-art style with bright colors and graphic dots, modern and playful"},
+ {"id":"watercolor","name":"Watercolor","prompt":"as a soft delicate watercolor painting with flowing pastel washes, artistic and dreamy"},
+ {"id":"marble-statue","name":"Marble Statue","prompt":"as an elegant white marble statue on a pedestal in a grand museum hall, classical sculpture"},
+ {"id":"stained-glass","name":"Stained Glass","prompt":"as a radiant stained-glass window figure with glowing jewel-toned panels, ornate and luminous"}]},
+{"id":"through-decades","name":"Through The Decades","emoji":"🕺","face":"f2","blurb":"Time-travel your style — one look for every era.","looks":[
+ {"id":"fifties","name":"1950s","prompt":"in classic 1950s style at a retro diner with a jukebox, rockabilly charm, nostalgic"},
+ {"id":"sixties","name":"1960s","prompt":"in groovy 1960s mod fashion with bold patterns and a vibrant psychedelic backdrop, retro cool"},
+ {"id":"seventies","name":"1970s Disco","prompt":"in dazzling 1970s disco style on a lit dance floor with a mirror ball, glamorous and fun"},
+ {"id":"eighties","name":"1980s Neon","prompt":"in bold 1980s neon workout fashion with big hair and bright colors, energetic retro"},
+ {"id":"nineties","name":"1990s","prompt":"in nostalgic 1990s grunge street style with a laid-back cool vibe, retro urban"}]},
+{"id":"music-icon","name":"Music Icon","emoji":"🎸","face":"m3","blurb":"Take the stage — you're the headliner.","looks":[
+ {"id":"rockstar","name":"Rock Star","prompt":"as a rockstar guitarist shredding on a huge concert stage with dramatic lights and haze, electric energy"},
+ {"id":"pop-diva","name":"Pop Superstar","prompt":"as a glamorous pop superstar performing under sparkling spotlights with a wireless mic, dazzling"},
+ {"id":"dj","name":"The DJ","prompt":"as a cool DJ commanding a nightclub crowd behind glowing turntables with neon lights, high energy"},
+ {"id":"jazz","name":"Jazz Singer","prompt":"as a soulful jazz singer at a vintage microphone in a warm dimly-lit club, classy and intimate"},
+ {"id":"conductor","name":"Conductor","prompt":"as an orchestra conductor mid-performance with baton raised before a grand concert hall, dramatic and elegant"}]}
+]}

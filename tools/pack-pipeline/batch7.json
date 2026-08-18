@@ -1,0 +1,31 @@
+{"packs":[
+{"id":"movie-moments-2","name":"Movie Scenes Vol. 2","emoji":"🎬","face":"m1","blurb":"More legendary movie moments — parodied, you as the star.","looks":[
+ {"id":"singing-rain","name":"Singin' in the Rain","prompt":"joyfully dancing and swinging on a lamppost in the pouring rain on a nostalgic city street at night, classic movie musical, umbrella in hand, cinematic"},
+ {"id":"king-of-world","name":"Top of the World","prompt":"standing triumphantly at the bow of a grand ocean liner with arms spread wide at golden sunset over the sea, epic romantic movie moment"},
+ {"id":"boombox","name":"The Serenade","prompt":"standing on a suburban lawn at dawn holding a large boombox overhead in a heartfelt romantic gesture, 1980s coming-of-age movie scene"},
+ {"id":"vine-swing","name":"Jungle Hero","prompt":"swinging heroically on a vine through a lush green jungle, adventurous classic movie action, dynamic"},
+ {"id":"diner-dance","name":"The Twist","prompt":"dancing the twist enthusiastically at a stylish retro nightclub, cool 1990s cult movie dance scene, vibrant"}]},
+{"id":"memes-2","name":"Memes Vol. 2","emoji":"😂","face":"f1","blurb":"More relatable meme energy — you're the main character.","looks":[
+ {"id":"this-is-fine","name":"This Is Fine","prompt":"sitting calmly at a table sipping coffee with a serene smile while the cozy room is comically on fire around them, cartoonish meme humor"},
+ {"id":"distracted","name":"Distracted","prompt":"walking down a sunny street turning head to look back in exaggerated surprise, playful relatable meme moment"},
+ {"id":"success-kid","name":"Success!","prompt":"making a triumphant fist-pump of victory with a determined confident grin on a plain bright background, classic success meme energy"},
+ {"id":"expectation","name":"Expectation vs Reality","prompt":"striking an overconfident heroic pose in slightly silly mismatched outfit, humorous self-aware meme vibe, bright"},
+ {"id":"monday","name":"Case of the Mondays","prompt":"slumped comically exhausted over a desk buried in coffee cups and sticky notes, relatable office humor meme, funny"}]},
+{"id":"ancient-legends","name":"Ancient Legends","emoji":"🏛️","face":"m2","blurb":"Heroes of antiquity — gladiators, pharaohs, warriors and gods.","looks":[
+ {"id":"gladiator","name":"Gladiator","prompt":"as a mighty Roman gladiator in armor holding a sword in a grand colosseum arena, epic and cinematic"},
+ {"id":"pharaoh","name":"Pharaoh","prompt":"as an ancient Egyptian pharaoh in golden regalia and headdress before towering temple columns, majestic"},
+ {"id":"viking","name":"Viking","prompt":"as a fierce Viking warrior with fur cloak and axe on a stormy Nordic coastline, rugged and epic"},
+ {"id":"samurai","name":"Samurai","prompt":"as a noble samurai in traditional armor with a katana amid falling cherry blossoms, serene and powerful"},
+ {"id":"greek-god","name":"Greek God","prompt":"as a radiant Greek god in flowing robes atop Mount Olympus with clouds and golden light, divine and majestic"}]},
+{"id":"secret-agent","name":"Secret Agent","emoji":"🕵️","face":"m3","blurb":"License to dazzle — the world's most stylish spy.","looks":[
+ {"id":"tux-spy","name":"Tux & Martini","prompt":"a suave secret agent in a sharp black tuxedo holding a martini in a glamorous casino, cool and confident, cinematic spy-thriller"},
+ {"id":"femme-fatale","name":"Femme Fatale","prompt":"an elegant mysterious spy in a stunning evening gown at a lavish embassy party, dramatic and glamorous"},
+ {"id":"casino-royale","name":"High Stakes","prompt":"a poised secret agent at a high-stakes poker table in an opulent casino, chips and tension, cinematic spy-thriller"},
+ {"id":"night-mission","name":"Night Mission","prompt":"a secret agent in sleek dark attire on a moonlit city rooftop overlooking glittering skyline at night, cool spy-thriller mood"}]},
+{"id":"fairytale","name":"Fairytale","emoji":"🧚","face":"f2","blurb":"Once upon a time — you're the storybook legend.","looks":[
+ {"id":"prince-princess","name":"Royalty","prompt":"as fairytale royalty in a beautiful storybook gown or regal attire in an enchanted castle ballroom, magical and elegant"},
+ {"id":"knight","name":"Brave Knight","prompt":"as a brave fairytale knight in shining armor before a castle with banners, heroic and storybook"},
+ {"id":"enchanted-forest","name":"Enchanted Forest","prompt":"wandering a glowing enchanted forest with fireflies and magical light, whimsical fairytale wonder"},
+ {"id":"genie","name":"The Genie","prompt":"as a magical genie with swirling colorful smoke emerging from an ornate golden lamp, whimsical and enchanting"},
+ {"id":"fairy","name":"Fairy Magic","prompt":"as a sparkling fairy with delicate glowing wings in a magical flower garden, whimsical and radiant"}]}
+]}

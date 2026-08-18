@@ -1,0 +1,26 @@
+{"packs":[
+{"id":"movie-moments-3","name":"Movie Scenes Vol. 3","emoji":"🎬","face":"m3","blurb":"Even more legendary movie moments — you take the lead.","looks":[
+ {"id":"stairs-triumph","name":"Champion's Climb","prompt":"running triumphantly up grand stone steps and raising both fists at the top in the misty morning, inspirational underdog sports-movie moment"},
+ {"id":"bench-story","name":"Life Story","prompt":"sitting on a sunny park bench holding a small box of chocolates with a gentle warm smile, nostalgic heartfelt movie moment"},
+ {"id":"highland-rally","name":"The Rally","prompt":"standing defiantly with face paint rallying a crowd on a green highland field, epic historical war-movie moment"},
+ {"id":"cliffhanger","name":"Cliffhanger","prompt":"reaching out a hand dramatically while dangling from a rocky cliff ledge, tense action-adventure movie moment"},
+ {"id":"gym-dance","name":"Last Dance","prompt":"slow-dancing under sparkling string lights at a school gym dance, heartfelt nostalgic teen-movie moment"}]},
+{"id":"memes-3","name":"Memes Vol. 3","emoji":"🤣","face":"f2","blurb":"More viral meme energy — you're the reaction.","looks":[
+ {"id":"butterfly","name":"Is This a...?","prompt":"pointing at a butterfly with an overly serious puzzled expression in a grassy field, absurd relatable meme humor"},
+ {"id":"why-not","name":"Why Not?","prompt":"shrugging with an exaggerated confused why-not expression and hands up, plain bright background, relatable meme"},
+ {"id":"tea-sip","name":"Tea Sip","prompt":"dramatically sipping from a teacup with a smug knowing side-eye, viral reaction meme, plain background"},
+ {"id":"thumbs-up","name":"Big Thumbs Up","prompt":"giving an overenthusiastic double thumbs up with an exaggerated cheesy grin, classic reaction meme, bright"},
+ {"id":"hiding","name":"Peeking Out","prompt":"peeking nervously over the top of a couch with wide worried eyes, funny relatable meme moment"}]},
+{"id":"magazine-covers-2","name":"Magazine Covers Vol. 2","emoji":"📰","face":"f1","blurb":"Cover star again — fictional mastheads, real spotlight.","looks":[
+ {"id":"fashion","name":"Fashion Cover","prompt":"on the cover of a glossy fashion magazine with an invented fictional title, in a stunning designer outfit with bold cover lines, high-fashion editorial"},
+ {"id":"success","name":"Innovator","prompt":"on the cover of a business success magazine with an invented fictional title, in a sharp power suit, confident, Innovator-of-the-Year style"},
+ {"id":"fitness","name":"Fitness Cover","prompt":"on the cover of a fitness magazine with an invented fictional title, athletic and energetic in workout gear, dynamic"},
+ {"id":"travel","name":"Travel Cover","prompt":"on the cover of a travel magazine with an invented fictional title, in a breathtaking exotic scenic location, adventurous and sunlit"},
+ {"id":"music","name":"Music Cover","prompt":"on the cover of a music and entertainment magazine with an invented fictional title, styled as a cool rockstar under dramatic lighting"}]},
+{"id":"space-explorer","name":"Space Explorer","emoji":"🚀","face":"m1","blurb":"To infinity — suit up as a fearless astronaut.","looks":[
+ {"id":"orbit","name":"In Orbit","prompt":"as an astronaut in a detailed white space suit floating in orbit with the glowing blue Earth below, cinematic and awe-inspiring"},
+ {"id":"red-planet","name":"Red Planet","prompt":"as an astronaut planting a flag on a rugged alien red planet with two moons in the sky, epic sci-fi"},
+ {"id":"spacewalk","name":"Spacewalk","prompt":"as an astronaut on a spacewalk repairing a satellite among the brilliant stars, dramatic and weightless"},
+ {"id":"station","name":"Space Station","prompt":"as a space explorer in a sleek futuristic space station corridor with glowing panels, high-tech sci-fi"},
+ {"id":"starship","name":"Starship Command","prompt":"as a commander on the bridge of a starship gazing through a viewport at a colorful distant nebula, cinematic sci-fi"}]}
+]}

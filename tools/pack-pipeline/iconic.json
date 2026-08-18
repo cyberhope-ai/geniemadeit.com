@@ -1,0 +1,15 @@
+{"packs":[
+{"id":"movie-moments","name":"Iconic Movie Moments","emoji":"🎬","blurb":"Star in the most legendary movie moments of all time — the classics, reimagined as you.","looks":[
+ {"id":"windswept-dress","name":"Subway Grate","prompt":"a glamorous woman in a billowing white halter dress standing over a subway grate as it blows upward, 1950s Hollywood glamour, black and white cinematic"},
+ {"id":"king-of-the-world","name":"Bow of the Ship","prompt":"standing triumphantly with arms outstretched at the bow of a grand ocean liner at golden sunset, epic romantic cinematic"},
+ {"id":"ace-pilot","name":"Ace Pilot","prompt":"a confident fighter pilot in a flight suit and aviator sunglasses standing beside a fighter jet on a sunlit runway, 80s blockbuster style"},
+ {"id":"noir-farewell","name":"Noir Farewell","prompt":"in a 1940s trench coat and fedora at a foggy airport tarmac at night, dramatic black and white film-noir lighting"}]},
+{"id":"album-covers","name":"Legendary Album Covers","emoji":"💿","blurb":"Become the star of a classic record — iconic album-cover styles, reimagined.","looks":[
+ {"id":"crosswalk","name":"The Crosswalk","prompt":"walking across a white zebra-stripe crosswalk on a sunny London street, classic 1960s album cover composition"},
+ {"id":"prism-light","name":"Prism","prompt":"a striking minimalist portrait with a triangular glass prism refracting a beam of white light into a rainbow on a black background, iconic album art style"},
+ {"id":"rock-leather","name":"Rock Icon","prompt":"a gritty rock-and-roll portrait in a worn leather jacket against a raw urban wall, classic rock album cover style, high contrast"}]},
+{"id":"magazine-covers","name":"Magazine Covers","emoji":"📰","blurb":"Land the cover — be the face of a legendary magazine (bold masthead, cover lines and all).","looks":[
+ {"id":"fashion-cover","name":"Fashion Cover","prompt":"a striking high-fashion magazine cover with a bold fictional masthead and stylish cover lines, elegant beauty lighting, glossy editorial"},
+ {"id":"person-of-year","name":"Person of the Year","prompt":"a prestigious news magazine cover portrait with a thick red border and a bold fictional masthead, serious confident expression"},
+ {"id":"music-cover","name":"Music Cover","prompt":"a bold rock-music magazine cover with a fictional masthead and edgy cover lines, dramatic dynamic lighting"}]}
+]}

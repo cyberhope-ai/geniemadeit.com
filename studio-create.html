@@ -27,6 +27,16 @@ h1 em{font-style:italic;color:var(--gold)}h2{font-family:var(--serif);font-weigh
 .thumbs figure{margin:0;position:relative;border-radius:9px;overflow:hidden;aspect-ratio:1/1;border:1px solid var(--line)}
 .thumbs img{width:100%;height:100%;object-fit:cover;display:block}
 .thumbs .x{position:absolute;top:3px;right:3px;background:rgba(8,4,18,.8);border:none;color:#fff;border-radius:7px;width:22px;height:22px;cursor:pointer;font-size:14px;line-height:1}
+.thumbs figure.rej{outline:2px solid #ff6f8a;outline-offset:-2px}
+.thumbs figure.chk{outline:2px solid #57e0a8;outline-offset:-2px}
+.badge{position:absolute;bottom:3px;left:3px;font-size:.6rem;font-weight:800;padding:2px 6px;border-radius:6px;line-height:1.2;max-width:calc(100% - 6px);cursor:help}
+.badge.g{background:rgba(15,47,28,.94);color:#8ff0bf}.badge.y{background:rgba(74,60,20,.94);color:#ffd97a}.badge.r{background:rgba(74,20,32,.94);color:#ff9ab0}
+.badge.p{background:rgba(30,20,70,.9);color:#c6b6ea}
+.pmgrade{margin-top:14px;padding:13px 16px;border-radius:12px;border:1px solid var(--line);background:rgba(255,255,255,.03)}
+.pmgrade .h{font-size:.95rem;font-weight:700;color:var(--ink)}
+.pmbar{height:8px;border-radius:5px;background:rgba(255,255,255,.08);overflow:hidden;margin:9px 0 7px}.pmbar i{display:block;height:100%;transition:width .4s}
+.pmgrade .tip{font-size:.82rem;color:var(--faint);margin-top:4px}.pmgrade .tip a{color:var(--magic)}
+.pmgrade ul{margin:6px 0 0;padding-left:18px;font-size:.83rem;color:var(--mut)}.pmgrade li{margin:2px 0}
 .field{margin-top:14px}label{font-size:.78rem;letter-spacing:.08em;text-transform:uppercase;color:var(--faint);display:block;margin-bottom:5px}
 input,select{background:rgba(10,6,22,.5);border:1px solid var(--line);border-radius:11px;padding:12px 14px;color:var(--ink);font:inherit;outline:none;width:100%}
 input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-template-columns:1fr 1fr;gap:14px}
@@ -39,6 +49,24 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 .looks{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:11px;margin-top:10px}
 .look{border:1px solid var(--line);border-radius:13px;padding:14px 10px;text-align:center;cursor:pointer;transition:.15s;background:rgba(255,255,255,.02)}
 .look:hover{border-color:var(--gold);transform:translateY(-2px)}.look .e{font-size:1.7rem}.look .n{font-size:.82rem;margin-top:5px;color:var(--mut)}
+.look.sel{border-color:var(--gold);background:rgba(245,196,81,.14);box-shadow:0 0 0 1px var(--gold) inset}
+.look.sel::after{content:"✓";position:absolute;top:6px;right:9px;color:var(--gold2);font-weight:800;font-size:.95rem}
+.look{position:relative}.look.dis{opacity:.32;pointer-events:none}
+.packgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(300px,1fr));gap:16px;margin-top:12px}
+.pack{border:1px solid var(--line);border-radius:16px;overflow:hidden;background:var(--panel);transition:.15s}
+.pack.sel{border-color:var(--gold);box-shadow:0 0 0 2px var(--gold) inset}
+.packhero{position:relative;aspect-ratio:4/3;background:#0a0416;cursor:zoom-in}
+.packhero img{width:100%;height:100%;object-fit:cover;display:block}
+.packhero .lbl{position:absolute;left:12px;bottom:10px;font-family:var(--serif);font-size:1.25rem;font-weight:700;text-shadow:0 2px 10px rgba(0,0,0,.85)}
+.packbody{padding:12px 14px}.packbody .bl{font-size:.83rem;color:var(--mut);min-height:2.4em}
+.packsubs{display:flex;gap:8px;margin-top:10px}
+.packsub{flex:1;cursor:pointer;border-radius:9px;overflow:hidden;border:1px solid var(--line);position:relative}
+.packsub img{width:100%;aspect-ratio:1/1;object-fit:cover;display:block}
+.packsub .sn{font-size:.62rem;text-align:center;padding:3px 2px;color:var(--mut);background:rgba(10,6,22,.65);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.packsub.on{border-color:var(--gold)}
+.packadd{margin-top:12px;display:flex;align-items:center;gap:10px;flex-wrap:wrap}
+.plight{position:fixed;inset:0;z-index:90;background:rgba(8,4,18,.9);display:none;align-items:center;justify-content:center;padding:24px;cursor:zoom-out}
+.plight.on{display:flex}.plight img{max-width:92vw;max-height:92vh;border-radius:12px}
 .grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(200px,1fr));gap:14px;margin-top:16px}
 .res{background:var(--panel);border:1px solid var(--line);border-radius:14px;overflow:hidden}
 .res img{width:100%;aspect-ratio:4/5;object-fit:cover;display:block}
@@ -69,12 +97,12 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 <div class="wrap">
   <span class="eyebrow">Studio You · Create</span>
   <h1>Your private <em>photo studio</em></h1>
-  <p class="sub">Upload your photos, we train a private model of you, then you pick your looks. Every photo is studio-grade and comes back sealed with your certificate.</p>
+  <p class="sub">Upload a couple of photos, pick your looks, and we create studio-grade portraits of you — usually in minutes. Every photo comes back sealed with your certificate.</p>
 
   <div class="steps">
-    <div class="stp" id="s1"><b>1 · Upload</b>5–25 photos</div>
-    <div class="stp" id="s2"><b>2 · Train</b>your private model</div>
-    <div class="stp" id="s3"><b>3 · Create</b>pick your looks</div>
+    <div class="stp" id="s1"><b>1 · Upload</b>2+ good photos</div>
+    <div class="stp" id="s2"><b>2 · Pick your looks</b>choose your styles</div>
+    <div class="stp" id="s3"><b>3 · We create them</b>we email + text you</div>
   </div>
 
   <!-- HOW IT WORKS (illustrated) -->
@@ -84,7 +112,7 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 
     <div class="card">
       <h2>1 · Upload your photos</h2>
-      <p class="note" style="margin-bottom:4px">Add <b>5–25 photos</b> of one person — a mix of angles, lighting and expressions (a few good selfies from your phone is perfect). <b>The more variety you add, the stronger the likeness.</b> Works for you, your partner, or your kids at any age. No prompt-writing, no editing — we handle everything.</p>
+      <p class="note" style="margin-bottom:4px">Add <b>2 or more clear photos</b> of one person — your best, closest, most recent shots (a couple of good ones is all it takes). <b>Face clearly visible, well-lit, filling the frame.</b> Works for you, your partner, or your kids at any age. No prompt-writing, no editing — we handle everything.</p>
       <div class="samplegrid">
         <figure><img src="/assets/studio-you/upload-examples/1.jpg" loading="lazy" alt="example upload photo"></figure>
         <figure><img src="/assets/studio-you/upload-examples/2.jpg" loading="lazy" alt="example upload photo"></figure>
@@ -107,43 +135,71 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
   <!-- STEP 1: upload -->
   <div class="card hidden" id="stepUpload">
     <h2>Add your photos</h2>
-    <p class="note">5–25 clear photos of one person — different angles, lighting and expressions. The more you add, the better the likeness. Works for you, your partner, or your kids.</p>
+    <p class="note"><b>2 or more clear photos</b> of one person — your best, closest, most recent shots. Just a couple of great ones works. <b style="color:var(--gold2)">Use full-resolution originals, not screenshots</b> — <a href="/studio-you/photo-tips" target="_blank" style="color:var(--magic)">see our photo tips →</a></p>
     <div class="drop" id="drop">📷 <b>Drop photos here</b> or click to choose<br><span class="note">JPG / PNG / WebP · up to 25</span></div>
     <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple class="hidden">
     <div class="thumbs" id="thumbs"></div>
+    <div class="pmgrade hidden" id="pmGrade"></div>
     <div class="row">
-      <div class="field"><label>Their age</label><input id="ageInput" type="number" min="1" max="110" placeholder="e.g. 34"></div>
+      <div class="field"><label>Approximate age</label><input id="ageInput" type="number" min="1" max="110" placeholder="e.g. 34"></div>
       <div class="field"><label>Hair colour (optional)</label><input id="hairInput" type="text" maxlength="24" placeholder="e.g. dark brown, blonde"></div>
     </div>
     <p class="note" id="upMsg"></p>
-    <div style="margin-top:16px"><button class="btn" id="trainBtn" disabled>Train my model →</button></div>
+    <div style="margin-top:16px"><button class="btn" id="uploadBtn" disabled>Continue to looks →</button></div>
   </div>
 
-  <!-- STEP 2: training -->
-  <div class="card hidden" id="stepTrain">
-    <h2>Training your private model…</h2>
-    <p class="sub">This takes a few minutes. You can keep this tab open — we'll move you to the fun part automatically.</p>
-    <div class="prog"><i id="trainBar"></i></div>
-    <p class="note" id="trainMsg">Starting…</p>
-  </div>
-
-  <!-- STEP 3: create -->
-  <div class="card hidden" id="stepCreate">
+  <!-- STEP 2: pick looks (BEFORE training) -->
+  <div class="card hidden" id="stepLooks">
     <h2>Pick your looks <span class="counter" id="looksCounter"></span></h2>
-    <p class="note">Tap a look and we'll create it as you. Each finished photo lands in your Vault, certified.</p>
+    <p class="note">Choose the styles you want and we'll create every one as <em style="color:var(--gold)">you</em>. Each finished photo comes back <b style="color:var(--ink)">high-resolution</b>, <b style="color:var(--ink)">GenieMade-certified</b>, and submitted <b style="color:var(--ink)">free to EverVerify.org</b> — provably yours.</p>
+    <div id="packWrap" style="display:none"><div class="packgrid" id="packGrid"></div></div>
     <div class="cats" id="cats"></div>
     <div class="looks" id="looks"></div>
-    <p class="note" id="createMsg"></p>
-    <h2 style="margin-top:26px">Your photos</h2>
-    <div class="grid" id="results"></div>
-    <p class="note">Finished photos are also in <a href="/app" style="color:var(--gold2)">your Vault</a> — downloadable full-res with their certificate.</p>
+    <div id="customWrap" style="margin-top:18px;border-top:1px solid var(--line);padding-top:16px">
+      <h2 style="font-size:1.15rem">✨ …or describe your own idea</h2>
+      <p class="note">Type anything — a scene, outfit, or vibe, and we'll create it as you. <span style="color:var(--faint)">e.g. "sharp and presidential, navy suit with a pink &amp; blue power tie, confident smile."</span></p>
+      <div id="customList" style="display:flex;flex-wrap:wrap;gap:8px;margin:6px 0"></div>
+      <div style="display:flex;gap:8px;margin-top:6px">
+        <input id="customInput" type="text" maxlength="600" placeholder="Describe your own photo idea…" style="flex:1">
+        <button class="btn ghost" id="customAdd" type="button" style="white-space:nowrap">+ Add</button>
+      </div>
+    </div>
+    <p class="note" id="pickMsg"></p>
+    <div style="margin-top:16px"><button class="btn" id="looksBtn" disabled>Continue →</button></div>
+  </div>
+
+  <!-- STEP 3: where to send it -->
+  <div class="card hidden" id="stepNotify">
+    <h2>Where should we send them?</h2>
+    <p class="note">Your photos take a little while to create — <b style="color:var(--ink)">you don't have to wait here</b>. Leave your email (and phone, if you'd like a text) and we'll ping you the moment they're ready in your Vault. Close the tab, go make coffee — it keeps running on our servers.</p>
+    <div class="row">
+      <div class="field"><label>Email (we'll notify you here)</label><input id="notifyEmail" type="email" placeholder="you@example.com"></div>
+      <div class="field"><label>Mobile for a text (optional)</label><input id="notifyPhone" type="tel" placeholder="+1 555 123 4567"></div>
+    </div>
+    <p class="note" id="notifyMsg"></p>
+    <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
+      <button class="btn ghost" id="notifyBack">← Back to looks</button>
+      <button class="btn" id="startBtn">Start creating my photos →</button>
+    </div>
+  </div>
+
+  <!-- STEP 4: processing (async) -->
+  <div class="card hidden" id="stepProcessing">
+    <h2>We're on it! ✨</h2>
+    <p class="sub" id="procLead">Your private model is training and your photos are being created right now.</p>
+    <div class="prog"><i id="procBar" style="width:30%"></i></div>
+    <p class="note" id="procMsg" style="min-height:1.2em;color:var(--gold2)"></p>
+    <div style="margin-top:16px;border-top:1px solid var(--line);padding-top:14px">
+      <p class="note" style="line-height:1.95" id="procPerks"></p>
+    </div>
+    <div style="margin-top:16px"><a class="btn ghost" href="/app">Go to my Vault →</a></div>
   </div>
 
   <!-- how it works: after upload -->
   <section style="margin-top:22px">
     <div class="card">
-      <h2>2 · We train your private model</h2>
-      <p class="note">In a few minutes we build a private AI model of <b>you</b> — it learns your real, unique features. <b>Not a filter, not a face-swap</b> — a genuine model of your face, sealed in your Vault and yours alone. You only train once; every future photo after that is instant.</p>
+      <h2>2 · We create your looks</h2>
+      <p class="note">From just a couple of photos, we render each look as <b>you</b> — capturing your real, unique features. <b>Not a filter, not a face-swap</b> — a faithful, photoreal portrait of your actual face, sealed in your Vault. No long training wait; your photos come back in minutes, each certified as authentically yours.</p>
       <div style="display:flex;gap:18px;align-items:center;flex-wrap:wrap;margin-top:4px">
         <img src="/assets/studio-you/goldenhour.jpg" style="width:150px;aspect-ratio:4/5;object-fit:cover;border-radius:12px;border:1px solid var(--line)" loading="lazy">
         <div style="flex:1;min-width:230px"><p class="note" style="line-height:1.9">✦ <b style="color:var(--ink)">Private &amp; certified</b> — your model and every photo are provably yours.<br>✦ <b style="color:var(--ink)">Reusable forever</b> — come back any time for brand-new looks.<br>✦ <b style="color:var(--ink)">Truly you</b> — built from your real photos, so it actually looks like you.</p></div>
@@ -152,32 +208,40 @@ input:focus,select:focus{border-color:var(--gold)}.row{display:grid;grid-templat
 
     <div class="card">
       <h2>3 · Pick your looks</h2>
-      <p class="note" style="margin-bottom:6px">One trained model unlocks <b>every style</b> — professional headshots, sports, fantasy, sci-fi, historical, holidays and more. Browse the categories, tap the looks you love, and we make them <em>you</em>. Here's a taste (these are one real person, shown with permission — yours are made the same way):</p>
+      <p class="note" style="margin-bottom:6px">One trained model unlocks <b>every style</b> — professional headshots, sports, fantasy, sci-fi, holidays and more. These are <b style="color:var(--ink)">real people of every age</b> (shared with permission) — a man, a woman, teens and kids — each one their <em>own</em> trained model. Whoever you are, yours are made exactly the same way:</p>
       <div class="samplegrid">
-        <figure><img src="/assets/studio-you/looks/corporate-headshot.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">💼 Corporate</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/doctor.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🩺 Doctor</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/attorney.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">⚖️ Attorney</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/black-tie-gala.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🥂 Black-Tie</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/astronaut.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🚀 Astronaut</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/cyberpunk.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🌆 Cyberpunk</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/elf-royalty.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🧝 Fantasy</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/athlete.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🏆 Athlete</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/chef.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">👨‍🍳 Chef</figcaption></figure>
-        <figure><img src="/assets/studio-you/looks/christmas-card.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🎄 Holiday</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/rick-corporate.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">💼 Corporate</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/cara-doctor.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🩺 Doctor</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/grant-basketball.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🏀 Sports</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/hope-violin.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🎻 Musician</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/pierce-attorney.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">⚖️ Attorney</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/faith-astronaut.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🚀 Astronaut</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/cara-blacktie.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🥂 Black-Tie</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/rick-superhero.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🦸 Superhero</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/pierce-chef.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">👨‍🍳 Chef</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/grant-sorcerer.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🧙 Fantasy</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/faith-cat.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">🐱 With a pet</figcaption></figure>
+        <figure><img src="/assets/studio-you/examples/hope-dance.jpg" loading="lazy"><figcaption style="padding:6px 8px;font-size:.76rem;color:var(--mut)">💃 Dance</figcaption></figure>
       </div>
-      <p class="note">…and dozens more across every category. Pick your favourites and they land in your Vault, certified and downloadable full-res.</p>
+      <p class="note">…and dozens more across every category — for you, your partner, or your kids. Pick your favourites and they land in your Vault, certified and downloadable full-res.</p>
     </div>
   </section>
 </div>
 
+<div class="plight" id="plight"><img id="plightImg" src=""></div>
+<script>window.GM_PACKS={"packs": [{"id": "birthday-bash", "name": "Birthday Bash", "emoji": "🎉", "tier": "play", "blurb": "Turn any photo into the star of an unforgettable birthday — confetti, cake and all.", "looks": [{"id": "confetti-celebration", "name": "Confetti Celebration", "prompt": "at a joyful birthday party wearing a party hat, colorful balloons and confetti raining down, big happy smile"}, {"id": "cake-smash", "name": "Cake Smash", "prompt": "celebrating a birthday with a big decorated cake glowing with candles, warm party lights, delighted expression"}, {"id": "neon-party", "name": "Neon Party", "prompt": "at a vibrant neon-lit birthday party, glowing HAPPY BIRTHDAY sign, colorful lights and streamers"}]}, {"id": "love-anniversary", "name": "Love & Anniversary", "emoji": "💘", "tier": "play", "blurb": "Say it with a portrait made for the one you love — romantic, retro or starry-eyed.", "looks": [{"id": "classic-romance", "name": "Classic Romance", "prompt": "a romantic portrait surrounded by red roses, soft golden glowing bokeh hearts, warm dreamy lighting"}, {"id": "retro-valentine", "name": "Retro Valentine", "prompt": "a retro 1950s valentine pin-up style portrait with hearts and roses, vintage warm tones"}, {"id": "starry-slow-dance", "name": "Starry Night", "prompt": "in an elegant evening outfit under a beautiful starry night sky with glowing string lights, romantic dreamy solo portrait"}]}, {"id": "congrats", "name": "Congrats!", "emoji": "🏆", "tier": "play", "blurb": "Celebrate the win — graduations, promotions, big news — like the champion they are.", "looks": [{"id": "trophy-moment", "name": "Trophy Moment", "prompt": "triumphantly lifting a shining gold trophy overhead in a stadium, confetti and bright spotlights, victorious"}, {"id": "graduation-glory", "name": "Graduation Glory", "prompt": "in a graduation cap and gown tossing the cap, confetti and celebration, proud joyful smile"}, {"id": "confetti-cannon", "name": "Confetti Cannon", "prompt": "celebrating with a huge burst of colorful confetti cannons, arms raised in triumph, festive lights"}]}, {"id": "cheer-up", "name": "Cheer Up", "emoji": "🌞", "tier": "play", "blurb": "Send a little sunshine — a warm, uplifting portrait to brighten someone's day.", "looks": [{"id": "sunshine-lollipops", "name": "Sunshine & Lollipops", "prompt": "in a bright sunny flower field with a rainbow, warm cheerful uplifting light, gentle happy smile"}, {"id": "cozy-comfort", "name": "Cozy Comfort", "prompt": "cozy by a warm fireplace wrapped in a soft blanket with a warm drink, comforting golden light"}, {"id": "rainbow-vibes", "name": "Rainbow Vibes", "prompt": "surrounded by colorful balloons floating up into a bright rainbow sky, joyful and hopeful"}]}, {"id": "thank-you", "name": "Thank You", "emoji": "🙏", "tier": "play", "blurb": "Gratitude that lands — a heartfelt portrait that says thanks better than words.", "looks": [{"id": "grateful-bouquet", "name": "Grateful Bouquet", "prompt": "holding a big beautiful bouquet of wildflowers, warm grateful smile, soft natural light"}, {"id": "golden-spotlight", "name": "Golden Spotlight", "prompt": "in a warm golden spotlight with a heartfelt expression, elegant simple background"}, {"id": "heartfelt-thanks", "name": "Heartfelt Thanks", "prompt": "a warm heartfelt portrait with a soft THANK YOU message in elegant script, cozy warm tones"}]}, {"id": "dance-floor", "name": "Dance Floor", "emoji": "🕺", "tier": "play", "blurb": "Drop them into a music video — disco, hip-hop or full rockstar. Cue the moves.", "looks": [{"id": "disco-fever", "name": "Disco Fever", "prompt": "dancing on a sparkling disco floor under a mirror ball in a shiny 70s outfit, dynamic pose, colorful lights"}, {"id": "90s-hip-hop", "name": "90s Hip-Hop", "prompt": "in a 90s hip-hop music video, bold streetwear, graffiti backdrop, confident dynamic pose"}, {"id": "rockstar-encore", "name": "Rockstar Encore", "prompt": "a rockstar on stage with a guitar under bright concert lights and a cheering crowd, energetic"}]}, {"id": "pro-headshots", "name": "Professional Headshots", "emoji": "💼", "tier": "studio", "blurb": "Polished, photoreal headshots for LinkedIn, your website, or the whole team.", "looks": [{"id": "studio-classic", "name": "Studio Classic", "prompt": "a professional corporate headshot in a tailored suit, clean neutral studio background, confident friendly expression"}, {"id": "modern-office", "name": "Modern Office", "prompt": "a professional headshot in smart business attire in a bright modern office with soft window light"}, {"id": "executive", "name": "Executive", "prompt": "a powerful executive portrait in a dark suit, dramatic soft studio lighting, confident and approachable"}]}, {"id": "realtor", "name": "Real Estate Pro", "emoji": "🏡", "tier": "studio", "blurb": "Trustworthy agent portraits that sell — for signs, cards and listings.", "looks": [{"id": "agent-headshot", "name": "Agent Headshot", "prompt": "a friendly professional real estate agent headshot in business casual, warm approachable smile, clean background"}, {"id": "in-front-of-home", "name": "In Front of a Home", "prompt": "a professional realtor standing confidently in front of a beautiful suburban home, bright daylight"}, {"id": "luxury-listing", "name": "Luxury Listing", "prompt": "an upscale real estate agent portrait in an elegant modern luxury home interior"}]}, {"id": "healthcare", "name": "Healthcare Heroes", "emoji": "🩺", "tier": "studio", "blurb": "Warm, credible portraits for doctors, nurses and caregivers.", "looks": [{"id": "doctor-coat", "name": "In the White Coat", "prompt": "a caring doctor in a clean white coat with a stethoscope, warm reassuring smile, bright clinic background"}, {"id": "nurse", "name": "Compassionate Nurse", "prompt": "a friendly nurse in scrubs in a bright hospital, kind and reassuring expression"}, {"id": "surgeon", "name": "Surgeon", "prompt": "a confident surgeon in surgical scrubs and cap, professional medical setting"}]}, {"id": "fitness", "name": "Fitness & Strong", "emoji": "💪", "tier": "play", "blurb": "Show off the hard work — athletic, energetic, magazine-cover strong.", "looks": [{"id": "gym-power", "name": "Gym Power", "prompt": "an athletic fitness portrait in workout gear in a modern gym, strong confident pose, dramatic lighting"}, {"id": "outdoor-runner", "name": "Outdoor Runner", "prompt": "an energetic runner mid-stride on a scenic trail at golden hour, athletic and determined"}, {"id": "magazine-cover", "name": "Cover Athlete", "prompt": "a fitness magazine cover style portrait, toned and confident, bold studio lighting"}]}, {"id": "glamour", "name": "Glamour & Vogue", "emoji": "✨", "tier": "play", "blurb": "High-fashion, red-carpet ready — your most glamorous self.", "looks": [{"id": "vogue-cover", "name": "Vogue Cover", "prompt": "a high-fashion vogue magazine cover portrait, elegant styling, dramatic beauty lighting"}, {"id": "red-carpet", "name": "Red Carpet", "prompt": "a glamorous red-carpet portrait in stunning evening wear, flashing camera bokeh"}, {"id": "golden-glam", "name": "Golden Glam", "prompt": "a luxurious golden-hour glamour portrait, soft warm elegant lighting, radiant"}]}, {"id": "wedding", "name": "Wedding Day", "emoji": "💍", "tier": "play", "blurb": "Bridal and groom portraits — timeless, romantic, keepsake-worthy (solo).", "looks": [{"id": "bridal-solo", "name": "Bridal Portrait", "prompt": "an elegant solo bridal portrait in a beautiful white wedding dress holding a bouquet, soft romantic light"}, {"id": "groom-solo", "name": "Groom Portrait", "prompt": "a sharp solo groom portrait in a classic tuxedo with boutonniere, warm elegant lighting"}, {"id": "garden-vows", "name": "Garden Vows", "prompt": "a romantic solo wedding portrait in a lush blooming garden, dreamy soft focus"}]}, {"id": "space", "name": "Space & Sci-Fi", "emoji": "🚀", "tier": "play", "blurb": "Blast off — astronaut, starship captain, and far-future explorer.", "looks": [{"id": "astronaut", "name": "Astronaut", "prompt": "an astronaut in a detailed white spacesuit, helmet under arm, stars and Earth behind, cinematic"}, {"id": "starship-captain", "name": "Starship Captain", "prompt": "a confident starship captain on a futuristic bridge with glowing controls and viewscreen of space"}, {"id": "cyber-explorer", "name": "Cyber Explorer", "prompt": "a futuristic explorer in sleek high-tech armor on an alien world, neon sci-fi atmosphere"}]}, {"id": "superhero", "name": "Superheroes", "emoji": "🦸", "tier": "play", "blurb": "Suit up — caped crusader, armored hero, or comic-book legend.", "looks": [{"id": "caped-hero", "name": "Caped Hero", "prompt": "a heroic caped superhero in a sleek suit flying over a city skyline at sunset, dynamic and powerful"}, {"id": "armored-hero", "name": "Armored Hero", "prompt": "a powerful armored superhero in high-tech metal armor, glowing energy, epic pose"}, {"id": "comic-legend", "name": "Comic Legend", "prompt": "a bold comic-book superhero in classic costume, dynamic comic art style, city backdrop"}]}, {"id": "fantasy", "name": "Fantasy Realm", "emoji": "🧙", "tier": "play", "blurb": "Wizards, elves and epic magic — step into the legend.", "looks": [{"id": "grand-wizard", "name": "Grand Wizard", "prompt": "a powerful wizard in ornate star-patterned robes casting a glowing spell, swirling magical aura, epic"}, {"id": "elf-royalty", "name": "Elf Royalty", "prompt": "an elegant elven royal in an enchanted forest with flowing silver robes, ethereal glow"}, {"id": "dragon-rider", "name": "Dragon Rider", "prompt": "a brave dragon rider in leather armor before a majestic dragon and mountains, cinematic fantasy"}]}, {"id": "warriors", "name": "Warriors & Legends", "emoji": "⚔️", "tier": "play", "blurb": "Viking, samurai, gladiator — forged in battle.", "looks": [{"id": "viking", "name": "Viking", "prompt": "a fierce Viking warrior in fur and iron armor with braided hair, dramatic norse landscape"}, {"id": "samurai", "name": "Samurai", "prompt": "a disciplined samurai in traditional armor holding a katana, cherry blossoms, cinematic"}, {"id": "gladiator", "name": "Gladiator", "prompt": "a mighty gladiator in leather and bronze armor in a roman colosseum, epic dramatic light"}]}, {"id": "pirates", "name": "Pirate Adventure", "emoji": "🏴‍☠️", "tier": "play", "blurb": "Ahoy — swashbuckling captain of the high seas.", "looks": [{"id": "captain", "name": "Pirate Captain", "prompt": "a bold pirate captain in a tricorn hat and coat on a ship deck, ocean and sails behind, adventurous"}, {"id": "treasure", "name": "Treasure Hunter", "prompt": "a swashbuckling pirate in a cave of golden treasure, torchlight, adventurous grin"}, {"id": "stormy-seas", "name": "Stormy Seas", "prompt": "a daring pirate at the helm in a dramatic ocean storm, cinematic and epic"}]}, {"id": "christmas", "name": "Christmas Magic", "emoji": "🎄", "tier": "play", "blurb": "Cozy, festive holiday portraits — the perfect Christmas card.", "looks": [{"id": "christmas-card", "name": "Christmas Card", "prompt": "a cozy festive Christmas portrait by a decorated tree in a warm holiday sweater, twinkling lights"}, {"id": "winter-wonderland", "name": "Winter Wonderland", "prompt": "a magical winter portrait in gently falling snow with warm coat and scarf, soft festive glow"}, {"id": "santa-workshop", "name": "Santa's Workshop", "prompt": "a whimsical festive portrait in a cozy Santa's workshop full of gifts and warm lights"}]}, {"id": "halloween", "name": "Halloween Spooky", "emoji": "🎃", "tier": "play", "blurb": "Costumes and spooky scenes — frightfully fun.", "looks": [{"id": "vampire", "name": "Elegant Vampire", "prompt": "an elegant gothic vampire in a dramatic dark castle, moody candlelight, mysterious"}, {"id": "witch", "name": "Bewitching Witch", "prompt": "a bewitching witch with a glowing spellbook and pumpkins, misty spooky atmosphere"}, {"id": "pumpkin-patch", "name": "Pumpkin Patch", "prompt": "a fun autumn portrait in a pumpkin patch at dusk with festive halloween decorations"}]}, {"id": "vintage", "name": "Vintage Decades", "emoji": "📻", "tier": "play", "blurb": "Time-travel through the styles — 20s, 50s, 70s and 80s.", "looks": [{"id": "gatsby-1920s", "name": "1920s Gatsby", "prompt": "a glamorous 1920s Great Gatsby style portrait in art-deco attire, sepia elegance"}, {"id": "rockabilly-50s", "name": "1950s Rockabilly", "prompt": "a retro 1950s rockabilly style portrait, vintage diner, classic americana"}, {"id": "disco-70s", "name": "1970s Disco", "prompt": "a groovy 1970s disco portrait in shiny attire under a mirror ball, colorful lights"}]}, {"id": "travel", "name": "Around the World", "emoji": "✈️", "tier": "play", "blurb": "Iconic destinations — Paris, Tokyo, tropical beaches and more.", "looks": [{"id": "paris", "name": "Paris", "prompt": "a stylish travel portrait in front of the Eiffel Tower in Paris on a bright day, chic"}, {"id": "tokyo", "name": "Tokyo Nights", "prompt": "a vibrant travel portrait in neon-lit Tokyo streets at night, cinematic city energy"}, {"id": "tropical-beach", "name": "Tropical Beach", "prompt": "a relaxed travel portrait on a stunning tropical beach at golden hour, turquoise water"}]}, {"id": "country", "name": "Country & Western", "emoji": "🤠", "tier": "play", "blurb": "Boots, hats and wide-open ranges — pure western.", "looks": [{"id": "cowboy", "name": "Classic Cowboy", "prompt": "a rugged cowboy in a hat and denim on a western ranch at golden hour, warm cinematic"}, {"id": "rodeo", "name": "Rodeo Star", "prompt": "a confident rodeo star in western wear at a dusty arena, dramatic light"}, {"id": "country-music", "name": "Country Star", "prompt": "a country music star with a guitar on a barn-lit stage, warm nashville vibe"}]}, {"id": "rockstar", "name": "Rockstar & Music", "emoji": "🎸", "tier": "play", "blurb": "Take the stage — rock, pop and full concert energy.", "looks": [{"id": "rock-concert", "name": "Rock Concert", "prompt": "a rockstar with a guitar on stage under blazing concert lights, cheering crowd, energetic"}, {"id": "pop-star", "name": "Pop Star", "prompt": "a dazzling pop star performing under colorful stage lights, glamorous and dynamic"}, {"id": "album-cover", "name": "Album Cover", "prompt": "a moody artistic music album cover style portrait, dramatic creative lighting"}]}, {"id": "graduation", "name": "Graduation Glory", "emoji": "🎓", "tier": "play", "blurb": "Celebrate the milestone — cap, gown and proud smiles.", "looks": [{"id": "cap-and-gown", "name": "Cap & Gown", "prompt": "a proud graduate in cap and gown holding a diploma on a beautiful campus, sunny day"}, {"id": "cap-toss", "name": "Cap Toss", "prompt": "a joyful graduate tossing the graduation cap in the air, confetti, celebratory"}, {"id": "honor-portrait", "name": "Honor Portrait", "prompt": "an elegant formal graduation portrait with honor cords, warm studio light"}]}, {"id": "beach", "name": "Beach & Summer", "emoji": "🏖️", "tier": "play", "blurb": "Sun, surf and golden-hour glow — summer at its best.", "looks": [{"id": "golden-shore", "name": "Golden Shore", "prompt": "a relaxed summer portrait on a sunny beach at golden hour, warm glowing light, ocean behind"}, {"id": "surfs-up", "name": "Surf's Up", "prompt": "a fun beach portrait with a surfboard by rolling waves, bright summer energy"}, {"id": "seaside-stroll", "name": "Seaside Stroll", "prompt": "a breezy seaside portrait walking along the shore at sunset, carefree"}]}, {"id": "retro-arcade", "name": "Retro Arcade", "emoji": "🕹️", "tier": "play", "blurb": "Step into the classics — pixels, neon and high scores.", "looks": [{"id": "inside-the-game", "name": "Inside the Game", "prompt": "as a small pixel-art character standing inside a colorful retro 8-bit arcade video game screen, high score display"}, {"id": "neon-arcade", "name": "Neon Arcade", "prompt": "posing in a neon-lit 1980s arcade surrounded by glowing arcade cabinets, vibrant retro"}, {"id": "pixel-hero", "name": "Pixel Hero", "prompt": "as a heroic 16-bit pixel-art game character in a side-scroller video game world with coins and platforms"}]}, {"id": "business-power", "name": "Boss Energy", "emoji": "👔", "tier": "studio", "blurb": "Command the room — founder, CEO, power-suit portraits.", "looks": [{"id": "founder", "name": "Startup Founder", "prompt": "a confident startup founder in smart-casual attire in a modern creative office, approachable and sharp"}, {"id": "power-suit", "name": "Power Suit", "prompt": "a commanding power-suit portrait, sleek corporate setting, confident authoritative pose"}, {"id": "magazine-exec", "name": "Cover Exec", "prompt": "a business-magazine cover style executive portrait, bold dramatic professional lighting"}]}, {"id": "artist", "name": "Creative Soul", "emoji": "🎨", "tier": "play", "blurb": "For makers and dreamers — painter, author, film director.", "looks": [{"id": "painter", "name": "Painter", "prompt": "an inspired artist in a sunlit studio surrounded by paintings and brushes, creative and warm"}, {"id": "author", "name": "Author", "prompt": "a thoughtful author in a cozy book-lined library, warm intellectual atmosphere"}, {"id": "director", "name": "Film Director", "prompt": "a visionary film director on a cinematic movie set with lights and camera, creative energy"}]}, {"id": "royalty", "name": "Royalty & Crowns", "emoji": "👑", "tier": "play", "blurb": "Take the throne — king, queen and timeless nobility.", "looks": [{"id": "monarch", "name": "Royal Monarch", "prompt": "a regal monarch in a jeweled crown and royal robes on an ornate throne, opulent palace"}, {"id": "renaissance", "name": "Renaissance Noble", "prompt": "an elegant renaissance noble in rich period attire, old-master painting style lighting"}, {"id": "egyptian", "name": "Egyptian Royalty", "prompt": "a majestic ancient Egyptian pharaoh in gold regalia in a torchlit temple, cinematic"}]}, {"id": "cartoon", "name": "Cartoon & Anime", "emoji": "🧸", "tier": "play", "blurb": "Become animated — 3D cartoon, anime and comic styles.", "looks": [{"id": "3d-cartoon", "name": "3D Cartoon", "prompt": "as a charming 3D animated Pixar-style cartoon character in a bright colorful animated scene"}, {"id": "anime", "name": "Anime Hero", "prompt": "as a vibrant anime character with expressive style in a dynamic anime scene"}, {"id": "comic-strip", "name": "Comic Strip", "prompt": "as a bold comic-book character with ink outlines and halftone shading, comic panel style"}]}, {"id": "pets", "name": "Me & My Pet", "emoji": "🐾", "tier": "play", "blurb": "A charming portrait with an adorable furry friend.", "looks": [{"id": "with-a-dog", "name": "With a Puppy", "prompt": "a warm heartwarming portrait holding an adorable happy puppy, soft natural light"}, {"id": "with-a-cat", "name": "With a Kitten", "prompt": "a cozy portrait cuddling a cute fluffy kitten, warm gentle light"}, {"id": "walk-in-park", "name": "Walk in the Park", "prompt": "a cheerful portrait walking a friendly dog in a sunny park, golden hour"}]}]};</script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
 <script>
 const $=s=>document.querySelector(s), $$=s=>[...document.querySelectorAll(s)];
 const api=(p,o)=>fetch(p,Object.assign({credentials:"same-origin"},o||{}));
 const jpost=(p,body)=>api(p,{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify(body||{})}).then(r=>r.json().catch(()=>({})));
-let CFG={min_photos:5,max_photos:25,looks:12}, photos=[], LOOKS=[], usedLook=new Set(), looksUsed=0, looksTotal=12;
+const CARDS=["gate","stepUpload","stepLooks","stepNotify","stepProcessing"];
+let CFG={min_photos:2,max_photos:25,looks:12}, photos=[], LOOKS=[], picks=new Set(), looksTotal=12, refUrls=[], curEmail="";
+let gmSeq=0; const grades={}; // per-photo analysis: id -> {v,label,reasons,w,h}
+let customLooks=[]; // user's own-idea prompts: [{name,prompt}]
+let PACKS=[], packState={}; // themed packs + which are selected
 
-function show(id){["gate","stepUpload","stepTrain","stepCreate"].forEach(x=>$("#"+x).classList.toggle("hidden",x!==id));}
+function show(id){CARDS.forEach(x=>$("#"+x).classList.toggle("hidden",x!==id));}
 function setStep(n){[1,2,3].forEach(i=>$("#s"+i).classList.toggle("on",i===n));}
 function gate(title,msg,actHtml){ $("#gateTitle").textContent=title; $("#gateMsg").textContent=msg; $("#gateAct").innerHTML=actHtml||""; show("gate"); }
 
@@ -185,10 +249,11 @@ async function boot(){
   // signed in?
   const me=await api("/api/auth/me").then(r=>r.ok?r.json():null).catch(()=>null);
   if(!me||!(me.user||me.email||me.id)){ setStep(1); return gate("Sign in to start","Create your account (or sign in) in the Studio, then come back here.",'<a class="btn" href="/app">Go to the Studio →</a>'); }
+  curEmail=(me.email||(me.user&&me.user.email)||"").toString();
   const sg=$("#gmSignout"); if(sg){ sg.style.display=""; sg.onclick=e=>{e.preventDefault();api("/api/auth/logout",{method:"POST"}).then(()=>location.href="/");}; }
   // session + model
   const s=await api("/api/studio/session").then(r=>r.json()).catch(()=>({}));
-  if(s&&s.config){ CFG=s.config; }
+  if(s&&s.config){ CFG=s.config; CFG.min_photos=2; }  /* Nano Banana Pro needs only 2 good photos — no training */
   if(!s||!s.session){
     setStep(1);
     gate("Choose your Studio package","Train your private model and create your looks. Cancel anytime — every photo is certified.",
@@ -196,12 +261,12 @@ async function boot(){
     $$("#gateAct [data-tier]").forEach(b=>b.onclick=()=>startCheckout(b.dataset.tier));
     return;
   }
-  looksTotal=s.session.looks_total||CFG.looks; looksUsed=s.session.looks_used||0;
-  const m=s.model;
-  if(!m){ setStep(1); return startUpload(); }
-  if(m.status==="ready"){ setStep(3); return startCreate(s); }
-  // training in progress
-  setStep(2); show("stepTrain"); pollTrain();
+  looksTotal=s.session.looks_total||CFG.looks;
+  const m=s.model, job=m&&m.job;
+  // A job already submitted -> show the "we're on it / done" screen (survives tab close, reboot, reload)
+  if(job){ setStep(3); return showProcessing(job); }
+  // otherwise start fresh at upload
+  setStep(1); startUpload();
 }
 
 async function startCheckout(tier){
@@ -212,63 +277,119 @@ async function startCheckout(tier){
   $("#gateMsg").innerHTML='<span class="err">'+((r&&(r.message||r.error))||"Couldn't start checkout — try again.")+'</span>';
 }
 
-/* ---------- STEP 1 ---------- */
-function startUpload(){ show("stepUpload"); renderThumbs(); }
+/* ---------- STEP 1 · UPLOAD ---------- */
+function startUpload(){ setStep(1); show("stepUpload"); renderThumbs(); }
 $("#drop").onclick=()=>$("#fileInput").click();
 ["dragover","dragenter"].forEach(e=>$("#drop").addEventListener(e,ev=>{ev.preventDefault();$("#drop").classList.add("hot");}));
 ["dragleave","drop"].forEach(e=>$("#drop").addEventListener(e,ev=>{ev.preventDefault();$("#drop").classList.remove("hot");}));
 $("#drop").addEventListener("drop",ev=>addFiles(ev.dataTransfer.files));
 $("#fileInput").addEventListener("change",e=>addFiles(e.target.files));
 function addFiles(list){
-  for(const f of list){ if(!/^image\//.test(f.type)) continue; if(photos.length>=CFG.max_photos) break; photos.push(f); }
-  renderThumbs();
+  for(const f of list){
+    if(!/^image\//.test(f.type)) continue;
+    if(photos.length>=CFG.max_photos) break;
+    f._gmid=++gmSeq; f._url=URL.createObjectURL(f);
+    photos.push(f);
+    analyzePhoto(f).then(g=>{ grades[f._gmid]=g; renderThumbs(); renderGrade(); });
+  }
+  renderThumbs(); renderGrade();
 }
 function renderThumbs(){
-  $("#thumbs").innerHTML=photos.map((f,i)=>`<figure><img src="${URL.createObjectURL(f)}"><button class="x" data-i="${i}">×</button></figure>`).join("");
-  $$("#thumbs .x").forEach(b=>b.onclick=()=>{photos.splice(+b.dataset.i,1);renderThumbs();});
+  $("#thumbs").innerHTML=photos.map((f,i)=>{
+    const g=grades[f._gmid];
+    const cls=g?(g.v==='r'?'rej':(g.v==='g'?'chk':'')):'';
+    const badge=g?`<span class="badge ${g.v}" title="${(g.reasons&&g.reasons.length?g.reasons.join(' · '):'Looks good')}">${g.label}</span>`:`<span class="badge p">checking…</span>`;
+    return `<figure class="${cls}"><img src="${f._url}"><button class="x" data-i="${i}">×</button>${badge}</figure>`;
+  }).join("");
+  $$("#thumbs .x").forEach(b=>b.onclick=()=>{ const f=photos[+b.dataset.i]; if(f&&f._url)URL.revokeObjectURL(f._url); if(f)delete grades[f._gmid]; photos.splice(+b.dataset.i,1); renderThumbs(); renderGrade(); });
   const ok=photos.length>=CFG.min_photos;
-  $("#trainBtn").disabled=!ok;
-  $("#upMsg").innerHTML= photos.length? `${photos.length} photo${photos.length>1?"s":""} added${ok?' <span class="ok">— ready to train</span>':` — add ${CFG.min_photos-photos.length} more`}` : "";
+  $("#uploadBtn").disabled=!ok;
+  $("#upMsg").innerHTML= photos.length? `${photos.length} photo${photos.length>1?"s":""} added${ok?'':` — add ${CFG.min_photos-photos.length} more`}` : "";
 }
-$("#trainBtn").onclick=async()=>{
+// ---------- client-side photo grader (instant, private, no upload needed) ----------
+function analyzePhoto(file){
+  return new Promise(res=>{
+    const img=new Image();
+    img.onload=async()=>{
+      const w=img.naturalWidth,h=img.naturalHeight,short=Math.min(w,h);
+      const reasons=[]; let score=100;
+      if(short<640){reasons.push('Low resolution — likely a screenshot');score-=55;}
+      else if(short<1000){reasons.push('A little low-res');score-=16;}
+      try{
+        const S=200,cv=document.createElement('canvas');cv.width=S;cv.height=S;
+        const cx=cv.getContext('2d',{willReadFrequently:true}); cx.drawImage(img,0,0,S,S);
+        const d=cx.getImageData(0,0,S,S).data, lum=new Float32Array(S*S); let mean=0;
+        for(let p=0,q=0;p<d.length;p+=4,q++){const g=0.299*d[p]+0.587*d[p+1]+0.114*d[p+2];lum[q]=g;mean+=g;}
+        mean/=lum.length;
+        let lv=0,ln=0;
+        for(let y=1;y<S-1;y++)for(let x=1;x<S-1;x++){const i=y*S+x;const l=4*lum[i]-lum[i-1]-lum[i+1]-lum[i-S]-lum[i+S];lv+=l*l;ln++;}
+        lv/=ln;
+        if(mean<38){reasons.push('Very dark');score-=24;} else if(mean>230){reasons.push('Overexposed');score-=20;}
+        if(lv<10){reasons.push('Looks blurry / soft');score-=30;}
+      }catch(e){}
+      if('FaceDetector' in window){
+        try{
+          const faces=await new window.FaceDetector({fastMode:true,maxDetectedFaces:5}).detect(img);
+          if(faces.length===0){reasons.push('No clear face detected');score-=40;}
+          else if(faces.length>1){reasons.push(faces.length+' people — use solo photos');score-=42;}
+          else{const bb=faces[0].boundingBox,frac=(bb.width*bb.height)/(w*h);
+            if(frac<0.02){reasons.push('Face is small/far — crop in closer');score-=28;}
+            else if(frac<0.05){reasons.push('Face a bit small in frame');score-=12;}}
+        }catch(e){}
+      }
+      let v,label;
+      if(score>=80){v='g';label='✓ Great';} else if(score>=55){v='y';label='! Okay';} else {v='r';label='✕ Replace';}
+      res({v,label,reasons,w,h});
+    };
+    img.onerror=()=>res({v:'y',label:'! Okay',reasons:['Could not read this file'],w:0,h:0});
+    img.src=file._url||URL.createObjectURL(file);
+  });
+}
+function renderGrade(){
+  const el=$("#pmGrade");
+  if(!photos.length){el.classList.add("hidden");return;}
+  el.classList.remove("hidden");
+  const done=photos.filter(f=>grades[f._gmid]);
+  if(done.length<photos.length){ el.innerHTML=`<div class="h">Checking your photos… (${done.length}/${photos.length})</div>`; return; }
+  const g=done.filter(f=>grades[f._gmid].v==='g').length;
+  const y=done.filter(f=>grades[f._gmid].v==='y').length;
+  const r=done.filter(f=>grades[f._gmid].v==='r').length;
+  const pct=Math.round((g+0.5*y)/photos.length*100);
+  const color=pct>=75?'#57e0a8':pct>=45?'#ffd97a':'#ff6f8a';
+  const issues={}; done.forEach(f=>{const gr=grades[f._gmid]; if(gr.v!=='g')(gr.reasons||[]).forEach(x=>issues[x]=(issues[x]||0)+1);});
+  const top=Object.entries(issues).sort((a,b)=>b[1]-a[1]).slice(0,3);
+  const head=(r===0&&y<=1)?`<span class="ok">Your photos look great!</span> ${g} of ${photos.length} are ideal.`
+    :`${g} look great`+(y?` · ${y} okay`:'')+(r?` · <span style="color:var(--bad)">${r} to replace</span>`:'')+`.`;
+  el.innerHTML=`<div class="h">${head}</div><div class="pmbar"><i style="width:${pct}%;background:${color}"></i></div>`+
+    (top.length?`<ul>`+top.map(t=>`<li>${t[0]}${t[1]>1?` <span style="color:var(--faint)">(${t[1]})</span>`:''}</li>`).join('')+`</ul>`:'')+
+    `<div class="tip">${r?'Tap the ✕ on a red photo to swap it for a better one. ':''}<a href="/studio-you/photo-tips" target="_blank">What makes a good photo? →</a></div>`;
+}
+$("#uploadBtn").onclick=async()=>{
   const age=parseInt($("#ageInput").value,10);
-  if(!age||age<1){ $("#upMsg").innerHTML='<span class="err">Please enter the age.</span>'; $("#ageInput").focus(); return; }
-  $("#trainBtn").disabled=true; $("#upMsg").textContent="Zipping your photos…";
+  if(!age||age<1){ $("#upMsg").innerHTML='<span class="err">Please enter the approximate age.</span>'; $("#ageInput").focus(); return; }
+  $("#uploadBtn").disabled=true;
   try{
-    const zip=new JSZip(); photos.forEach((f,i)=>zip.file(`p${String(i).padStart(2,"0")}_${(f.name||"photo").replace(/[^\w.\-]+/g,"")}`,f));
-    const blob=await zip.generateAsync({type:"blob"});
-    $("#upMsg").textContent="Uploading…";
-    const fd=new FormData(); fd.append("file",new File([blob],"photos.zip",{type:"application/zip"}));
-    const up=await api("/api/upload",{method:"POST",body:fd}).then(r=>r.json());
-    if(!up.ok){ throw new Error(up.message||"upload failed"); }
-    const zurl=location.origin+up.url;
-    $("#upMsg").textContent="Starting training…";
-    const tr=await jpost("/api/studio/train",{images_zip_url:zurl,age,hair_color:$("#hairInput").value.trim(),source_count:photos.length});
-    if(!tr.ok){ throw new Error(tr.message||tr.error||"training failed"); }
-    setStep(2); show("stepTrain"); pollTrain();
-  }catch(e){ $("#upMsg").innerHTML='<span class="err">'+(e.message||"Something went wrong — try again.")+'</span>'; $("#trainBtn").disabled=false; }
+    // Upload each reference photo individually and collect its URL (Nano Banana Pro uses reference photos — no training).
+    refUrls=[];
+    for(let i=0;i<photos.length;i++){
+      $("#upMsg").textContent=`Uploading photo ${i+1} of ${photos.length}…`;
+      const fd=new FormData(); fd.append("file",photos[i]);
+      const up=await api("/api/upload",{method:"POST",body:fd}).then(r=>r.json());
+      if(!up.ok||!up.url){ throw new Error(up.message||"upload failed"); }
+      refUrls.push(location.origin+up.url);
+    }
+    $("#upMsg").innerHTML='<span class="ok">Photos uploaded ✓</span>';
+    goLooks();
+  }catch(e){ $("#upMsg").innerHTML='<span class="err">'+(e.message||"Something went wrong — try again.")+'</span>'; $("#uploadBtn").disabled=false; }
 };
 
-/* ---------- STEP 2 ---------- */
-let trainPct=12;
-async function pollTrain(){
-  $("#trainBar").style.width=Math.min(92,trainPct)+"%"; trainPct+=6;
-  const st=await api("/api/studio/train/status").then(r=>r.json()).catch(()=>({}));
-  if(st&&st.status==="ready"){ $("#trainBar").style.width="100%"; $("#trainMsg").innerHTML='<span class="ok">Your model is ready!</span>'; setTimeout(()=>boot(),700); return; }
-  $("#trainMsg").textContent="Training… (this takes a few minutes)";
-  setTimeout(pollTrain,8000);
-}
-
-/* ---------- STEP 3 ---------- */
-async function startCreate(s){
-  show("stepCreate");
-  (s.session.looks||[]).forEach(l=>{ if(l.look_id) usedLook.add(l.look_id); addResult(l,true); });
-  updateCounter();
-  const d=await api("/api/studio/looks").then(r=>r.json()).catch(()=>({}));
-  LOOKS=(d&&d.looks)||[]; renderCats(); renderLooks("all");
-}
-function updateCounter(){ $("#looksCounter").textContent=`${looksUsed} / ${looksTotal} looks used`; }
+/* ---------- STEP 2 · PICK LOOKS (before training) ---------- */
 let curCat="all";
+async function goLooks(){
+  setStep(2); show("stepLooks");
+  if(!LOOKS.length){ const d=await api("/api/studio/looks").then(r=>r.json()).catch(()=>({})); LOOKS=(d&&d.looks)||[]; }
+  loadPacks(); renderCats(); renderLooks("all"); updatePick();
+}
 function renderCats(){
   const cats=["all",...[...new Set(LOOKS.map(l=>l.category).filter(Boolean))]];
   $("#cats").innerHTML=cats.map(c=>`<span class="cat ${c===curCat?"on":""}" data-c="${c}">${c==="all"?"All":c}</span>`).join("");
@@ -277,25 +398,134 @@ function renderCats(){
 function renderLooks(cat){
   const list=LOOKS.filter(l=>cat==="all"||l.category===cat);
   $("#looks").innerHTML=list.map(l=>`<div class="look" data-id="${l.id}"><div class="e">${l.emoji||"✨"}</div><div class="n">${l.name}</div></div>`).join("");
-  $$("#looks .look").forEach(el=>el.onclick=()=>createLook(el.dataset.id,el));
+  $$("#looks .look").forEach(el=>{
+    if(picks.has(el.dataset.id)) el.classList.add("sel");
+    el.onclick=()=>togglePick(el.dataset.id,el);
+  });
+  applyDisable();
 }
-async function createLook(look_id,el){
-  if(looksUsed>=looksTotal){ $("#createMsg").innerHTML='<span class="err">You\'ve used all your looks. Add more from your saved model any time.</span>'; return; }
-  el.style.opacity=.5; $("#createMsg").textContent="Creating your photo… (about a minute)";
-  const r=await jpost("/api/studio/look",{look_id});
-  el.style.opacity=1;
-  if(!r.ok){ $("#createMsg").innerHTML='<span class="err">'+(r.message||r.error||"Couldn\'t create that one.")+'</span>'; return; }
-  looksUsed=r.looks_used||looksUsed+1; updateCounter(); $("#createMsg").innerHTML='<span class="ok">Done — added to your photos + Vault.</span>';
-  addResult(r.look,false);
+function packLookCount(){ return PACKS.filter(p=>packState[p.id]).reduce((n,p)=>n+p.looks.length,0); }
+function totalPicks(){ return picks.size + customLooks.length + packLookCount(); }
+/* ---- Pick a Pack ---- */
+async function loadPacks(){
+  if(PACKS.length){ renderPacks(); return; }
+  const d=window.GM_PACKS||await api("/assets/studio-you/packs.json").then(r=>r.json()).catch(()=>({packs:[]}));
+  PACKS=(d&&d.packs)||[]; renderPacks();
 }
-function addResult(look,existing){
-  if(!look||!look.url) return;
-  const name=(look.look_name||"Studio look");
-  const div=document.createElement("div"); div.className="res";
-  div.innerHTML=`<img src="${look.url}"><div class="b"><span class="cap">${name}</span>`+
-    `<button class="mini" data-dl>Download</button></div>`;
-  div.querySelector("[data-dl]").onclick=()=>{ const a=document.createElement("a"); const sep=look.url.includes("?")?"&":"?"; a.href=look.url+sep+"download=1&name="+encodeURIComponent(name.replace(/[^\w \-]+/g,"")); document.body.appendChild(a); a.click(); a.remove(); };
-  $("#results").prepend(div);
+function packImg(pid,lid){ return `/assets/studio-you/packs/${pid}/${lid}.jpg`; }
+function renderPacks(){
+  const el=$("#packGrid"); if(!el) return;
+  el.innerHTML=PACKS.map(p=>`<div class="pack ${packState[p.id]?'sel':''}" data-pk="${p.id}">
+    <div class="packhero" data-heropk="${p.id}"><img id="hero-${p.id}" src="${packImg(p.id,p.looks[0].id)}" alt="${p.name}"><span class="lbl">${p.emoji} ${p.name}</span></div>
+    <div class="packbody"><div class="bl">${p.blurb}</div>
+      <div class="packsubs">${p.looks.map((l,i)=>`<div class="packsub ${i===0?'on':''}" data-pk="${p.id}" data-li="${i}"><img src="${packImg(p.id,l.id)}"><div class="sn">${l.name}</div></div>`).join('')}</div>
+      <div class="packadd"><button class="btn ${packState[p.id]?'':'ghost'}" data-addpk="${p.id}">${packState[p.id]?'✓ Added':'✦ Add this pack'}</button><span class="note" style="font-size:.75rem">${p.looks.length} looks · certified</span></div>
+    </div></div>`).join('');
+  $$('#packGrid .packsub').forEach(s=>s.onclick=(e)=>{ e.stopPropagation(); const pk=s.dataset.pk,li=+s.dataset.li,p=PACKS.find(x=>x.id===pk); $('#hero-'+pk).src=packImg(pk,p.looks[li].id); $$(`#packGrid .packsub[data-pk="${pk}"]`).forEach(x=>x.classList.toggle('on',+x.dataset.li===li)); });
+  $$('#packGrid .packhero').forEach(h=>h.onclick=()=>{ const img=h.querySelector('img'); $('#plightImg').src=img.src; $('#plight').classList.add('on'); });
+  $$('#packGrid [data-addpk]').forEach(b=>b.onclick=()=>togglePack(b.dataset.addpk));
+}
+function togglePack(pid){
+  const p=PACKS.find(x=>x.id===pid); if(!p) return;
+  if(packState[pid]){ packState[pid]=false; }
+  else { if(totalPicks()+p.looks.length>looksTotal){ $("#pickMsg").innerHTML=`<span class="err">Not enough looks left for the ${p.name} pack (needs ${p.looks.length}). Remove something or pick a smaller pack.</span>`; return; } packState[pid]=true; }
+  renderPacks(); updatePick();
+}
+$("#plight").onclick=()=>$("#plight").classList.remove('on');
+function togglePick(id,el){
+  if(picks.has(id)){ picks.delete(id); el.classList.remove("sel"); }
+  else{ if(totalPicks()>=looksTotal){ $("#pickMsg").innerHTML='<span class="err">That\'s your '+looksTotal+' — remove one to swap.</span>'; return; } picks.add(id); el.classList.add("sel"); }
+  updatePick();
+}
+function applyDisable(){ const full=totalPicks()>=looksTotal; $$("#looks .look").forEach(el=>el.classList.toggle("dis",full&&!picks.has(el.dataset.id))); }
+/* ---- custom "your own idea" looks ---- */
+function renderCustom(){
+  $("#customList").innerHTML=customLooks.map((c,i)=>`<span class="cat on" style="cursor:default">✨ ${c.prompt.length>40?c.prompt.slice(0,40)+"…":c.prompt} <b data-ci="${i}" style="cursor:pointer;margin-left:4px">×</b></span>`).join("");
+  $$("#customList b[data-ci]").forEach(b=>b.onclick=()=>{ customLooks.splice(+b.dataset.ci,1); renderCustom(); updatePick(); });
+}
+function addCustom(){
+  const t=$("#customInput").value.trim();
+  if(!t){ return; }
+  if(totalPicks()>=looksTotal){ $("#pickMsg").innerHTML='<span class="err">That\'s your '+looksTotal+' — remove one to add your idea.</span>'; return; }
+  customLooks.push({name:"Your idea",prompt:t}); $("#customInput").value="";
+  renderCustom(); updatePick();
+}
+$("#customAdd").onclick=addCustom;
+$("#customInput").addEventListener("keydown",e=>{ if(e.key==="Enter"){ e.preventDefault(); addCustom(); }});
+function updatePick(){
+  const n=totalPicks();
+  $("#looksCounter").textContent=`${n} / ${looksTotal} selected`;
+  $("#looksBtn").disabled=n<1;
+  $("#looksBtn").textContent=n?`Continue with ${n} →`:"Continue →";
+  if(n&&n<looksTotal) $("#pickMsg").innerHTML=`Pick up to <b style="color:var(--ink)">${looksTotal-n}</b> more — or continue now.`;
+  else if(n>=looksTotal) $("#pickMsg").innerHTML='<span class="ok">All '+looksTotal+' chosen — ready to go!</span>';
+  else $("#pickMsg").textContent="";
+  applyDisable();
+}
+$("#looksBtn").onclick=()=>{ if(totalPicks()<1) return; goNotify(); };
+
+/* ---------- STEP 3 · NOTIFY ---------- */
+function goNotify(){
+  setStep(3); show("stepNotify");
+  if(curEmail && !$("#notifyEmail").value) $("#notifyEmail").value=curEmail;
+}
+$("#notifyBack").onclick=()=>goLooks();
+$("#startBtn").onclick=async()=>{
+  const email=$("#notifyEmail").value.trim(), phone=$("#notifyPhone").value.trim();
+  if(!email||!/.+@.+\..+/.test(email)){ $("#notifyMsg").innerHTML='<span class="err">Please enter a valid email so we can reach you.</span>'; $("#notifyEmail").focus(); return; }
+  $("#startBtn").disabled=true; $("#notifyMsg").textContent="Starting your photos…";
+  const age=parseInt($("#ageInput").value,10)||null;
+  // pack looks ride the custom-look path with a "play" tier (cheap standard model)
+  const packCustom=[];
+  PACKS.filter(p=>packState[p.id]).forEach(p=>p.looks.forEach(l=>packCustom.push({name:p.name+" · "+l.name,prompt:l.prompt,tier:"play"})));
+  const allCustom=[...customLooks.map(c=>({name:c.name,prompt:c.prompt,tier:"studio"})),...packCustom];
+  const r=await jpost("/api/studio/start",{
+    ref_urls:refUrls, age, hair_color:$("#hairInput").value.trim(),
+    look_ids:[...picks], custom_looks:allCustom, source_count:photos.length,
+    notify_email:email, notify_phone:phone
+  });
+  if(!r.ok){ $("#notifyMsg").innerHTML='<span class="err">'+(r.message||r.error||"Couldn\'t start — try again.")+'</span>'; $("#startBtn").disabled=false; return; }
+  showProcessing({total:r.looks,done:0,notified:false,notify_email:r.notify_email,notify_phone:r.notify_phone});
+};
+
+/* ---------- STEP 4 · PROCESSING (async, poll for progress) ---------- */
+let procTimer=null;
+function showProcessing(job){
+  setStep(3); show("stepProcessing");
+  const total=job.total||picks.size||looksTotal;
+  const to=[]; if(job.notify_email) to.push('<b style="color:var(--ink)">'+job.notify_email+'</b>'); if(job.notify_phone) to.push('a text to <b style="color:var(--ink)">'+job.notify_phone+'</b>');
+  const dest= to.length? to.join(" and ") : "you";
+  if(job.notified){
+    $("#procLead").innerHTML='<span class="ok">All done — your photos are ready in your Vault!</span>';
+    $("#procBar").style.width="100%";
+    $("#procMsg").textContent="";
+  }else{
+    $("#procLead").innerHTML=`We're creating your <b style="color:var(--ink)">${total} photo${total>1?"s":""}</b> now — each one rendered as you, one by one. This usually takes just <b style="color:var(--ink)">a few minutes</b>.`;
+  }
+  $("#procPerks").innerHTML=
+    `✦ <b style="color:var(--ink)">We'll notify ${dest}</b> the moment they're ready — no need to wait here.<br>`+
+    `✦ <b style="color:var(--ink)">Safe to close this tab</b> — everything runs on our servers. Reboot, lose signal, whatever; it keeps going.<br>`+
+    `✦ Each photo is <b style="color:var(--ink)">high-resolution</b>, <b style="color:var(--ink)">GenieMade-certified</b> and submitted <b style="color:var(--ink)">free to EverVerify.org</b>.<br>`+
+    `✦ Your uploaded photos are <b style="color:var(--ink)">saved in your account</b> — no need to re-upload next time.`;
+  if(procTimer) clearInterval(procTimer);
+  if(!job.notified){ pollProcessing(); procTimer=setInterval(pollProcessing,15000); }
+}
+async function pollProcessing(){
+  const s=await api("/api/studio/session").then(r=>r.json()).catch(()=>({}));
+  const job=s&&s.model&&s.model.job;
+  if(!job){ return; }
+  const pct=job.total? Math.round(30+ (job.done/job.total)*70) : 40;
+  $("#procBar").style.width=Math.min(100,pct)+"%";
+  if(job.notified){
+    if(procTimer)clearInterval(procTimer);
+    $("#procBar").style.width="100%";
+    $("#procLead").innerHTML='<span class="ok">All done — your '+(job.total||"")+' photos are ready!</span>';
+    $("#procMsg").innerHTML='They\'re waiting in <a href="/app" style="color:var(--gold2)">your Vault</a>, full-res and certified.';
+  }else if(job.done>0){
+    $("#procMsg").textContent=`${job.done} of ${job.total} created so far…`;
+  }else{
+    $("#procMsg").textContent="Creating your photos…";
+  }
 }
 boot();
 </script>

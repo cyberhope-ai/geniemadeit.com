@@ -1,0 +1,14 @@
+{"packs":[
+{"id":"movie-posters","name":"Blockbuster Posters","emoji":"🖼️","blurb":"Headline your own blockbuster — dramatic movie-poster art with your name in lights.","looks":[
+ {"id":"action-hero","name":"Action Hero","prompt":"a dramatic blockbuster action-movie poster, standing heroically before explosions and a city skyline, bold fictional movie title and credits at the bottom, cinematic teal-and-orange"},
+ {"id":"romance-poster","name":"Romance Epic","prompt":"a sweeping romance-movie poster, soft golden dreamy lighting, elegant, a fictional romantic movie title in elegant script"},
+ {"id":"scifi-poster","name":"Sci-Fi Epic","prompt":"an epic science-fiction movie poster, futuristic world with spaceships and glowing planets, dramatic, a bold fictional sci-fi title"}]},
+{"id":"memes","name":"Meme Legends","emoji":"😂","blurb":"Become the meme — the internet's most relatable moments, starring you.","looks":[
+ {"id":"success","name":"Success!","prompt":"a triumphant success-celebration meme, clenched fist of victory with a determined proud grin, plain bright background, meme style"},
+ {"id":"this-is-fine","name":"This Is Fine","prompt":"sitting calmly with a small smile at a table in a room full of cartoonish flames, ironically relaxed, funny meme style"},
+ {"id":"dramatic-look","name":"The Dramatic Look","prompt":"an intense dramatic side-eye zoom-in reaction, suspicious raised eyebrow, exaggerated funny meme style"}]},
+{"id":"exotic-cars","name":"Exotic Dream Cars","emoji":"🚗","blurb":"Live the fantasy — posing with the rarest, most exotic supercars on earth.","looks":[
+ {"id":"supercar","name":"The Supercar","prompt":"standing confidently beside a sleek exotic red supercar on a scenic coastal road at golden hour, luxury lifestyle, no visible brand logos"},
+ {"id":"classic-roadster","name":"Classic Roadster","prompt":"posing with an elegant vintage classic convertible roadster in front of a grand mansion, timeless luxury, no brand logos"},
+ {"id":"hypercar-garage","name":"Hypercar Garage","prompt":"beside a futuristic matte-black hypercar in a sleek modern glass garage, dramatic showroom lighting, no brand logos"}]}
+]}

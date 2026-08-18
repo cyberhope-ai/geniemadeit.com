@@ -1,0 +1,102 @@
+{"packs":[
+{"id":"pro-headshots","name":"Professional Headshots","emoji":"💼","tier":"studio","blurb":"Polished, photoreal headshots for LinkedIn, your website, or the whole team.","looks":[
+ {"id":"studio-classic","name":"Studio Classic","prompt":"a professional corporate headshot in a tailored suit, clean neutral studio background, confident friendly expression"},
+ {"id":"modern-office","name":"Modern Office","prompt":"a professional headshot in smart business attire in a bright modern office with soft window light"},
+ {"id":"executive","name":"Executive","prompt":"a powerful executive portrait in a dark suit, dramatic soft studio lighting, confident and approachable"}]},
+{"id":"realtor","name":"Real Estate Pro","emoji":"🏡","tier":"studio","blurb":"Trustworthy agent portraits that sell — for signs, cards and listings.","looks":[
+ {"id":"agent-headshot","name":"Agent Headshot","prompt":"a friendly professional real estate agent headshot in business casual, warm approachable smile, clean background"},
+ {"id":"in-front-of-home","name":"In Front of a Home","prompt":"a professional realtor standing confidently in front of a beautiful suburban home, bright daylight"},
+ {"id":"luxury-listing","name":"Luxury Listing","prompt":"an upscale real estate agent portrait in an elegant modern luxury home interior"}]},
+{"id":"healthcare","name":"Healthcare Heroes","emoji":"🩺","tier":"studio","blurb":"Warm, credible portraits for doctors, nurses and caregivers.","looks":[
+ {"id":"doctor-coat","name":"In the White Coat","prompt":"a caring doctor in a clean white coat with a stethoscope, warm reassuring smile, bright clinic background"},
+ {"id":"nurse","name":"Compassionate Nurse","prompt":"a friendly nurse in scrubs in a bright hospital, kind and reassuring expression"},
+ {"id":"surgeon","name":"Surgeon","prompt":"a confident surgeon in surgical scrubs and cap, professional medical setting"}]},
+{"id":"fitness","name":"Fitness & Strong","emoji":"💪","tier":"play","blurb":"Show off the hard work — athletic, energetic, magazine-cover strong.","looks":[
+ {"id":"gym-power","name":"Gym Power","prompt":"an athletic fitness portrait in workout gear in a modern gym, strong confident pose, dramatic lighting"},
+ {"id":"outdoor-runner","name":"Outdoor Runner","prompt":"an energetic runner mid-stride on a scenic trail at golden hour, athletic and determined"},
+ {"id":"magazine-cover","name":"Cover Athlete","prompt":"a fitness magazine cover style portrait, toned and confident, bold studio lighting"}]},
+{"id":"glamour","name":"Glamour & Vogue","emoji":"✨","tier":"play","blurb":"High-fashion, red-carpet ready — your most glamorous self.","looks":[
+ {"id":"vogue-cover","name":"Vogue Cover","prompt":"a high-fashion vogue magazine cover portrait, elegant styling, dramatic beauty lighting"},
+ {"id":"red-carpet","name":"Red Carpet","prompt":"a glamorous red-carpet portrait in stunning evening wear, flashing camera bokeh"},
+ {"id":"golden-glam","name":"Golden Glam","prompt":"a luxurious golden-hour glamour portrait, soft warm elegant lighting, radiant"}]},
+{"id":"wedding","name":"Wedding Day","emoji":"💍","tier":"play","blurb":"Bridal and groom portraits — timeless, romantic, keepsake-worthy (solo).","looks":[
+ {"id":"bridal-solo","name":"Bridal Portrait","prompt":"an elegant solo bridal portrait in a beautiful white wedding dress holding a bouquet, soft romantic light"},
+ {"id":"groom-solo","name":"Groom Portrait","prompt":"a sharp solo groom portrait in a classic tuxedo with boutonniere, warm elegant lighting"},
+ {"id":"garden-vows","name":"Garden Vows","prompt":"a romantic solo wedding portrait in a lush blooming garden, dreamy soft focus"}]},
+{"id":"space","name":"Space & Sci-Fi","emoji":"🚀","tier":"play","blurb":"Blast off — astronaut, starship captain, and far-future explorer.","looks":[
+ {"id":"astronaut","name":"Astronaut","prompt":"an astronaut in a detailed white spacesuit, helmet under arm, stars and Earth behind, cinematic"},
+ {"id":"starship-captain","name":"Starship Captain","prompt":"a confident starship captain on a futuristic bridge with glowing controls and viewscreen of space"},
+ {"id":"cyber-explorer","name":"Cyber Explorer","prompt":"a futuristic explorer in sleek high-tech armor on an alien world, neon sci-fi atmosphere"}]},
+{"id":"superhero","name":"Superheroes","emoji":"🦸","tier":"play","blurb":"Suit up — caped crusader, armored hero, or comic-book legend.","looks":[
+ {"id":"caped-hero","name":"Caped Hero","prompt":"a heroic caped superhero in a sleek suit flying over a city skyline at sunset, dynamic and powerful"},
+ {"id":"armored-hero","name":"Armored Hero","prompt":"a powerful armored superhero in high-tech metal armor, glowing energy, epic pose"},
+ {"id":"comic-legend","name":"Comic Legend","prompt":"a bold comic-book superhero in classic costume, dynamic comic art style, city backdrop"}]},
+{"id":"fantasy","name":"Fantasy Realm","emoji":"🧙","tier":"play","blurb":"Wizards, elves and epic magic — step into the legend.","looks":[
+ {"id":"grand-wizard","name":"Grand Wizard","prompt":"a powerful wizard in ornate star-patterned robes casting a glowing spell, swirling magical aura, epic"},
+ {"id":"elf-royalty","name":"Elf Royalty","prompt":"an elegant elven royal in an enchanted forest with flowing silver robes, ethereal glow"},
+ {"id":"dragon-rider","name":"Dragon Rider","prompt":"a brave dragon rider in leather armor before a majestic dragon and mountains, cinematic fantasy"}]},
+{"id":"warriors","name":"Warriors & Legends","emoji":"⚔️","tier":"play","blurb":"Viking, samurai, gladiator — forged in battle.","looks":[
+ {"id":"viking","name":"Viking","prompt":"a fierce Viking warrior in fur and iron armor with braided hair, dramatic norse landscape"},
+ {"id":"samurai","name":"Samurai","prompt":"a disciplined samurai in traditional armor holding a katana, cherry blossoms, cinematic"},
+ {"id":"gladiator","name":"Gladiator","prompt":"a mighty gladiator in leather and bronze armor in a roman colosseum, epic dramatic light"}]},
+{"id":"pirates","name":"Pirate Adventure","emoji":"🏴‍☠️","tier":"play","blurb":"Ahoy — swashbuckling captain of the high seas.","looks":[
+ {"id":"captain","name":"Pirate Captain","prompt":"a bold pirate captain in a tricorn hat and coat on a ship deck, ocean and sails behind, adventurous"},
+ {"id":"treasure","name":"Treasure Hunter","prompt":"a swashbuckling pirate in a cave of golden treasure, torchlight, adventurous grin"},
+ {"id":"stormy-seas","name":"Stormy Seas","prompt":"a daring pirate at the helm in a dramatic ocean storm, cinematic and epic"}]},
+{"id":"christmas","name":"Christmas Magic","emoji":"🎄","tier":"play","blurb":"Cozy, festive holiday portraits — the perfect Christmas card.","looks":[
+ {"id":"christmas-card","name":"Christmas Card","prompt":"a cozy festive Christmas portrait by a decorated tree in a warm holiday sweater, twinkling lights"},
+ {"id":"winter-wonderland","name":"Winter Wonderland","prompt":"a magical winter portrait in gently falling snow with warm coat and scarf, soft festive glow"},
+ {"id":"santa-workshop","name":"Santa's Workshop","prompt":"a whimsical festive portrait in a cozy Santa's workshop full of gifts and warm lights"}]},
+{"id":"halloween","name":"Halloween Spooky","emoji":"🎃","tier":"play","blurb":"Costumes and spooky scenes — frightfully fun.","looks":[
+ {"id":"vampire","name":"Elegant Vampire","prompt":"an elegant gothic vampire in a dramatic dark castle, moody candlelight, mysterious"},
+ {"id":"witch","name":"Bewitching Witch","prompt":"a bewitching witch with a glowing spellbook and pumpkins, misty spooky atmosphere"},
+ {"id":"pumpkin-patch","name":"Pumpkin Patch","prompt":"a fun autumn portrait in a pumpkin patch at dusk with festive halloween decorations"}]},
+{"id":"vintage","name":"Vintage Decades","emoji":"📻","tier":"play","blurb":"Time-travel through the styles — 20s, 50s, 70s and 80s.","looks":[
+ {"id":"gatsby-1920s","name":"1920s Gatsby","prompt":"a glamorous 1920s Great Gatsby style portrait in art-deco attire, sepia elegance"},
+ {"id":"rockabilly-50s","name":"1950s Rockabilly","prompt":"a retro 1950s rockabilly style portrait, vintage diner, classic americana"},
+ {"id":"disco-70s","name":"1970s Disco","prompt":"a groovy 1970s disco portrait in shiny attire under a mirror ball, colorful lights"}]},
+{"id":"travel","name":"Around the World","emoji":"✈️","tier":"play","blurb":"Iconic destinations — Paris, Tokyo, tropical beaches and more.","looks":[
+ {"id":"paris","name":"Paris","prompt":"a stylish travel portrait in front of the Eiffel Tower in Paris on a bright day, chic"},
+ {"id":"tokyo","name":"Tokyo Nights","prompt":"a vibrant travel portrait in neon-lit Tokyo streets at night, cinematic city energy"},
+ {"id":"tropical-beach","name":"Tropical Beach","prompt":"a relaxed travel portrait on a stunning tropical beach at golden hour, turquoise water"}]},
+{"id":"country","name":"Country & Western","emoji":"🤠","tier":"play","blurb":"Boots, hats and wide-open ranges — pure western.","looks":[
+ {"id":"cowboy","name":"Classic Cowboy","prompt":"a rugged cowboy in a hat and denim on a western ranch at golden hour, warm cinematic"},
+ {"id":"rodeo","name":"Rodeo Star","prompt":"a confident rodeo star in western wear at a dusty arena, dramatic light"},
+ {"id":"country-music","name":"Country Star","prompt":"a country music star with a guitar on a barn-lit stage, warm nashville vibe"}]},
+{"id":"rockstar","name":"Rockstar & Music","emoji":"🎸","tier":"play","blurb":"Take the stage — rock, pop and full concert energy.","looks":[
+ {"id":"rock-concert","name":"Rock Concert","prompt":"a rockstar with a guitar on stage under blazing concert lights, cheering crowd, energetic"},
+ {"id":"pop-star","name":"Pop Star","prompt":"a dazzling pop star performing under colorful stage lights, glamorous and dynamic"},
+ {"id":"album-cover","name":"Album Cover","prompt":"a moody artistic music album cover style portrait, dramatic creative lighting"}]},
+{"id":"graduation","name":"Graduation Glory","emoji":"🎓","tier":"play","blurb":"Celebrate the milestone — cap, gown and proud smiles.","looks":[
+ {"id":"cap-and-gown","name":"Cap & Gown","prompt":"a proud graduate in cap and gown holding a diploma on a beautiful campus, sunny day"},
+ {"id":"cap-toss","name":"Cap Toss","prompt":"a joyful graduate tossing the graduation cap in the air, confetti, celebratory"},
+ {"id":"honor-portrait","name":"Honor Portrait","prompt":"an elegant formal graduation portrait with honor cords, warm studio light"}]},
+{"id":"beach","name":"Beach & Summer","emoji":"🏖️","tier":"play","blurb":"Sun, surf and golden-hour glow — summer at its best.","looks":[
+ {"id":"golden-shore","name":"Golden Shore","prompt":"a relaxed summer portrait on a sunny beach at golden hour, warm glowing light, ocean behind"},
+ {"id":"surfs-up","name":"Surf's Up","prompt":"a fun beach portrait with a surfboard by rolling waves, bright summer energy"},
+ {"id":"seaside-stroll","name":"Seaside Stroll","prompt":"a breezy seaside portrait walking along the shore at sunset, carefree"}]},
+{"id":"retro-arcade","name":"Retro Arcade","emoji":"🕹️","tier":"play","blurb":"Step into the classics — pixels, neon and high scores.","looks":[
+ {"id":"inside-the-game","name":"Inside the Game","prompt":"as a small pixel-art character standing inside a colorful retro 8-bit arcade video game screen, high score display"},
+ {"id":"neon-arcade","name":"Neon Arcade","prompt":"posing in a neon-lit 1980s arcade surrounded by glowing arcade cabinets, vibrant retro"},
+ {"id":"pixel-hero","name":"Pixel Hero","prompt":"as a heroic 16-bit pixel-art game character in a side-scroller video game world with coins and platforms"}]},
+{"id":"business-power","name":"Boss Energy","emoji":"👔","tier":"studio","blurb":"Command the room — founder, CEO, power-suit portraits.","looks":[
+ {"id":"founder","name":"Startup Founder","prompt":"a confident startup founder in smart-casual attire in a modern creative office, approachable and sharp"},
+ {"id":"power-suit","name":"Power Suit","prompt":"a commanding power-suit portrait, sleek corporate setting, confident authoritative pose"},
+ {"id":"magazine-exec","name":"Cover Exec","prompt":"a business-magazine cover style executive portrait, bold dramatic professional lighting"}]},
+{"id":"artist","name":"Creative Soul","emoji":"🎨","tier":"play","blurb":"For makers and dreamers — painter, author, film director.","looks":[
+ {"id":"painter","name":"Painter","prompt":"an inspired artist in a sunlit studio surrounded by paintings and brushes, creative and warm"},
+ {"id":"author","name":"Author","prompt":"a thoughtful author in a cozy book-lined library, warm intellectual atmosphere"},
+ {"id":"director","name":"Film Director","prompt":"a visionary film director on a cinematic movie set with lights and camera, creative energy"}]},
+{"id":"royalty","name":"Royalty & Crowns","emoji":"👑","tier":"play","blurb":"Take the throne — king, queen and timeless nobility.","looks":[
+ {"id":"monarch","name":"Royal Monarch","prompt":"a regal monarch in a jeweled crown and royal robes on an ornate throne, opulent palace"},
+ {"id":"renaissance","name":"Renaissance Noble","prompt":"an elegant renaissance noble in rich period attire, old-master painting style lighting"},
+ {"id":"egyptian","name":"Egyptian Royalty","prompt":"a majestic ancient Egyptian pharaoh in gold regalia in a torchlit temple, cinematic"}]},
+{"id":"cartoon","name":"Cartoon & Anime","emoji":"🧸","tier":"play","blurb":"Become animated — 3D cartoon, anime and comic styles.","looks":[
+ {"id":"3d-cartoon","name":"3D Cartoon","prompt":"as a charming 3D animated Pixar-style cartoon character in a bright colorful animated scene"},
+ {"id":"anime","name":"Anime Hero","prompt":"as a vibrant anime character with expressive style in a dynamic anime scene"},
+ {"id":"comic-strip","name":"Comic Strip","prompt":"as a bold comic-book character with ink outlines and halftone shading, comic panel style"}]},
+{"id":"pets","name":"Me & My Pet","emoji":"🐾","tier":"play","blurb":"A charming portrait with an adorable furry friend.","looks":[
+ {"id":"with-a-dog","name":"With a Puppy","prompt":"a warm heartwarming portrait holding an adorable happy puppy, soft natural light"},
+ {"id":"with-a-cat","name":"With a Kitten","prompt":"a cozy portrait cuddling a cute fluffy kitten, warm gentle light"},
+ {"id":"walk-in-park","name":"Walk in the Park","prompt":"a cheerful portrait walking a friendly dog in a sunny park, golden hour"}]}
+]}

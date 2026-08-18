@@ -1,0 +1,23 @@
+{"packs":[
+{"id":"adventurer","name":"Adventurer","emoji":"🗺️","face":"m3","blurb":"Chase the legend — treasure hunter, jungle explorer, deep-sea diver and more.","looks":[
+ {"id":"treasure-hunter","name":"Treasure Hunter","prompt":"a rugged treasure-hunting adventurer in a fedora and leather jacket in an ancient torchlit temple, whip and satchel, cinematic"},
+ {"id":"jungle-explorer","name":"Jungle Explorer","prompt":"an intrepid explorer hacking through a lush misty jungle with vines and ancient ruins, adventurous"},
+ {"id":"deep-sea","name":"Deep-Sea Diver","prompt":"a deep-sea diver in gear among glowing bioluminescent creatures and a sunken shipwreck, underwater blue"},
+ {"id":"mountaineer","name":"Summit","prompt":"a triumphant mountaineer at a snowy peak above the clouds at sunrise, ice axe raised, epic"},
+ {"id":"safari","name":"Safari","prompt":"a khaki-clad safari explorer on the African savanna at golden hour with distant wildlife, warm cinematic"}]},
+{"id":"secret-agent","name":"Secret Agent","emoji":"🕵️","face":"f2","blurb":"License to dazzle — tuxedo spy, action agent, master of disguise.","looks":[
+ {"id":"tux-spy","name":"Tuxedo Spy","prompt":"a suave secret agent in an elegant tuxedo in a glamorous casino, cool confident, cinematic spy-film lighting"},
+ {"id":"action-agent","name":"Action Agent","prompt":"a daring action spy in tactical attire in a dramatic explosive action scene, dynamic, cinematic"},
+ {"id":"femme-fatale","name":"Femme Fatale","prompt":"a mysterious glamorous spy in an elegant gown in a moody noir setting, dramatic shadows"},
+ {"id":"rooftop-chase","name":"Rooftop Chase","prompt":"a secret agent in a sharp suit on a night-time city rooftop with a glittering skyline, cinematic tension"}]},
+{"id":"book-hero","name":"Book Cover Hero","emoji":"📖","face":"m2","blurb":"Headline your own bestseller — thriller, fantasy, romance or sci-fi cover.","looks":[
+ {"id":"thriller","name":"Thriller","prompt":"a dramatic mystery-thriller novel cover, brooding intense figure in shadow, bold fictional title and author name"},
+ {"id":"fantasy-epic","name":"Fantasy Epic","prompt":"an epic fantasy novel cover as a heroic figure with a sword before a mythical landscape, bold fictional title"},
+ {"id":"romance-novel","name":"Romance","prompt":"a sweeping romance novel cover, windswept and passionate golden light, elegant fictional title"},
+ {"id":"scifi-novel","name":"Sci-Fi","prompt":"a bold science-fiction novel cover as a hero before a futuristic world and starships, fictional title"}]},
+{"id":"dance-styles","name":"Dance Floor Legends","emoji":"💃","face":"f3","blurb":"Move like a pro — ballet, ballroom, breakdance and Latin fire.","looks":[
+ {"id":"ballet","name":"Ballet","prompt":"an elegant ballet dancer mid-pose in a flowing tutu on a grand stage under a soft spotlight, graceful"},
+ {"id":"ballroom","name":"Ballroom","prompt":"a glamorous ballroom dancer mid-twirl in a sparkling gown in an opulent ballroom, dynamic elegant"},
+ {"id":"breakdance","name":"Breakdance","prompt":"an energetic breakdancer mid-freeze on an urban street with graffiti, dynamic street-style"},
+ {"id":"latin","name":"Latin Fire","prompt":"a passionate Latin dancer mid-move in a fiery red outfit on a dramatic stage, vibrant and dynamic"}]}
+]}

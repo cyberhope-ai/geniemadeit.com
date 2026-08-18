@@ -1,0 +1,26 @@
+{"packs":[
+{"id":"wedding-romance","name":"Wedding & Romance","emoji":"💍","face":"f1","blurb":"Your fairytale romance — every dreamy moment.","looks":[
+ {"id":"wedding-glam","name":"The Big Day","prompt":"in elegant formal wedding attire at a beautiful flower-filled venue, radiant and joyful"},
+ {"id":"first-dance","name":"First Dance","prompt":"dancing joyfully under twinkling string lights at an elegant wedding reception, dreamy romantic glow"},
+ {"id":"engagement","name":"Engagement","prompt":"in a romantic engagement portrait pose in a golden sunset meadow, warm and happy"},
+ {"id":"honeymoon","name":"Honeymoon","prompt":"on a dreamy honeymoon on a tropical beach at sunset, relaxed and romantic"},
+ {"id":"vows","name":"The Vows","prompt":"in beautiful formal attire on a scenic clifftop overlooking the ocean, romantic and elegant"}]},
+{"id":"holiday-magic","name":"Holiday Magic","emoji":"🎄","face":"m2","blurb":"Season's greetings — a look for every holiday.","looks":[
+ {"id":"christmas","name":"Christmas","prompt":"by a beautifully decorated Christmas tree in a cozy festive living room with warm glowing lights, holiday cheer"},
+ {"id":"halloween","name":"Halloween","prompt":"in a fun playful Halloween costume amid glowing jack-o-lanterns and spooky decorations, festive"},
+ {"id":"valentine","name":"Valentine","prompt":"in a romantic Valentine setting surrounded by red roses and soft candlelight, warm and sweet"},
+ {"id":"new-year","name":"New Year","prompt":"celebrating New Year's Eve with sparklers and confetti under bright fireworks, festive and joyful"},
+ {"id":"thanksgiving","name":"Thanksgiving","prompt":"at a warm autumn Thanksgiving table with fall leaves and cozy harvest decor, grateful and cheerful"}]},
+{"id":"video-game-hero","name":"Video Game Hero","emoji":"🎮","face":"m3","blurb":"Press start — you're the playable character.","looks":[
+ {"id":"pixel-warrior","name":"Pixel Warrior","prompt":"as a heroic pixel-art video game warrior in a retro 8-bit fantasy landscape, colorful and nostalgic"},
+ {"id":"rpg-knight","name":"RPG Knight","prompt":"as an RPG fantasy knight in ornate armor in a magical video game world, epic game-art style"},
+ {"id":"arcade-racer","name":"Arcade Racer","prompt":"as an arcade racing game hero beside a bright cartoon race car on a stylized track, dynamic and fun"},
+ {"id":"fighter","name":"Fighting Champ","prompt":"as a fighting-game champion in a dramatic combat stance in a stylized arena, energetic game art"},
+ {"id":"mage","name":"Battle Mage","prompt":"as a powerful fantasy game mage casting glowing spells with vibrant magical effects, video-game style"}]},
+{"id":"underwater-world","name":"Underwater World","emoji":"🐠","face":"f2","blurb":"Dive in — explore the deep blue.","looks":[
+ {"id":"scuba","name":"Scuba Dive","prompt":"as a scuba diver swimming alongside playful dolphins in crystal-clear blue ocean, adventurous"},
+ {"id":"merfolk","name":"Merfolk","prompt":"as a graceful merperson with a shimmering tail among colorful coral, magical and dreamy"},
+ {"id":"deep-sea","name":"Deep-Sea Explorer","prompt":"as a deep-sea explorer in a diving suit exploring a mysterious glowing ocean trench, cinematic"},
+ {"id":"reef","name":"Coral Reef","prompt":"snorkeling over a vibrant coral reef teeming with bright tropical fish, beautiful and sunlit"},
+ {"id":"treasure","name":"Treasure Diver","prompt":"as a treasure diver discovering a sunken chest amid shipwreck ruins underwater, adventurous"}]}
+]}

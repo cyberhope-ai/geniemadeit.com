@@ -1,0 +1,24 @@
+{"packs":[
+{"id":"monster-mash","name":"Monster Mash","emoji":"🧟","face":"m2","blurb":"Classic creature feature — become the legendary monsters of old.","looks":[
+ {"id":"frankenstein","name":"The Monster","prompt":"as a classic Frankenstein-style monster with bolts and stitches in a spooky laboratory, green-tinged, cinematic horror"},
+ {"id":"vampire","name":"Vampire","prompt":"as an elegant classic vampire in a dramatic cape in a gothic candlelit castle, pale and mysterious"},
+ {"id":"werewolf","name":"Werewolf","prompt":"as a fierce werewolf under a full moon in a misty dark forest, dramatic and wild"},
+ {"id":"mummy","name":"The Mummy","prompt":"as an ancient bandaged mummy rising in a torchlit Egyptian tomb, eerie and cinematic"},
+ {"id":"zombie","name":"Zombie","prompt":"as a spooky-fun zombie in a foggy graveyard at night, tattered clothes, playful horror"}]},
+{"id":"extreme-sports","name":"Extreme Sports","emoji":"🏔️","face":"m3","blurb":"Adrenaline maxed — surf, ski, skydive and climb.","looks":[
+ {"id":"surfing","name":"Big Wave","prompt":"a surfer riding a massive barreling ocean wave, dynamic spray, sunny, action"},
+ {"id":"skydiving","name":"Skydive","prompt":"a skydiver in freefall high above the earth with clouds and blue sky, exhilarating action"},
+ {"id":"skiing","name":"Powder Run","prompt":"a skier carving through deep powder snow on a steep mountain, spray and speed, dynamic"},
+ {"id":"rock-climb","name":"Rock Climber","prompt":"a rock climber scaling a dramatic sheer cliff face high above a canyon, muscles and focus"},
+ {"id":"motocross","name":"Motocross","prompt":"a motocross rider mid-jump soaring over a dirt track, dust and airborne action"}]},
+{"id":"gangster-era","name":"Gangster Era","emoji":"🎩","face":"f2","blurb":"1920s underworld glamour — pinstripes, speakeasies and jazz.","looks":[
+ {"id":"boss","name":"The Boss","prompt":"a 1920s mob boss in a sharp pinstripe suit and fedora in a smoky speakeasy, cinematic noir"},
+ {"id":"flapper","name":"Flapper","prompt":"a glamorous 1920s flapper in a beaded dress and feathers at a jazz-age club, sparkling"},
+ {"id":"getaway","name":"Getaway","prompt":"a stylish 1920s gangster beside a vintage classic car on a rainy night street, dramatic noir"},
+ {"id":"jazz-club","name":"Jazz Club","prompt":"an elegant figure in 1920s attire at a lively jazz club with a band and warm golden light"}]},
+{"id":"cyber-future","name":"Cyberpunk Future","emoji":"🌆","face":"m1","blurb":"Neon dystopia — step into a high-tech cyberpunk world.","looks":[
+ {"id":"street-samurai","name":"Street Samurai","prompt":"a cyberpunk street samurai in high-tech gear on a neon-drenched rainy futuristic city street, glowing implants"},
+ {"id":"netrunner","name":"Netrunner","prompt":"a cyberpunk hacker surrounded by glowing holographic screens and data, neon-lit, intense"},
+ {"id":"neon-racer","name":"Neon Racer","prompt":"a futuristic racer beside a glowing neon hovercar in a cyberpunk megacity, vibrant"},
+ {"id":"android","name":"The Android","prompt":"a sleek futuristic android with subtle glowing tech details, minimalist high-tech setting, cinematic"}]}
+]}

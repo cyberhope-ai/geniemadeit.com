@@ -91,6 +91,7 @@ a.lnk{color:var(--gold2)}
   <div class="tabs">
     <button class="tab on" data-tab="affiliates">Affiliates</button>
     <button class="tab" data-tab="customers">Customers</button>
+    <button class="tab" data-tab="jobs">Studio Jobs</button>
   </div>
 
   <section id="view-affiliates">
@@ -106,6 +107,16 @@ a.lnk{color:var(--gold2)}
     <div class="cards" id="custCards" hidden></div>
     <div id="custWrap"></div>
     <p class="muted" style="margin-top:20px">Read-only. Card numbers are never shown — last 4 digits only.</p>
+  </section>
+
+  <section id="view-jobs" hidden>
+    <div class="tools" style="justify-content:space-between;margin-bottom:8px">
+      <div class="muted" id="jobsNote">Loading the Studio You queue…</div>
+      <label class="muted" style="font-size:.82rem"><input type="checkbox" id="jobsAuto" checked style="width:auto;margin-right:6px;vertical-align:middle">Auto-refresh (15s)</label>
+    </div>
+    <div class="cards" id="jobsCards" hidden></div>
+    <div class="scroll" id="jobsWrap"></div>
+    <p class="muted" style="margin-top:16px">Live view of every Studio You session in flight. <b>Training</b> = building the model · <b>Rendering</b> = creating looks one-by-one (the every-minute cron advances one look per tick) · <b>Done</b> = all looks made and the customer notified. Phone numbers show last 4 only.</p>
   </section>
 </main>
 
@@ -146,19 +157,66 @@ document.getElementById("pw").addEventListener("keydown",function(e){if(e.key===
 document.getElementById("logoutBtn").onclick=function(){sessionStorage.removeItem(TKEY);showGate("");};
 document.getElementById("refreshBtn").onclick=function(){
   var active=(document.querySelector(".tab.on")||{}).getAttribute?document.querySelector(".tab.on").getAttribute("data-tab"):"affiliates";
-  if(active==="customers"){custLoaded=false;loadCustomers();}else{load();}
+  if(active==="customers"){custLoaded=false;loadCustomers();}else if(active==="jobs"){loadJobs();}else{load();}
 };
 var custLoaded=false;
+function activeTab(){var t=document.querySelector(".tab.on");return t?t.getAttribute("data-tab"):"affiliates";}
 document.querySelectorAll(".tab").forEach(function(t){
   t.onclick=function(){
     document.querySelectorAll(".tab").forEach(function(x){x.classList.remove("on");}); t.classList.add("on");
     var tab=t.getAttribute("data-tab");
     document.getElementById("view-affiliates").hidden=(tab!=="affiliates");
     document.getElementById("view-customers").hidden=(tab!=="customers");
-    document.getElementById("statusTag").textContent=(tab==="customers"?"Customers":"Rewardful");
+    document.getElementById("view-jobs").hidden=(tab!=="jobs");
+    document.getElementById("statusTag").textContent=(tab==="customers"?"Customers":tab==="jobs"?"Studio Jobs":"Rewardful");
     if(tab==="customers"&&!custLoaded){loadCustomers();}
+    if(tab==="jobs"){loadJobs();}
   };
 });
+
+// ---- Studio Jobs queue (customer-service live view) ----
+var jobsTimer=null;
+function jobStage(j){
+  if(j.notified) return {label:"Done",cls:"active"};
+  if(j.status!=="ready") return {label:"Training",cls:"other"};
+  return {label:"Rendering "+j.looks_done+"/"+j.looks_total,cls:"other"};
+}
+async function loadJobs(){
+  var note=document.getElementById("jobsNote"); note.className="muted";
+  try{
+    var r=await fetch("/gmadmin/studio-jobs",{headers:{"x-admin-token":token()}});
+    if(r.status===401){showGate("That password didn’t work.");return;}
+    var d=null; try{d=await r.json();}catch(e){}
+    if(!r.ok){note.className="err";note.textContent="Couldn’t load the queue ("+r.status+").";return;}
+    var jobs=(d&&d.jobs)||[]; if(!Array.isArray(jobs))jobs=[];
+    var inflight=jobs.filter(function(j){return !j.notified;}).length;
+    var done=jobs.filter(function(j){return j.notified;}).length;
+    var cc=document.getElementById("jobsCards"); cc.hidden=false;
+    cc.innerHTML=[["Active (in cron)",num(d&&d.active_count)],["In-flight",inflight],["Completed",done],["Total sessions",jobs.length]]
+      .map(function(c){return '<div class="card"><div class="k">'+c[0]+'</div><div class="v">'+c[1]+'</div></div>';}).join("");
+    var rows=jobs.map(function(j){
+      var st=jobStage(j);
+      var pct=j.looks_total?Math.round((j.looks_done/j.looks_total)*100):0;
+      var bar='<div style="height:6px;border-radius:4px;background:rgba(255,255,255,.08);overflow:hidden;min-width:70px"><i style="display:block;height:100%;width:'+pct+'%;background:linear-gradient(90deg,var(--gold2),var(--gold))"></i></div>';
+      return "<tr><td class='mono' title='"+esc(j.user)+"'>"+sid(j.user,14)+"</td>"+
+        "<td><span class='state "+st.cls+"'>"+esc(st.label)+"</span></td>"+
+        "<td style='min-width:90px'>"+bar+"<span class='muted' style='font-size:.78rem'>"+num(j.looks_done)+" / "+num(j.looks_total)+" looks</span></td>"+
+        "<td>"+esc(j.age||"—")+"</td>"+
+        "<td class='muted'>"+esc(j.notify_email||"—")+"</td>"+
+        "<td class='muted'>"+esc(j.notify_phone||"—")+"</td>"+
+        "<td>"+(j.notified?'<span class="ok">sent ✓</span>':'<span class="muted">pending</span>')+"</td>"+
+        "<td class='muted' title='"+esc(j.submitted_at||"")+"'>"+esc((j.submitted_at||"").replace("T"," ").slice(0,16))+"</td></tr>";
+    }).join("");
+    document.getElementById("jobsWrap").innerHTML=jobs.length
+      ? '<table><thead><tr><th>User</th><th>Stage</th><th>Progress</th><th>Age</th><th>Notify email</th><th>Phone</th><th>Notified</th><th>Submitted</th></tr></thead><tbody>'+rows+'</tbody></table>'
+      : '<p class="muted">No Studio You jobs yet. When a customer uploads photos, picks looks and hits Start, their session appears here in real time.</p>';
+    note.textContent="Updated "+new Date().toLocaleTimeString();
+  }catch(err){note.className="err";note.textContent="Couldn’t load the queue.";}
+  // schedule the next auto tick only while the jobs tab is visible + auto is on
+  if(jobsTimer){clearTimeout(jobsTimer);jobsTimer=null;}
+  if(activeTab()==="jobs"&&document.getElementById("jobsAuto").checked){jobsTimer=setTimeout(loadJobs,15000);}
+}
+document.getElementById("jobsAuto").addEventListener("change",function(){if(this.checked&&activeTab()==="jobs")loadJobs();else if(jobsTimer){clearTimeout(jobsTimer);jobsTimer=null;}});
 async function loadCustomers(){
   custLoaded=true;
   var note=document.getElementById("custNote"); note.className="muted"; note.textContent="Loading customers…";

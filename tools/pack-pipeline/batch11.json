@@ -1,0 +1,14 @@
+{"packs":[
+{"id":"magazine-covers-3","name":"Magazine Covers Vol. 3","emoji":"📰","face":"f1","blurb":"Cover star of the world's most iconic magazine formats.","looks":[
+ {"id":"icon-of-year","name":"Icon of the Year","prompt":"on the cover of a prestigious weekly newsmagazine with an invented fictional title, iconic bold-framed annual Icon-of-the-Year portrait, serious and important, newsstand style"},
+ {"id":"music-culture","name":"Music & Culture","prompt":"on the cover of a legendary music and culture magazine with an invented fictional title, styled as an edgy rockstar in an artistic bold portrait with cover lines"},
+ {"id":"sports-mag","name":"Sports Cover","prompt":"on the cover of a major national sports magazine with an invented fictional title, dynamic athletic action shot in sports gear, energetic bold layout"},
+ {"id":"celeb-weekly","name":"Celebrity Weekly","prompt":"on the cover of a popular celebrity and lifestyle magazine with an invented fictional title, warm glamorous portrait with fun gossip-style cover lines"},
+ {"id":"wealth-mag","name":"Wealth & Power","prompt":"on the cover of a business and wealth magazine with an invented fictional title, confident powerful portrait in a sharp suit with a self-made-success headline"}]},
+{"id":"memes-4","name":"Memes Vol. 4","emoji":"🔥","face":"f2","blurb":"The most famous meme formats — you're the star.","looks":[
+ {"id":"roll-safe","name":"Roll Safe","prompt":"tapping a finger to the temple with a knowing clever grin, the classic think-about-it roll-safe meme, plain background"},
+ {"id":"disaster","name":"Disaster Grin","prompt":"smirking mischievously close to the camera with a house fire blazing in the background, playful disaster meme"},
+ {"id":"hide-the-pain","name":"Forced Smile","prompt":"giving a stiff forced awkward smile with subtly pained eyes while holding a coffee mug, relatable everyday meme"},
+ {"id":"stonks","name":"Stonks","prompt":"standing proudly in a suit in front of a rising green stock arrow chart with an oblivious overconfident look, stonks meme humor"},
+ {"id":"two-buttons","name":"Tough Choice","prompt":"nervously sweating while agonizing over which of two big red buttons to press, exaggerated tough-decision meme humor"}]}
+]}

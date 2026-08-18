@@ -1,0 +1,20 @@
+{"packs":[
+{"id":"magazine-covers","name":"Magazine Covers","emoji":"📰","face":"f2","blurb":"Land the cover — be the face of a legendary magazine (bold masthead, cover lines and all).","looks":[
+ {"id":"fashion-cover","name":"Fashion","prompt":"a striking high-fashion magazine cover with a bold fictional masthead and stylish cover lines, elegant beauty lighting, glossy editorial"},
+ {"id":"person-of-year","name":"Person of the Year","prompt":"a prestigious news magazine cover with a thick red border and a bold fictional masthead, serious confident expression"},
+ {"id":"music-cover","name":"Music","prompt":"a bold rock-music magazine cover with a fictional masthead and edgy cover lines, dramatic dynamic lighting"},
+ {"id":"sports-cover","name":"Sports","prompt":"a dynamic sports magazine cover as an athlete mid-action, bold fictional masthead and headline, energetic"},
+ {"id":"business-cover","name":"Business","prompt":"a polished business magazine cover as a successful executive, confident, fictional masthead and cover lines"}]},
+{"id":"movie-moments","name":"Iconic Movie Moments","emoji":"🎬","face":"f1","blurb":"Star in the most legendary movie moments of all time — the classics, reimagined as you.","looks":[
+ {"id":"windswept-dress","name":"Subway Grate","prompt":"a glamorous person in a billowing white halter dress over a subway grate as it blows upward, 1950s Hollywood glamour, black and white cinematic"},
+ {"id":"king-of-the-world","name":"Bow of the Ship","prompt":"standing triumphantly with arms outstretched at the bow of a grand ocean liner at golden sunset, epic romantic cinematic"},
+ {"id":"ace-pilot","name":"Ace Pilot","prompt":"a confident fighter pilot in a plain flight suit and aviator sunglasses beside a fighter jet on a sunlit runway, cinematic, no text or logos"},
+ {"id":"noir-farewell","name":"Noir Farewell","prompt":"in a 1940s trench coat and fedora at a foggy airport tarmac at night, dramatic black and white film-noir lighting"},
+ {"id":"rain-dance","name":"Rain Dance","prompt":"joyfully dancing with an umbrella on a rain-soaked city street under a lamppost, classic musical film scene, warm cinematic"}]},
+{"id":"memes","name":"Meme Legends","emoji":"😂","face":"m1","blurb":"Become the meme — the internet's most relatable moments, starring you.","looks":[
+ {"id":"success","name":"Success!","prompt":"a triumphant success-celebration, clenched fist of victory with a determined proud grin, plain bright background, funny meme style"},
+ {"id":"this-is-fine","name":"This Is Fine","prompt":"sitting calmly with a small smile at a table in a room full of cartoonish flames, ironically relaxed, funny meme style"},
+ {"id":"dramatic-look","name":"The Dramatic Look","prompt":"an intense dramatic side-eye zoom-in reaction, suspicious raised eyebrow, exaggerated funny meme style"},
+ {"id":"smart-tap","name":"Can't Lose","prompt":"tapping a finger to the temple with a knowing smug smile, 'roll safe' clever-guy meme style, plain background"},
+ {"id":"shocked","name":"Shocked!","prompt":"an exaggerated wide-eyed open-mouthed shocked surprised face, funny reaction meme style, plain background"}]}
+]}
