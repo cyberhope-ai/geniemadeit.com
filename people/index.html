@@ -36,6 +36,14 @@ h1{font-family:var(--serif);font-size:clamp(1.8rem,5vw,2.6rem);font-weight:600;m
 .skilldna{margin-top:30px;border:1px solid var(--goldd);background:rgba(245,196,81,.06);border-radius:16px;padding:18px 20px}
 .skilldna b{color:var(--gold2)}
 .gate{text-align:center;padding:70px 20px}
+.upwrap{margin-top:20px;border:1px solid var(--goldd);background:rgba(245,196,81,.05);border-radius:16px;padding:15px 16px}
+.uphd{font-size:.74rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold2);font-weight:700;margin-bottom:11px}
+.uprow{display:flex;gap:12px;overflow-x:auto;padding-bottom:4px}
+.rem{flex:0 0 auto;display:flex;align-items:center;gap:11px;background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:10px 13px}
+.rph{width:46px;height:46px;border-radius:10px;overflow:hidden;background:var(--panel2);display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.rph img{width:100%;height:100%;object-fit:cover;object-position:center top}.rph .ini2{font-family:var(--serif);color:var(--faint);font-size:1.2rem}
+.ri{display:flex;flex-direction:column;gap:2px}.ri b{font-size:.9rem}.rw{color:var(--gold2);font-size:.82rem;font-weight:600}
+.rbtn{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1a05;font-weight:800;font-size:.82rem;border-radius:20px;padding:8px 13px;white-space:nowrap}
 /* modal */
 .ov{position:fixed;inset:0;background:rgba(8,4,18,.72);backdrop-filter:blur(4px);display:none;align-items:flex-start;justify-content:center;z-index:50;padding:28px 16px;overflow:auto}
 .ov.on{display:flex}
@@ -114,11 +122,28 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
       '<span class="eyebrow">My People</span><h1>Your <em>circle</em></h1>'+
       '<p class="lead">Save the people you love — their photos, birthdays and what they’re into — so we can help you make and send the perfect card, right on time.</p>'+
       '<div class="quick"><button data-rel="spouse">＋ Spouse</button><button data-rel="child">＋ Child</button><button data-rel="parent">＋ Parent</button><button data-rel="relative">＋ Relative</button><button data-rel="friend">＋ Friend</button></div>'+
+      '<div id="upcoming"></div>'+
+      '<h2 style="font-family:var(--serif);font-size:1.2rem;font-weight:600;margin:26px 0 2px">Everyone</h2>'+
       '<div class="grid">'+cards+'<div class="addcard" id="addBtn"><span class="plus">＋</span>Add someone</div></div>'+
       '<div class="skilldna">✨ <b>Coming soon:</b> the interests you save here unlock a <b>free SkillDNA trial</b> — a science-backed read on what makes each person tick, so every card lands.</div>';
     [].forEach.call(document.querySelectorAll(".pc"),function(c){c.onclick=function(){edit(people.find(function(x){return x.id===c.dataset.id;}));};});
     document.getElementById("addBtn").onclick=function(){edit(null,"friend");};
     [].forEach.call(document.querySelectorAll(".quick button"),function(b){b.onclick=function(){edit(null,b.dataset.rel);};});
+    loadReminders();
+  }
+  function loadReminders(){
+    var box=document.getElementById("upcoming"); if(!box)return;
+    fetch("/api/reminders?days=60",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
+      var rem=(d&&d.reminders)||[]; if(!rem.length){box.innerHTML="";return;}
+      var cards=rem.slice(0,8).map(function(r){
+        var ph=r.photo?'<img src="'+esc(r.photo)+'" alt="">':'<span class="ini2">'+esc((r.name||"?").slice(0,1).toUpperCase())+'</span>';
+        var when=r.days_away===0?"today!":r.days_away===1?"tomorrow":("in "+r.days_away+" days");
+        var icon=r.kind==="birthday"?"🎂":"🎉";
+        var pk=r.kind==="birthday"?"birthday":"congrats";
+        return '<div class="rem"><div class="rph">'+ph+'</div><div class="ri"><b>'+icon+' '+esc(r.name||"Someone")+"'s "+esc(r.label)+'</b><span class="rw">'+when+'</span></div><a class="rbtn" href="/app?pack='+pk+'">Make their card →</a></div>';
+      }).join("");
+      box.innerHTML='<div class="upwrap"><div class="uphd">⏰ Coming up</div><div class="uprow">'+cards+'</div></div>';
+    }).catch(function(){});
   }
   // ---- editor ----
   function edit(p,rel){
