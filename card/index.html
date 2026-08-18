@@ -1,0 +1,169 @@
+<!doctype html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Make a Card or E-Invite | GenieMade</title>
+<meta name="description" content="Turn your GenieMade image into a personalized greeting card or e-invite — add a message, pick a style, download or send. Certified and provably yours.">
+<meta name="robots" content="noindex">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800&family=Playfair+Display:ital,wght@0,600;0,700;1,600&family=Pacifico&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+:root{--night:#130a26;--night2:#1c1140;--panel:#231553;--panel2:#2b1b63;--line:#3a2a6b;--ink:#f7f1ff;--mut:#c6b6ea;--faint:#8f7fbb;--gold:#f5c451;--gold2:#ffe390;--goldd:#c88f2c;--serif:"Playfair Display",Georgia,serif;--sans:"Inter",system-ui,-apple-system,Segoe UI,Roboto,sans-serif}
+body{background:radial-gradient(1100px 620px at 82% -6%,rgba(245,196,81,.12),transparent 60%),linear-gradient(178deg,var(--night2),var(--night));color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased;min-height:100vh}
+a{color:inherit;text-decoration:none}
+.hd{display:flex;align-items:center;gap:12px;padding:14px 22px;border-bottom:1px solid var(--line);position:sticky;top:0;background:rgba(19,10,38,.85);backdrop-filter:blur(10px);z-index:10}
+.brand{font-family:var(--serif);font-size:20px;font-weight:600}.brand b{color:var(--gold)}
+.hd .sp{flex:1}.hd a.back{color:var(--mut);font-size:14px}
+.wrap{max-width:1100px;margin:0 auto;padding:22px;display:grid;grid-template-columns:1fr 380px;gap:26px}
+@media(max-width:860px){.wrap{grid-template-columns:1fr}}
+.stage{display:flex;flex-direction:column;align-items:center;gap:14px}
+#card{width:100%;max-width:420px;border-radius:14px;box-shadow:0 24px 60px -18px rgba(0,0,0,.7);background:var(--panel)}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:16px;padding:18px}
+h1{font-family:var(--serif);font-size:1.5rem;font-weight:600;margin-bottom:2px}
+.sub{color:var(--mut);font-size:.9rem;margin-bottom:16px}
+label{display:block;font-size:.78rem;letter-spacing:.05em;text-transform:uppercase;color:var(--faint);margin:14px 0 6px;font-weight:600}
+input,textarea{width:100%;background:var(--night);border:1px solid var(--line);border-radius:10px;color:var(--ink);font:inherit;padding:10px 12px;resize:vertical}
+textarea{min-height:66px}
+input:focus,textarea:focus{outline:none;border-color:var(--gold)}
+.styles{display:flex;gap:8px;flex-wrap:wrap;margin-top:6px}
+.sw{width:38px;height:38px;border-radius:9px;border:2px solid transparent;cursor:pointer;position:relative}
+.sw[aria-pressed=true]{border-color:var(--gold2);box-shadow:0 0 0 2px rgba(245,196,81,.3)}
+.row2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
+.btn{display:block;width:100%;text-align:center;border:none;border-radius:30px;padding:13px;font:inherit;font-weight:800;cursor:pointer;margin-top:12px;transition:transform .15s}
+.btn.gold{color:#2a1a05;background:linear-gradient(180deg,var(--gold2),var(--gold))}.btn.gold:hover{transform:translateY(-1px)}
+.btn.ghost{background:rgba(255,255,255,.05);border:1px solid var(--line);color:var(--ink)}.btn.ghost:hover{border-color:var(--gold)}
+.share{margin-top:14px;padding:14px;border:1px solid var(--goldd);background:rgba(245,196,81,.07);border-radius:12px;display:none}
+.share.on{display:block}
+.share .lnk{display:flex;gap:8px;margin-top:8px}
+.share input{font-size:.82rem}
+.sbtns{display:flex;gap:8px;flex-wrap:wrap;margin-top:10px}
+.sbtns a,.sbtns button{flex:1;text-align:center;font-size:.85rem;font-weight:700;padding:9px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);color:var(--ink);cursor:pointer;text-decoration:none}
+.sbtns a:hover,.sbtns button:hover{border-color:var(--gold)}
+.tog{display:flex;gap:6px;background:var(--night);border:1px solid var(--line);border-radius:30px;padding:4px;width:max-content;margin-bottom:4px}
+.tog button{border:none;background:transparent;color:var(--mut);font:inherit;font-weight:700;font-size:.85rem;padding:7px 16px;border-radius:30px;cursor:pointer}
+.tog button[aria-pressed=true]{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1a05}
+.cert{display:flex;align-items:center;justify-content:center;gap:7px;color:var(--gold2);font-size:.8rem;margin-top:4px}
+.hint{color:var(--faint);font-size:.82rem;margin-top:10px}
+#invFields{display:none}
+</style></head>
+<body>
+<header class="hd"><a class="brand" href="/">Genie<b>Made</b></a><span class="sp"></span><a class="back" href="/app">← Back to Studio</a></header>
+<div class="wrap">
+  <div class="stage">
+    <div class="tog" id="kindTog"><button data-kind="card" aria-pressed="true">🎴 Greeting card</button><button data-kind="invite" aria-pressed="false">✉️ E-invite</button></div>
+    <canvas id="card" width="1080" height="1350"></canvas>
+    <div class="cert">◈ Every card ships with a certificate of authenticity</div>
+  </div>
+  <div class="panel">
+    <h1 id="ttl">Make your card</h1>
+    <div class="sub" id="sub">Add a message, pick a style, then download or send.</div>
+    <label>Your message</label>
+    <textarea id="msg" maxlength="200" placeholder="Happy Birthday, Mike!"></textarea>
+    <div class="row2"><div><label>To</label><input id="to" maxlength="40" placeholder="Mike"></div><div><label>From</label><input id="from" maxlength="40" placeholder="You"></div></div>
+    <div id="invFields">
+      <div class="row2"><div><label>Date</label><input id="evDate" maxlength="30" placeholder="Sat, Sep 6"></div><div><label>Time</label><input id="evTime" maxlength="20" placeholder="7:00 PM"></div></div>
+      <label>Place</label><input id="evPlace" maxlength="60" placeholder="123 Main St · RSVP by text">
+    </div>
+    <label>Style</label>
+    <div class="styles" id="styles"></div>
+    <button class="btn gold" id="dl">⬇ Download card</button>
+    <button class="btn ghost" id="mk">🔗 Create a share link</button>
+    <div class="share" id="share">
+      <b>Your card is live — send it:</b>
+      <div class="lnk"><input id="shareUrl" readonly><button class="sbtns" style="flex:0 0 auto;padding:9px 12px;border-radius:10px;background:var(--panel2);border:1px solid var(--line);color:#fff;cursor:pointer" id="copy">Copy</button></div>
+      <div class="sbtns"><button id="native">Share…</button><a id="sms" href="#">Text</a><a id="email" href="#">Email</a></div>
+    </div>
+    <div class="hint" id="hint">Tip: create the image first in the <a href="/app" style="color:var(--gold2)">Studio</a>, then come back here to card it. Sharing needs a free account.</div>
+  </div>
+</div>
+<script>
+(function(){
+  var q=new URLSearchParams(location.search);
+  var imgUrl=q.get("img")||"", pack=q.get("pack")||"", title=q.get("title")||"";
+  var kind=q.get("kind")==="invite"?"invite":"card";
+  var STYLES=[
+   {id:"classic",bg:"#f7f1ea",frame:"#c88f2c",band:"rgba(20,10,30,.0)",card:"#ffffff",accent:"#b8342b",text:"#20140a",font:'"Playfair Display",Georgia,serif'},
+   {id:"festive",bg:"#0d3b2e",frame:"#f5c451",band:"linear",card:"#0d3b2e",accent:"#f5c451",text:"#fff7e6",font:'"Playfair Display",Georgia,serif'},
+   {id:"elegant",bg:"#12122a",frame:"#d9c27a",band:"linear",card:"#12122a",accent:"#d9c27a",text:"#f4efff",font:'"Playfair Display",Georgia,serif'},
+   {id:"fun",bg:"#ff5aa5",frame:"#ffe066",band:"rgba(255,255,255,.92)",card:"#fff0f7",accent:"#7a2ff2",text:"#2a1140",font:'"Pacifico",cursive'},
+   {id:"bold",bg:"#111",frame:"#f5c451",band:"rgba(0,0,0,.62)",card:"#111",accent:"#f5c451",text:"#fff",font:'"Inter",sans-serif'}
+  ];
+  var swColors={classic:"#f7f1ea",festive:"#0d3b2e",elegant:"#12122a",fun:"#ff5aa5",bold:"#111"};
+  var style=STYLES[0];
+  var cv=document.getElementById("card"), ctx=cv.getContext("2d");
+  var img=new Image(); img.crossOrigin="anonymous";
+  var imgReady=false;
+  if(imgUrl){ img.onload=function(){imgReady=true;draw();}; img.onerror=function(){imgReady=false;draw();}; img.src=imgUrl; }
+  // style swatches
+  var sc=document.getElementById("styles");
+  STYLES.forEach(function(s,i){var b=document.createElement("button");b.className="sw";b.style.background=swColors[s.id];b.setAttribute("aria-pressed",i===0);b.title=s.id;
+    b.onclick=function(){style=s;[].forEach.call(sc.children,function(x,j){x.setAttribute("aria-pressed",j===i)});draw();};sc.appendChild(b);});
+  // kind toggle
+  document.getElementById("kindTog").addEventListener("click",function(e){var b=e.target.closest("button");if(!b)return;kind=b.dataset.kind;
+    [].forEach.call(this.children,function(x){x.setAttribute("aria-pressed",x===b)});
+    document.getElementById("invFields").style.display=kind==="invite"?"block":"none";
+    document.getElementById("ttl").textContent=kind==="invite"?"Make your e-invite":"Make your card";
+    document.getElementById("msg").placeholder=kind==="invite"?"You're invited!":"Happy Birthday, Mike!";draw();});
+  if(kind==="invite"){document.querySelector('#kindTog [data-kind=invite]').click();}
+  ["msg","to","from","evDate","evTime","evPlace"].forEach(function(id){document.getElementById(id).addEventListener("input",draw);});
+  function rr(x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath();}
+  function wrap(text,x,y,maxW,lh,max){var words=(text||"").split(/\s+/),line="",lines=[];for(var i=0;i<words.length;i++){var t=line?line+" "+words[i]:words[i];if(ctx.measureText(t).width>maxW&&line){lines.push(line);line=words[i];}else line=t;}if(line)lines.push(line);lines=lines.slice(0,max||6);var yy=y-(lines.length-1)*lh/2;lines.forEach(function(l){ctx.fillText(l,x,yy);yy+=lh;});return lines.length;}
+  function draw(){
+    var W=cv.width,H=cv.height,fr=46;
+    ctx.clearRect(0,0,W,H);
+    // frame
+    ctx.fillStyle=style.bg;rr(0,0,W,H,34);ctx.fill();
+    ctx.fillStyle=style.frame;rr(fr*0.5,fr*0.5,W-fr,H-fr,26);ctx.fill();
+    var ix=fr,iy=fr,iw=W-fr*2,ih=H-fr*2;
+    ctx.save();rr(ix,iy,iw,ih,18);ctx.clip();
+    ctx.fillStyle=style.card;ctx.fillRect(ix,iy,iw,ih);
+    // image cover-fit into top ~72%
+    var imgH=ih*0.72;
+    if(imgReady){var s=Math.max(iw/img.width,imgH/img.height);var dw=img.width*s,dh=img.height*s;ctx.drawImage(img,ix+(iw-dw)/2,iy+(imgH-dh)/2,dw,dh);}
+    else{ctx.fillStyle="rgba(255,255,255,.06)";ctx.fillRect(ix,iy,iw,imgH);ctx.fillStyle=style.accent;ctx.font='600 40px '+style.font;ctx.textAlign="center";ctx.fillText(imgUrl?"loading…":"Add an image →",ix+iw/2,iy+imgH/2);}
+    // message band
+    var by=iy+imgH,bh=ih-imgH;
+    if(style.band==="linear"){var g=ctx.createLinearGradient(0,by,0,by+bh);g.addColorStop(0,style.card+"00");g.addColorStop(.18,style.card);g.addColorStop(1,style.card);ctx.fillStyle=g;}
+    else ctx.fillStyle=style.band;
+    ctx.fillRect(ix,by,iw,bh);
+    ctx.textAlign="center";
+    var cx=ix+iw/2, cy=by+bh*0.42;
+    if(document.getElementById("to").value){ctx.fillStyle=style.accent;ctx.font='700 30px "Inter",sans-serif';ctx.fillText("To "+document.getElementById("to").value,cx,by+42);}
+    ctx.fillStyle=style.text;ctx.font='600 52px '+style.font;
+    var msg=document.getElementById("msg").value||(kind==="invite"?"You're invited!":"Happy Birthday!");
+    wrap(msg,cx,cy,iw-120,60,3);
+    if(kind==="invite"){ctx.fillStyle=style.accent;ctx.font='700 27px "Inter",sans-serif';
+      var det=[document.getElementById("evDate").value,document.getElementById("evTime").value].filter(Boolean).join("  ·  ");
+      if(det)ctx.fillText(det,cx,by+bh-88);
+      if(document.getElementById("evPlace").value){ctx.fillStyle=style.text;ctx.font='400 24px "Inter",sans-serif';ctx.fillText(document.getElementById("evPlace").value,cx,by+bh-54);}
+    }
+    if(document.getElementById("from").value){ctx.fillStyle=style.text;ctx.font='italic 400 28px '+style.font;ctx.fillText("— "+document.getElementById("from").value,cx,by+bh-22);}
+    ctx.restore();
+    // gold corner mark
+    ctx.fillStyle=style.frame;ctx.font='700 22px "Inter",sans-serif';ctx.textAlign="right";ctx.fillText("GenieMade ◈",W-fr-6,H-fr-2);
+  }
+  draw();
+  function blob(cb){cv.toBlob(cb,"image/png",0.95);}
+  document.getElementById("dl").onclick=function(){blob(function(b){var a=document.createElement("a");a.href=URL.createObjectURL(b);a.download="geniemade-"+kind+".png";a.click();});};
+  var shareBox=document.getElementById("share");
+  document.getElementById("mk").onclick=function(){
+    var btn=this;btn.textContent="Saving…";btn.disabled=true;
+    blob(function(b){
+      var fd=new FormData();fd.append("file",b,"card.png");
+      fd.append("message",document.getElementById("msg").value);fd.append("to",document.getElementById("to").value);
+      fd.append("from",document.getElementById("from").value);fd.append("kind",kind);
+      fetch("/api/card",{method:"POST",body:fd,credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
+        btn.textContent="🔗 Create a share link";btn.disabled=false;
+        if(!d.ok){ if(d.error==="auth_required"){alert("Create a free account (in the Studio) to get a shareable link. You can still download your card now.");location.href="/app";} else alert(d.message||"Could not save the card."); return;}
+        var url=location.origin+d.share_url;
+        shareBox.classList.add("on");document.getElementById("shareUrl").value=url;
+        var txt=encodeURIComponent((document.getElementById("msg").value||"I made you a card")+" "+url);
+        document.getElementById("sms").href="sms:?&body="+txt;
+        document.getElementById("email").href="mailto:?subject="+encodeURIComponent("A card for you")+"&body="+txt;
+        document.getElementById("native").onclick=function(){if(navigator.share)navigator.share({title:"A GenieMade card",text:document.getElementById("msg").value||"I made you a card",url:url});else{document.getElementById("shareUrl").select();document.execCommand("copy");}};
+        shareBox.scrollIntoView({behavior:"smooth"});
+      }).catch(function(){btn.textContent="🔗 Create a share link";btn.disabled=false;alert("Network error — try again.");});
+    });
+  };
+  document.getElementById("copy").onclick=function(){var i=document.getElementById("shareUrl");i.select();document.execCommand("copy");this.textContent="Copied!";var t=this;setTimeout(function(){t.textContent="Copy"},1400);};
+})();
+</script>
+</body></html>

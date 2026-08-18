@@ -242,6 +242,13 @@
     els.result.classList.add("on");
     $("#dlBtn").onclick = () => gmDownload(item);
     var dc = $("#dlCertBtn"); if (dc) dc.onclick = () => gmDownloadCert(item);
+    // Turn an image result into a greeting card / e-invite (the composer reads ?img=)
+    var cb = $("#cardBtn");
+    if (cb) {
+      var isImg = item.url && /\.(png|jpe?g|webp)(\?|$)/i.test(item.url);
+      if (isImg) { cb.style.display = ""; cb.href = "/card?img=" + encodeURIComponent(item.url) + (item.look_name ? "&title=" + encodeURIComponent(item.look_name) : ""); }
+      else cb.style.display = "none";
+    }
     els.result.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 

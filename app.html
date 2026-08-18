@@ -314,6 +314,7 @@
           </dl>
           <div class="cert-actions">
             <button class="btn gold" id="dlBtn">Download full-res</button>
+            <a class="btn ghost" id="cardBtn" style="display:none">🎴 Make a card</a>
             <button class="btn ghost" id="dlCertBtn">Certificate</button>
             <button class="btn ghost" id="againBtn">Make another</button>
             <a class="btn ghost" id="everVerifyLink" href="#" target="_blank" rel="noopener" style="display:none">Verify on EverVerify ↗</a>
@@ -427,7 +428,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260818a"></script>
+<script src="assets/studio.js?v=20260818b"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
