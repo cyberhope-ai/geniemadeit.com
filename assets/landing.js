@@ -47,9 +47,7 @@
 
   // ---- pricing: subscriptions (monthly/annual, recommended) + one-time credit packs ----
   const SUB_TIERS = [
-    { id: "starter", tag: "Starter", m: 12, y: 120, feats: ["150 credits every month", "Text & image generation", "Certificate on every creation", "Your private Vault"], hot: false },
-    { id: "plus",    tag: "Plus",    m: 39, y: 390, feats: ["600 credits every month", "Everything in Starter", "Video generation", "Commercial license", "Priority generation"], hot: true },
-    { id: "pro",     tag: "Pro",     m: 89, y: 890, feats: ["1,500 credits every month", "Everything in Plus", "Highest priority", "Early access to new models", "API access"], hot: false },
+    { id: "bronze", tag: "Bronze", m: 4.95, y: 49.95, feats: ["Unlimited e-cards &amp; AI images", "Every themed pack — holidays, occasions, invitations", "Save friends &amp; family + birthday reminders", "A certificate on every creation", "Your private Vault, forever"], hot: true },
   ];
   const ONE_TIME = [
     { id: "starter", credits: "150", usd: 15 },
@@ -62,15 +60,32 @@
     if (!el) return;
     const annual = billing === "year";
     const tbtn = (on) => `padding:8px 20px;border-radius:999px;border:1px solid var(--line);background:${on ? "var(--gold)" : "transparent"};color:${on ? "#1a1200" : "var(--mut)"};font-weight:700;cursor:pointer`;
-    const tiers = SUB_TIERS.map((p) => `
+    const freeCard = `
+      <div class="plan">
+        <div class="tag">Free</div>
+        <div class="price">$0</div>
+        <div class="cr">3 free wishes to start</div>
+        <ul><li>Try any pack or prompt</li><li>Certificate on every creation</li><li>No card needed</li></ul>
+        <a class="btn ghost" href="/app" style="text-decoration:none;text-align:center;display:block">Start free</a>
+      </div>`;
+    const studioCard = `
+      <div class="plan">
+        <div class="tag">Studio You</div>
+        <div class="price">$19<span class="per"> to start</span></div>
+        <div class="cr">Your own trained AI model · one-time</div>
+        <ul><li>We train a private model of you</li><li>Studio-grade, unmistakably-<em>you</em> portraits</li><li>Taster $19 · Session $39 · VIP $99</li></ul>
+        <a class="btn ghost" href="/studio-you" style="text-decoration:none;text-align:center;display:block">Explore Studio You →</a>
+      </div>`;
+    const bronze = SUB_TIERS.map((p) => `
       <div class="plan${p.hot ? " hot" : ""}">
         ${p.hot ? '<span class="popular">Most popular</span>' : ""}
         <div class="tag">${p.tag}</div>
         <div class="price">$${annual ? p.y : p.m}<span class="per"> / ${annual ? "year" : "month"}</span></div>
-        <div class="cr">${annual ? "2 months free" : "billed monthly · cancel anytime"}</div>
+        <div class="cr">${annual ? "~2 months free · cancel anytime" : "billed monthly · cancel anytime"}</div>
         <ul>${p.feats.map((f) => `<li>${f}</li>`).join("")}</ul>
-        <button class="btn ${p.hot ? "gold" : "ghost"}" data-plan="${p.id}">Subscribe</button>
+        <button class="btn ${p.hot ? "gold" : "ghost"}" data-plan="${p.id}">Choose Bronze</button>
       </div>`).join("");
+    const tiers = freeCard + bronze + studioCard;
     const packs = ONE_TIME.map((p) => `
       <span style="display:inline-flex;align-items:center;gap:10px;border:1px solid var(--line);border-radius:12px;padding:10px 14px;margin:6px">
         <b>${p.credits} credits</b><span style="color:var(--faint)">$${p.usd}</span>
