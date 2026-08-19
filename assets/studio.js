@@ -739,7 +739,7 @@
     $("#authSubmit").onclick = doAuth;
     $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth("signup"); };
-    $$("#payModal button[data-plan]").forEach((b) => b.onclick = () => studioCheckout(b.dataset.plan));
+    $$("#payModal button[data-plan]").forEach((b) => b.onclick = () => studioCheckout(b.dataset.plan, b.dataset.interval));
     const ws = $("#welcomeStart"); if (ws) ws.onclick = () => { closeModals(); const p = $("#prompt"); if (p) p.focus(); };
     const om = $("#obMore"); if (om) om.onclick = (e) => { e.preventDefault(); openModal("payModal"); };
     $$("[data-close]").forEach((b) => b.onclick = closeModals);
@@ -749,13 +749,13 @@
   function escapeHtml(s) { return (s || "").replace(/[&<>"']/g, (c) => ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])); }
 
   // ---- in-app checkout: real Stripe session (was a dead alert). Carries the Rewardful referral. ----
-  async function studioCheckout(plan) {
+  async function studioCheckout(plan, interval) {
     if (!state.signedIn) { openAuth("signup"); return; }
     try {
       const referral = (window.Rewardful && window.Rewardful.referral) || undefined;
       const r = await fetch("/api/billing/checkout", {
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
-        body: JSON.stringify({ plan, pack: plan, client_reference_id: referral }),
+        body: JSON.stringify({ mode: "subscription", plan, interval: interval || "month", client_reference_id: referral }),
       });
       if (r.status === 401) { openAuth("signup"); return; }
       const j = await r.json().catch(() => ({}));

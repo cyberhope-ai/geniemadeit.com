@@ -378,12 +378,12 @@
   <div class="sheet" style="position:relative">
     <button class="x" data-close>×</button>
     <h3>Your three wishes are used up.</h3>
-    <p>Keep creating — pick a plan and the lamp never runs dry. Cancel anytime.</p>
+    <p>Go Bronze and the lamp never runs dry — <b>unlimited image creations</b>. Cancel anytime.</p>
     <div class="price">
-      <div class="plan"><div class="amt">$12</div><div class="per">/ month</div><div class="d">150 credits<br>+ full Vault</div><button class="btn ghost full" data-plan="starter" style="margin-top:12px">Choose Starter</button></div>
-      <div class="plan hot"><div class="amt">$39</div><div class="per">/ month</div><div class="d">600 credits<br>video + priority</div><button class="btn gold full" data-plan="plus" style="margin-top:12px">Choose Plus</button></div>
+      <div class="plan"><div class="amt">$4.95</div><div class="per">/ month</div><div class="d">Unlimited images<br>+ full Vault</div><button class="btn ghost full" data-plan="bronze" data-interval="month" style="margin-top:12px">Choose Bronze</button></div>
+      <div class="plan hot"><div class="amt">$49.95</div><div class="per">/ year</div><div class="d">Unlimited images<br>2 months free</div><button class="btn gold full" data-plan="bronze" data-interval="year" style="margin-top:12px">Best value — Annual</button></div>
     </div>
-    <div class="fine">Secure checkout · powered by Stripe</div>
+    <div class="fine">Secure checkout · powered by Stripe · Studio You portraits sold separately</div>
   </div>
 </div>
 
@@ -442,7 +442,7 @@
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260818e"></script>
+<script src="assets/studio.js?v=20260819a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
