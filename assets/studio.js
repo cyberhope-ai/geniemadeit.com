@@ -223,8 +223,12 @@
       }
       return `<div style="position:absolute;inset:0;display:grid;place-items:center;background:conic-gradient(from 210deg at 60% 40%,rgba(245,196,81,.14),rgba(102,227,232,.10),rgba(160,107,255,.14),rgba(245,196,81,.14))"><div style="font-size:2rem">🔊</div></div>`;
     }
-    if (item.type === "video" || item.kind === "video") return `<video src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`;
-    return `<img src="${item.url}" alt="${escapeHtml(item.prompt)}">`;
+    if (item.type === "video" || item.kind === "video") return big
+      ? `<video src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`
+      : `<video src="${item.url}" muted playsinline preload="metadata"></video>`;   // vault tiles: show 1st frame, don't auto-download/loop
+    return big
+      ? `<img src="${item.url}" alt="${escapeHtml(item.prompt)}">`
+      : `<img src="${item.url}" loading="lazy" decoding="async" alt="${escapeHtml(item.prompt)}">`;   // vault tiles: only load when scrolled into view
   }
   function renderResult(item) {
     els.canvas.innerHTML = mediaEl(item, true);
