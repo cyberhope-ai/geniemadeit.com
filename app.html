@@ -18,7 +18,7 @@
     --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
   }
   *{box-sizing:border-box}
-  html,body{margin:0;min-height:100%}
+  html,body{scroll-behavior:smooth;margin:0;min-height:100%}
   body{background:
       radial-gradient(1200px 620px at 82% -10%, rgba(245,196,81,.14), transparent 62%),
       radial-gradient(900px 640px at 4% 112%, rgba(102,227,232,.09), transparent 60%),
@@ -230,6 +230,7 @@
     </a>
     <nav class="links"><a href="/">Home</a><a href="/people">👥 My People</a><a href="/studio-you">Studio You</a><a href="/#pricing">Pricing</a><a href="/import">Import</a><a href="/verify.html">Verify</a></nav>
     <div class="spacer"></div>
+    <a class="btn gold" href="#vault" title="Jump straight to your photo Vault">🖼 My Vault</a>
     <div class="credits" title="Wishes remaining"><span>✦</span> <span class="n" id="creditN">3</span> wishes</div>
     <a class="btn ghost" href="/account" title="Your account, credits & receipts">Account</a>
     <button class="btn ghost" id="accountBtn">Sign in</button>
@@ -341,7 +342,7 @@
     <div class="packgrid" id="packGrid"></div>
   </section>
 
-  <section class="vault">
+  <section class="vault" id="vault" style="scroll-margin-top:76px">
     <h2>Your Vault</h2>
     <div class="vsub">Every creation, sealed and provably yours. Tap any to see its certificate.</div>
     <div class="vaultbar" style="display:flex;gap:10px;flex-wrap:wrap;margin:0 0 16px">
