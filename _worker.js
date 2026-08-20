@@ -71,12 +71,15 @@ export default {
         return new Response(JSON.stringify({ error: "unauthorized" }), { status: 401, headers: { "content-type": "application/json" }});
       if (!env.ENGINE_ADMIN_SECRET)
         return new Response(JSON.stringify({ error: "engine_admin_not_configured" }), { status: 503, headers: { "content-type": "application/json" }});
-      if (request.method !== "GET")
-        return new Response(JSON.stringify({ error: "read_only" }), { status: 405, headers: { "content-type": "application/json" }});
       const sub = url.pathname.slice("/gmadmin/".length).replace(/^\/+/, "");
+      const isWrite = sub.startsWith("promo"); // promo creation is the only POST-able admin op via this proxy
+      if (request.method !== "GET" && !(request.method === "POST" && isWrite))
+        return new Response(JSON.stringify({ error: "read_only" }), { status: 405, headers: { "content-type": "application/json" }});
       const eng = "https://geniemade-engine.cyberhopeai.workers.dev/api/admin/" + sub + url.search;
       try {
-        const resp = await fetch(eng, { headers: { "x-admin-token": env.ENGINE_ADMIN_SECRET } });
+        const init = { method: request.method, headers: { "x-admin-token": env.ENGINE_ADMIN_SECRET } };
+        if (request.method === "POST") { init.body = await request.text(); init.headers["content-type"] = "application/json"; }
+        const resp = await fetch(eng, init);
         const body = await resp.text();
         return new Response(body, { status: resp.status, headers: { "content-type": "application/json", "cache-control": "no-store" }});
       } catch (e) {
