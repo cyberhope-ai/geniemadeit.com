@@ -34,7 +34,7 @@
   .bar{max-width:1120px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
   .links{display:flex;gap:18px;font-size:14px;margin-left:8px}
   .links a{color:var(--mut);text-decoration:none} .links a:hover{color:var(--ink)}
-  @media(max-width:760px){.links{display:none}}
+  @media(max-width:760px){.links{display:none}.bar{flex-wrap:wrap;row-gap:8px}}
   .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
   .lamp{width:30px;height:30px;filter:drop-shadow(0 3px 10px rgba(245,196,81,.5))}
   .wm{font-family:var(--serif);font-size:1.28rem;font-weight:600}.wm b{color:var(--gold);font-weight:600}
@@ -68,7 +68,7 @@
   .composer textarea::placeholder{color:var(--faint)}
   .composer textarea:focus{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,196,81,.12)}
   .controls{display:flex;flex-wrap:wrap;gap:12px;align-items:center;margin-top:14px}
-  .seg{display:flex;background:rgba(10,6,22,.4);border:1px solid var(--line);border-radius:11px;padding:3px}
+  .seg{display:flex;background:rgba(10,6,22,.4);border:1px solid var(--line);border-radius:11px;padding:3px;overflow-x:auto;scrollbar-width:none}
   .seg button{border:none;background:transparent;color:var(--mut);font:inherit;font-weight:600;font-size:.86rem;
     padding:7px 13px;border-radius:8px;cursor:pointer;display:flex;align-items:center;gap:6px;transition:.15s}
   .seg button[aria-pressed=true]{background:linear-gradient(180deg,var(--gold2),var(--gold));color:#2a1a05}
