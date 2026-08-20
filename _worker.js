@@ -3,7 +3,7 @@ export default {
     const url = new URL(request.url);
     // CyberHopeAI-branded landing at geniemade.cyberhopeai.com (matches the A2P brand CyberHopeAI). Root = brand
     // page; privacy/terms served on-brand; everything else redirects to the app on geniemadeit.com.
-    if (url.hostname === "geniemade.cyberhopeai.com") {
+    if (url.hostname === "geniemade.cyberhopeai.com" || url.hostname === "geniemadeit.cyberhopeai.com") {
       const path = url.pathname;
       if (path === "/" || path === "/index.html")
         return env.ASSETS.fetch(new Request(new URL("/geniemade-cyberhope.html", url), request));
