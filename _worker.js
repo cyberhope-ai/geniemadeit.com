@@ -5,8 +5,8 @@ export default {
     // page; privacy/terms served on-brand; everything else redirects to the app on geniemadeit.com.
     if (url.hostname === "geniemade.cyberhopeai.com" || url.hostname === "geniemadeit.cyberhopeai.com") {
       const path = url.pathname;
-      if (path === "/" || path === "/index.html")
-        return env.ASSETS.fetch(new Request(new URL("/geniemade-cyberhope.html", url), request));
+      if (path === "/" || path === "/index.html" || path === "/geniemade-cyberhope" || path === "/geniemade-cyberhope.html")
+        return env.ASSETS.fetch(new Request(new URL("/geniemade-cyberhope", url), request));
       if (path === "/privacy" || path === "/terms" || path.startsWith("/assets/"))
         return env.ASSETS.fetch(request);
       return Response.redirect("https://geniemadeit.com" + path + url.search, 302);
