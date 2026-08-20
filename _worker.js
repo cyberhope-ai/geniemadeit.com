@@ -1,6 +1,16 @@
 export default {
   async fetch(request, env, ctx) {
     const url = new URL(request.url);
+    // CyberHopeAI-branded landing at geniemade.cyberhopeai.com (matches the A2P brand CyberHopeAI). Root = brand
+    // page; privacy/terms served on-brand; everything else redirects to the app on geniemadeit.com.
+    if (url.hostname === "geniemade.cyberhopeai.com") {
+      const path = url.pathname;
+      if (path === "/" || path === "/index.html")
+        return env.ASSETS.fetch(new Request(new URL("/geniemade-cyberhope.html", url), request));
+      if (path === "/privacy" || path === "/terms" || path.startsWith("/assets/"))
+        return env.ASSETS.fetch(request);
+      return Response.redirect("https://geniemadeit.com" + path + url.search, 302);
+    }
     if (url.pathname === "/api/waitlist") {
       if (request.method !== "POST")
         return new Response("Method Not Allowed", { status: 405 });
