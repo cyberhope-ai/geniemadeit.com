@@ -73,7 +73,7 @@
         <div class="tag">Studio You</div>
         <div class="price">$19<span class="per"> to start</span></div>
         <div class="cr">Your own trained AI model · one-time</div>
-        <ul><li>We train a private model of you</li><li>Studio-grade, unmistakably-<em>you</em> portraits</li><li>Taster $19 · Session $39 · VIP $99</li></ul>
+        <ul><li>We train a private model of you</li><li>Studio-grade, unmistakably-<em>you</em> portraits</li><li>Taster $19 · Session $39</li></ul>
         <a class="btn ghost" href="/studio-you" style="text-decoration:none;text-align:center;display:block">Explore Studio You →</a>
       </div>`;
     const bronze = SUB_TIERS.map((p) => `
