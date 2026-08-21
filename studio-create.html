@@ -114,7 +114,7 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
   <div class="steps">
     <div class="stp" id="s1"><b>1 · Upload</b>2+ good photos</div>
     <div class="stp" id="s2"><b>2 · Pick your looks</b>choose your styles</div>
-    <div class="stp" id="s3"><b>3 · We create them</b>we email + text you</div>
+    <div class="stp" id="s3"><b>3 · We create them</b>we email you</div>
   </div>
 
   <!-- HOW IT WORKS (illustrated) -->
@@ -183,12 +183,12 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
   <!-- STEP 3: where to send it -->
   <div class="card hidden" id="stepNotify">
     <h2>Where should we send them?</h2>
-    <p class="note">Your photos take a little while to create — <b style="color:var(--ink)">you don't have to wait here</b>. Leave your email (and phone, if you'd like a text) and we'll ping you the moment they're ready in your Vault. Close the tab, go make coffee — it keeps running on our servers.</p>
+    <p class="note">Your photos take a little while to create — <b style="color:var(--ink)">you don't have to wait here</b>. Leave your email and we'll ping you the moment they're ready in your Vault. Close the tab, go make coffee — it keeps running on our servers.</p>
     <div class="row">
       <div class="field"><label>Email (we'll notify you here)</label><input id="notifyEmail" type="email" placeholder="you@example.com"></div>
-      <div class="field"><label>Mobile for a text (optional)</label><input id="notifyPhone" type="tel" placeholder="+1 555 123 4567"></div>
+      <!-- SMS notify field hidden until A2P campaign is approved -->
+      <input id="notifyPhone" type="hidden" value="">
     </div>
-    <p class="note" style="font-size:12px;opacity:.85">By entering your mobile number, you agree to receive SMS text updates about your order (such as when your photos are ready) from GenieMade. Msg &amp; data rates may apply. Message frequency varies. Consent is not a condition of purchase. Reply STOP to unsubscribe, HELP for help. See our <a href="/privacy" style="color:var(--gold)">Privacy Policy</a> and <a href="/terms" style="color:var(--gold)">Terms</a>.</p>
     <p class="note" id="notifyMsg"></p>
     <div style="margin-top:16px;display:flex;gap:10px;flex-wrap:wrap">
       <button class="btn ghost" id="notifyBack">← Back to looks</button>
