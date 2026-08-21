@@ -195,7 +195,15 @@
   function wireSignin() {
     paintAccount();
     $("#authSubmit").onclick = doAuth;
-    $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
+    $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?return_to=/app"; };
+    const msB = $("#msBtn"), fbB = $("#fbBtn");
+    if (msB) msB.onclick = () => { window.location.href = "/api/auth/ms/start?return_to=/app"; };
+    if (fbB) fbB.onclick = () => { window.location.href = "/api/auth/facebook/start?return_to=/app"; };
+    // social buttons render only for providers the engine reports configured — no dead buttons
+    fetch("/api/auth/providers").then((r) => r.json()).then((pr) => {
+      if (pr && pr.microsoft && msB) msB.style.display = "";
+      if (pr && pr.facebook && fbB) fbB.style.display = "";
+    }).catch(() => {});
     document.querySelectorAll("[data-close]").forEach((b) => b.onclick = closeAuth);
     $("#authModal").addEventListener("click", (e) => { if (e.target.id === "authModal") closeAuth(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAuth(); });
