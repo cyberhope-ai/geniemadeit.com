@@ -741,7 +741,15 @@
       } else openAuth("signin");
     };
     $("#authSubmit").onclick = doAuth;
-    $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?redirect=/app"; };
+    $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?return_to=/app"; };
+    const msB = $("#msBtn"), fbB = $("#fbBtn");
+    if (msB) msB.onclick = () => { window.location.href = "/api/auth/ms/start?return_to=/app"; };
+    if (fbB) fbB.onclick = () => { window.location.href = "/api/auth/facebook/start?return_to=/app"; };
+    // social buttons render only for providers the engine says are actually configured — no dead buttons
+    fetch("/api/auth/providers").then((r) => r.json()).then((pr) => {
+      if (pr && pr.microsoft && msB) msB.style.display = "";
+      if (pr && pr.facebook && fbB) fbB.style.display = "";
+    }).catch(() => {});
     $("#swapLink").onclick = (e) => { e.preventDefault(); openAuth("signup"); };
     $$("#payModal button[data-plan]").forEach((b) => b.onclick = () => studioCheckout(b.dataset.plan, b.dataset.interval));
     const ws = $("#welcomeStart"); if (ws) ws.onclick = () => { closeModals(); const p = $("#prompt"); if (p) p.focus(); };
