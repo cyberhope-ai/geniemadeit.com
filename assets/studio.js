@@ -47,7 +47,7 @@
         certificate: g.certificate || { receipt_id: g.cert_id, issued_at: g.created_at, hash: g.hash, c2pa: true },
       }));
       renderVault();
-    } catch (_) { /* keep whatever we have */ }
+    } catch (e) { console.error("loadGallery failed:", e); /* keep whatever we have */ }
   }
 
   // ---- helpers ----
@@ -213,9 +213,9 @@
     const u = (item.url || "").toLowerCase();
     return item.kind === "audio" || item.type === "voice" || item.type === "audio.speech" || u.endsWith(".wav") || u.endsWith(".mp3");
   }
-  function mediaEl(item, player) {
+  function mediaEl(item, big) {
     if (isAudio(item)) {
-      if (player) {
+      if (big) {
         return `<div style="position:absolute;inset:0;display:grid;place-content:center;justify-items:center;gap:14px;padding:24px;text-align:center;background:conic-gradient(from 210deg at 55% 40%,rgba(245,196,81,.12),rgba(102,227,232,.08),rgba(160,107,255,.12),rgba(245,196,81,.12))">
           <div style="font-size:2.8rem">🔊</div>
           <audio controls src="${item.url}" style="width:90%;max-width:340px"></audio>
