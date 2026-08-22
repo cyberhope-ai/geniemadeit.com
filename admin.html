@@ -134,6 +134,9 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
     <div class="scroll" id="conCapWrap"></div>
     <h2 class="sec">The business, per customer — usage · revenue · margin</h2>
     <div class="scroll" id="conUserWrap"></div>
+    <h2 class="sec">Stripe — live from their API</h2>
+    <div class="muted" id="stripeNote"></div>
+    <div class="scroll" id="conStripeWrap"></div>
     <p class="muted" style="margin-top:16px">Read-only P&amp;L from live activity. Revenue = Stripe purchases. Cost = REAL fal spend when the daily balance snapshots cover the range (labeled), else our per-model estimate. Margin per customer = lifetime paid − provider cost in range. Reconcile to the exact fal invoice with the dashboard Usage CSV.</p>
   </section>
 </main>
@@ -239,6 +242,25 @@ async function loadConsumption(){
       (d.by_user||[]).map(function(u){var m=(u.margin_usd!=null?u.margin_usd:((u.paid_cents||0)/100-(u.cost_usd||0)));
         return '<tr><td>'+conEsc(u.email||u.user_id)+'</td><td>'+conEsc(u.plan||"")+'</td><td>'+(u.jobs||0)+'</td><td>'+(u.credits||0)+'</td><td>'+(u.credits_left==null?"—":Number(u.credits_left).toLocaleString())+'</td><td>'+usd((u.paid_cents||0)/100)+'</td><td>'+(u.purchases||0)+'</td><td>'+usd(u.cost_usd)+'</td><td style="color:'+(m>=0?'#7ee2a8':'#ff9c9c')+'">'+usd(m)+'</td></tr>';}).join("")+'</tbody></table>';
   }catch(e){note.textContent="Error loading consumption.";}
+  loadStripeReport();
+}
+async function loadStripeReport(){
+  var sn=document.getElementById("stripeNote"), w=document.getElementById("conStripeWrap");
+  if(!sn||!w)return; sn.textContent="Pulling live from Stripe…";
+  try{
+    var r=await fetch("/gmadmin/stripe-report?limit=40",{headers:{"x-admin-token":token()}});
+    var d=await r.json();
+    if(!d||!d.ok){sn.textContent="Stripe report unavailable ("+((d&&d.error)||r.status)+").";return;}
+    var b=d.balance, bs="";
+    if(b){bs=" · Balance available "+(b.available||[]).map(function(x){return money(x.amount_cents,x.currency);}).join(", ")
+      +((b.pending&&b.pending.length)?(" · pending "+b.pending.map(function(x){return money(x.amount_cents,x.currency);}).join(", ")):"");}
+    sn.innerHTML="✓ Live from Stripe's API — last "+d.count+" charges · gross shown "+money(d.gross_cents_shown)+bs;
+    w.innerHTML='<table><thead><tr><th>Date</th><th>Email</th><th>Amount</th><th>Status</th><th>Receipt</th></tr></thead><tbody>'+
+      (d.charges||[]).map(function(c){
+        var st=c.refunded?'<span style="color:#ffb08a">refunded</span>':(c.paid?'<span style="color:#7ee2a8">paid</span>':esc(c.status||""));
+        return '<tr><td class="muted">'+esc(String(c.ts||"").slice(0,10))+'</td><td>'+esc(c.email||"—")+'</td><td>'+money(c.amount_cents,c.currency)+'</td><td>'+st+'</td><td>'+(c.receipt_url?('<a class="rcpt" href="'+esc(c.receipt_url)+'" target="_blank" rel="noopener">Receipt ↗</a>'):"—")+'</td></tr>';
+      }).join("")+'</tbody></table>';
+  }catch(e){sn.textContent="Error pulling Stripe.";}
 }
 async function loadJobs(){
   var note=document.getElementById("jobsNote"); note.className="muted";
@@ -292,10 +314,10 @@ async function loadCustomers(){
     var rows=list.map(function(c){
       var name=c.name||[c.first_name,c.last_name].filter(Boolean).join(" ")||"—";
       var card=c.card_last4?("•••• "+esc(c.card_last4)):"—";
-      return "<tr class='cust-row' data-cust-id='"+esc(c.id)+"' title='View billing detail'><td>"+esc(name)+"</td><td class='muted'>"+esc(c.email||"—")+"</td><td>"+esc(c.phone||"—")+"</td><td>"+esc(c.plan||"free")+"</td><td>"+num(c.credits)+"</td><td class='muted'>"+card+"</td><td class='muted'>"+esc((c.created_at||"").slice(0,10))+"</td></tr>";
+      return "<tr class='cust-row' data-cust-id='"+esc(c.id)+"' title='View billing detail'><td>"+esc(name)+"</td><td class='muted'>"+esc(c.email||"—")+"</td><td>"+esc(c.signup_geo||"—")+"</td><td>"+esc(c.plan||"free")+"</td><td>"+num(c.credits)+"</td><td class='muted'>"+card+"</td><td class='muted'>"+esc((c.created_at||"").slice(0,10))+"</td></tr>";
     }).join("");
     document.getElementById("custWrap").innerHTML=list.length
-      ? '<table><thead><tr><th>Name</th><th>Email</th><th>Phone</th><th>Plan</th><th>Credits</th><th>Card</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted" style="margin-top:8px">Click a customer for full billing &amp; credit accounting.</p>'
+      ? '<table><thead><tr><th>Name</th><th>Email</th><th>From</th><th>Plan</th><th>Credits</th><th>Card</th><th>Joined</th></tr></thead><tbody>'+rows+'</tbody></table><p class="muted" style="margin-top:8px">Click a customer for full billing &amp; credit accounting.</p>'
       : '<p class="muted">No customers yet.</p>';
     note.textContent="";
   }catch(err){note.className="err";note.textContent="Couldn’t load customers.";}
@@ -370,6 +392,7 @@ function renderDetail(d){
   h+='<div><span class="lbl">Full name</span> '+esc(c.full_name||c.name||"—")+'</div>';
   h+='<div><span class="lbl">Email</span> '+esc(c.email||"—")+'</div>';
   h+='<div><span class="lbl">Plan</span> '+esc(c.plan||"free")+(c.card_last4?' · card •••• '+esc(c.card_last4):'')+'</div>';
+  if(c.signup_geo||c.signup_ip)h+='<div><span class="lbl">Signed up from</span> '+esc(c.signup_geo||"?")+(c.signup_ip?' · <span class="mono">'+esc(c.signup_ip)+'</span>':'')+'</div>';
   if(c.stripe_customer_id) h+='<div><span class="lbl">Stripe ID</span> <span class="mono">'+esc(c.stripe_customer_id)+'</span></div>';
   if(c.address_text) h+='<div><span class="lbl">Address</span> '+esc(c.address_text).replace(/\n/g,"<br>")+'</div>';
   h+='</div>';
