@@ -91,7 +91,7 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
   <div class="tabs">
     <button class="tab on" data-tab="affiliates">Affiliates</button>
     <button class="tab" data-tab="customers">Customers</button>
-    <button class="tab" data-tab="consumption">Consumption</button>
+    <button class="tab" data-tab="consumption">P&amp;L</button>
     <button class="tab" data-tab="jobs">Studio Jobs</button>
   </div>
 
@@ -128,11 +128,13 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
       </select>
     </div>
     <div class="cards" id="conCards" hidden></div>
+    <h2 class="sec">Revenue vs. cost — by day</h2>
+    <div class="scroll" id="conRevWrap"></div>
     <h2 class="sec">What's driving cost (by capability)</h2>
     <div class="scroll" id="conCapWrap"></div>
-    <h2 class="sec">Per customer — credits used vs. left</h2>
+    <h2 class="sec">The business, per customer — usage · revenue · margin</h2>
     <div class="scroll" id="conUserWrap"></div>
-    <p class="muted" style="margin-top:16px">Credits consumed and our estimated provider cost across every account. Read-only. Provider cost is our per-model estimate (reconcile to the exact fal invoice via the Usage CSV).</p>
+    <p class="muted" style="margin-top:16px">Read-only P&amp;L from live activity. Revenue = Stripe purchases. Cost = REAL fal spend when the daily balance snapshots cover the range (labeled), else our per-model estimate. Margin per customer = lifetime paid − provider cost in range. Reconcile to the exact fal invoice with the dashboard Usage CSV.</p>
   </section>
 </main>
 
@@ -210,22 +212,32 @@ async function loadConsumption(){
     if(r.status===401){showGate("Session expired — sign in again.");return;}
     var d=await r.json();
     if(!d||!d.ok){note.textContent="Couldn't load consumption.";return;}
-    var t=d.totals||{}, f=d.fal||{};
+    var t=d.totals||{}, f=d.fal||{}, pl=d.pnl||{};
     var cards=document.getElementById("conCards"); cards.hidden=false;
-    cards.innerHTML=conCard("Credits consumed",(t.credits||0).toLocaleString())
-      +conCard("Our cost estimate",usd(t.cost_usd))
-      +(f.real_spend_period!=null?conCard("Actual fal spend ⟵ auto",usd(f.real_spend_period)):"")
-      +(f.balance!=null?conCard("Fal balance (live)",usd(f.balance)):"")
+    cards.innerHTML=conCard("REVENUE (range)",usd(pl.revenue_usd))
+      +conCard("Provider cost — "+(pl.margin_basis==="real_fal_spend"?"REAL fal":"estimate"),usd(pl.provider_cost_real_usd!=null?pl.provider_cost_real_usd:pl.provider_cost_est_usd))
+      +conCard("GROSS MARGIN",usd(pl.gross_margin_usd)+(pl.margin_pct!=null?(" · "+pl.margin_pct+"%"):""))
+      +conCard("Paying customers",(pl.paying_users||0)+" · "+(pl.purchases||0)+" purchases")
+      +conCard("Credits consumed",(t.credits||0).toLocaleString())
       +conCard("Creations",(t.jobs||0).toLocaleString())
+      +(f.balance!=null?conCard("Fal balance (live)",usd(f.balance)):"")
       +conCard("Active customers",(t.users||0).toLocaleString());
+    // daily revenue vs cost merge
+    var costBy={}; (d.by_day||[]).forEach(function(x){costBy[x.date]=x;});
+    var revBy={}; (d.revenue_by_day||[]).forEach(function(x){revBy[x.date]=x;});
+    var days=Object.keys(Object.assign({},costBy,revBy)).sort().reverse().slice(0,45);
+    document.getElementById("conRevWrap").innerHTML='<table><thead><tr><th>Date</th><th>Revenue</th><th>Purchases</th><th>Credits used</th><th>Est cost</th><th>Margin (est)</th></tr></thead><tbody>'+
+      days.map(function(dt){var c=costBy[dt]||{},rv=revBy[dt]||{};var rev=(rv.cents||0)/100,cost=c.cost_usd||0;
+        return '<tr><td class="muted">'+dt+'</td><td>'+usd(rev)+'</td><td>'+(rv.purchases||0)+'</td><td>'+(c.credits||0)+'</td><td>'+usd(cost)+'</td><td style="color:'+((rev-cost)>=0?'#7ee2a8':'#ff9c9c')+'">'+usd(rev-cost)+'</td></tr>';}).join("")+'</tbody></table>';
     note.innerHTML = (f.real_spend_period!=null)
       ? ('✓ Real fal spend auto-pulled from balance: <b style="color:#ffe390">'+usd(f.real_spend_period)+'</b> for this range · our estimate '+usd(t.cost_usd)+' · live balance '+usd(f.balance)+(f.account?' ('+conEsc(f.account)+')':''))
       : (f.balance!=null ? ('Fal live balance: <b style="color:#ffe390">'+usd(f.balance)+'</b> — exact per-range spend fills in as daily balance snapshots accrue. Itemized invoice: export fal dashboard Usage CSV (no API).')
       : '');
     document.getElementById("conCapWrap").innerHTML='<table><thead><tr><th>Capability</th><th>Jobs</th><th>Credits</th><th>Provider cost</th></tr></thead><tbody>'+
       (d.by_capability||[]).map(function(c){return '<tr><td>'+conEsc(c.capability)+'</td><td>'+(c.jobs||0)+'</td><td>'+(c.credits||0)+'</td><td>'+usd(c.cost_usd)+'</td></tr>';}).join("")+'</tbody></table>';
-    document.getElementById("conUserWrap").innerHTML='<table><thead><tr><th>Customer</th><th>Plan</th><th>Credits used</th><th>Credits left</th><th>Provider cost</th></tr></thead><tbody>'+
-      (d.by_user||[]).map(function(u){return '<tr><td>'+conEsc(u.email||u.user_id)+'</td><td>'+conEsc(u.plan||"")+'</td><td>'+(u.credits||0)+'</td><td>'+(u.credits_left==null?"—":Number(u.credits_left).toLocaleString())+'</td><td>'+usd(u.cost_usd)+'</td></tr>';}).join("")+'</tbody></table>';
+    document.getElementById("conUserWrap").innerHTML='<table><thead><tr><th>Customer</th><th>Plan</th><th>Creations</th><th>Credits used</th><th>Credits left</th><th>Paid (lifetime)</th><th>Purchases</th><th>Provider cost</th><th>Margin</th></tr></thead><tbody>'+
+      (d.by_user||[]).map(function(u){var m=(u.margin_usd!=null?u.margin_usd:((u.paid_cents||0)/100-(u.cost_usd||0)));
+        return '<tr><td>'+conEsc(u.email||u.user_id)+'</td><td>'+conEsc(u.plan||"")+'</td><td>'+(u.jobs||0)+'</td><td>'+(u.credits||0)+'</td><td>'+(u.credits_left==null?"—":Number(u.credits_left).toLocaleString())+'</td><td>'+usd((u.paid_cents||0)/100)+'</td><td>'+(u.purchases||0)+'</td><td>'+usd(u.cost_usd)+'</td><td style="color:'+(m>=0?'#7ee2a8':'#ff9c9c')+'">'+usd(m)+'</td></tr>';}).join("")+'</tbody></table>';
   }catch(e){note.textContent="Error loading consumption.";}
 }
 async function loadJobs(){

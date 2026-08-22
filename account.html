@@ -128,13 +128,25 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
     <div class="card">
       <h2>Creation history</h2>
       <p class="note">Every image and video you’ve made — the credits each one used and its certificate of authenticity. The pictures themselves live in <a href="/app#vault" style="color:var(--gold,#f5c451)">your Vault →</a></p>
-      <div id="genSummary" class="note"></div>
+      <div id="genValue" class="valstrip" hidden></div>
+      <div class="pgbar">
+        <span class="note" id="genSummary"></span>
+        <span style="flex:1"></span>
+        <label class="note" for="genSize">Show</label>
+        <select id="genSize"><option>10</option><option selected>25</option><option>50</option><option>100</option><option>200</option><option value="1000">All</option></select>
+        <button class="btn sm" id="genPrev">‹ Prev</button>
+        <span class="note" id="genPage"></span>
+        <button class="btn sm" id="genNext">Next ›</button>
+      </div>
       <div id="genWrap"><div class="muted">Loading your creations…</div></div>
-      <div style="margin-top:10px"><button class="btn sm" id="genMore" hidden>Load more</button></div>
     </div>
   </div>
 </main>
-<style>.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em}.st-ok{color:#7ee2a8;font-weight:700}.st-rf{color:#ffb08a}</style>
+<style>.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em}.st-ok{color:#7ee2a8;font-weight:700}.st-rf{color:#ffb08a}
+.valstrip{display:flex;gap:22px;flex-wrap:wrap;background:rgba(245,196,81,.06);border:1px solid rgba(245,196,81,.35);border-radius:12px;padding:12px 16px;margin:10px 0}
+.valstrip .vs b{display:block;font-size:1.25rem;color:var(--gold,#f5c451)}.valstrip .vs span{font-size:.78rem;color:#8f7fbb}
+.pgbar{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
+.pgbar select{background:#1c1140;color:#f7f1ff;border:1px solid #3a2a6b;border-radius:8px;padding:5px 9px}</style>
 
 <script>
 function money(c,cur){return (cur&&cur!=="usd"?cur.toUpperCase()+" ":"$")+((Number(c)||0)/100).toFixed(2);}
@@ -149,35 +161,47 @@ async function boot(){
   }
   show("boot",false); show("acct",true);
   document.getElementById("gmSignout").style.display="";
-  loadAccount(); loadCredits(); loadInvoices(); loadAddress(); loadCreations(false);
+  loadAccount(); loadAddress();
+  Promise.all([loadCredits(),loadInvoices()]).then(function(){loadCreations();});
 }
-var genCursor=null, genCount=0, genCredits=0;
+var genPage=0, genPages=1, credBal=null, paidCents=0;
+var CREDIT_RETAIL=0.10; // list rate: starter pack $15 / 150 credits
 function capName(c){var m={"image":"Image","image.pro":"Pro Image","image.nano":"Premium Image","image.gpt":"GPT Image","studio.photo":"Studio Photo","studio.train":"Studio Training","video.text2video":"Video (from text)","video.image2video":"Video (from photo)","bgremove":"Background Remove","upscale":"Upscale","restore":"Photo Restore"};return m[c]||c||"Creation";}
-async function loadCreations(more){
-  var w=document.getElementById("genWrap"),btn=document.getElementById("genMore");
-  var r=await api("/api/usage/history?limit=25"+((more&&genCursor)?("&cursor="+encodeURIComponent(genCursor)):""));
-  var items=(r.data&&r.data.items)||[];
-  genCursor=(r.data&&r.data.next_cursor)||null;
-  if(btn)btn.hidden=!genCursor;
-  if(!more){
-    if(!items.length){w.innerHTML='<p class="muted">No creations yet — your history appears here after your first wish.</p>';return;}
-    w.innerHTML='<table><thead><tr><th>Date</th><th>Creation</th><th>Credits</th><th>Status</th><th>Certificate</th></tr></thead><tbody id="genRows"></tbody></table>';
-    genCount=0;genCredits=0;
+async function loadCreations(){
+  var w=document.getElementById("genWrap");
+  var size=parseInt(document.getElementById("genSize").value,10)||25;
+  var r=await api("/api/usage/history?limit="+size+"&page="+genPage);
+  var d=r.data||{}, items=d.items||[];
+  genPages=d.pages||1; if(genPage>=genPages)genPage=genPages-1;
+  document.getElementById("genPage").textContent="Page "+(genPage+1)+" of "+genPages;
+  document.getElementById("genPrev").disabled=genPage<=0;
+  document.getElementById("genNext").disabled=genPage>=genPages-1;
+  document.getElementById("genSummary").textContent=(d.total_ok||0)+" creation"+((d.total_ok||0)===1?"":"s")+" · "+(d.credits_used||0)+" credits used";
+  // ---- value strip: what all this work is WORTH, and the every-credit-accounted check ----
+  var v=document.getElementById("genValue");
+  if(v&&d.total_ok){
+    var val=(d.credits_used||0)*CREDIT_RETAIL;
+    var recon=(credBal!=null)?((d.credits_used||0)+credBal):null;
+    v.hidden=false;
+    v.innerHTML='<div class="vs"><b>'+(d.total_ok||0)+'</b><span>creations made</span></div>'
+      +'<div class="vs"><b>'+(d.credits_used||0)+(credBal!=null?(' <span style="font-size:.6em;color:#8f7fbb">+ '+credBal+' left</span>'):'')+'</b><span>credits used</span></div>'
+      +'<div class="vs"><b>≈ $'+val.toFixed(2)+'</b><span>creation value at list rate (10¢/credit)</span></div>'
+      +(paidCents?('<div class="vs"><b>$'+(paidCents/100).toFixed(2)+'</b><span>you’ve purchased'+(val>paidCents/100?(' — '+ (paidCents>0?((val/(paidCents/100)).toFixed(1)+'× value'):'')) :'')+'</span></div>'):'')
+      +(recon!=null?('<div class="vs"><b>'+recon+'</b><span>total credits received — every credit accounted (used + remaining)</span></div>'):'');
   }
-  var tb=document.getElementById("genRows"); if(!tb)return;
-  tb.insertAdjacentHTML("beforeend",items.map(function(x){
+  if(!items.length){w.innerHTML='<p class="muted">No creations yet — your history appears here after your first wish.</p>';return;}
+  w.innerHTML='<table><thead><tr><th>Date</th><th>Creation</th><th>Credits</th><th>Status</th><th>Certificate</th></tr></thead><tbody>'+items.map(function(x){
     var ok=x.status==="ok";
-    if(ok){genCount++;genCredits+=(Number(x.credits)||0);}
-    var d=String(x.ts||"").replace("T"," ").slice(0,16);
+    var dt=String(x.ts||"").replace("T"," ").slice(0,16);
     var mdl=x.model?' <span class="muted">· '+esc(String(x.model).split("/").pop())+'</span>':"";
     var cert=x.cert_id?('<span class="mono" title="'+esc(x.cert_id)+'">'+esc(String(x.cert_id).slice(0,12))+'…</span>'):'—';
     var st=ok?'<span class="st-ok">✓</span>':'<span class="st-rf" title="This creation failed — its credits were automatically refunded">refunded</span>';
-    return '<tr><td class="muted">'+esc(d)+'</td><td>'+esc(capName(x.capability))+mdl+'</td><td>'+(ok?(x.credits||0):0)+'</td><td>'+st+'</td><td>'+cert+'</td></tr>';
-  }).join(""));
-  var s=document.getElementById("genSummary");
-  if(s)s.textContent=genCount+" creation"+(genCount===1?"":"s")+" shown · "+genCredits+" credits used"+(genCursor?" (more below)":"");
+    return '<tr><td class="muted">'+esc(dt)+'</td><td>'+esc(capName(x.capability))+mdl+'</td><td>'+(ok?(x.credits||0):0)+'</td><td>'+st+'</td><td>'+cert+'</td></tr>';
+  }).join("")+'</tbody></table>';
 }
-document.getElementById("genMore").onclick=function(){loadCreations(true);};
+document.getElementById("genPrev").onclick=function(){if(genPage>0){genPage--;loadCreations();}};
+document.getElementById("genNext").onclick=function(){if(genPage<genPages-1){genPage++;loadCreations();}};
+document.getElementById("genSize").onchange=function(){genPage=0;loadCreations();};
 async function loadAccount(){
   var a=await api("/api/account"); var u=(a.data&&(a.data.account||a.data.user||a.data))||{};
   document.getElementById("hello").textContent=(u.email?("Signed in as "+u.email):"");
@@ -199,10 +223,12 @@ async function loadAddress(){
 }
 async function loadCredits(){
   var c=await api("/api/credits"); var d=c.data||{};
-  document.getElementById("creditBal").textContent=(d.credits!=null?d.credits:(d.balance!=null?d.balance:"—"));
+  credBal=(d.credits!=null?Number(d.credits):(d.balance!=null?Number(d.balance):null));
+  document.getElementById("creditBal").textContent=(credBal!=null?credBal:"—");
 }
 async function loadInvoices(){
   var r=await api("/api/billing/invoices"); var inv=(r.data&&(r.data.invoices||r.data.data))||[];
+  paidCents=(Array.isArray(inv)?inv:[]).reduce(function(s,x){return s+(Number(x.amount_cents)||0);},0);
   var w=document.getElementById("invWrap");
   if(!Array.isArray(inv)||!inv.length){w.innerHTML='<p class="muted">No purchases yet — your receipts will appear here after your first top-up.</p>';return;}
   w.innerHTML='<table><thead><tr><th>Date</th><th>Item</th><th>Credits</th><th>Amount</th><th>Receipt</th></tr></thead><tbody>'+inv.map(function(x){
