@@ -125,8 +125,16 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
       <div style="margin:10px 0"><button class="btn sm" id="portalBtn">Manage billing &amp; cards →</button> <span id="portalMsg" class="note"></span></div>
       <div id="invWrap"><div class="muted">Loading receipts…</div></div>
     </div>
+    <div class="card">
+      <h2>Creation history</h2>
+      <p class="note">Every image and video you’ve made — the credits each one used and its certificate of authenticity. The pictures themselves live in <a href="/app#vault" style="color:var(--gold,#f5c451)">your Vault →</a></p>
+      <div id="genSummary" class="note"></div>
+      <div id="genWrap"><div class="muted">Loading your creations…</div></div>
+      <div style="margin-top:10px"><button class="btn sm" id="genMore" hidden>Load more</button></div>
+    </div>
   </div>
 </main>
+<style>.mono{font-family:ui-monospace,SFMono-Regular,Menlo,monospace;font-size:.82em}.st-ok{color:#7ee2a8;font-weight:700}.st-rf{color:#ffb08a}</style>
 
 <script>
 function money(c,cur){return (cur&&cur!=="usd"?cur.toUpperCase()+" ":"$")+((Number(c)||0)/100).toFixed(2);}
@@ -141,8 +149,35 @@ async function boot(){
   }
   show("boot",false); show("acct",true);
   document.getElementById("gmSignout").style.display="";
-  loadAccount(); loadCredits(); loadInvoices(); loadAddress();
+  loadAccount(); loadCredits(); loadInvoices(); loadAddress(); loadCreations(false);
 }
+var genCursor=null, genCount=0, genCredits=0;
+function capName(c){var m={"image":"Image","image.pro":"Pro Image","image.nano":"Premium Image","image.gpt":"GPT Image","studio.photo":"Studio Photo","studio.train":"Studio Training","video.text2video":"Video (from text)","video.image2video":"Video (from photo)","bgremove":"Background Remove","upscale":"Upscale","restore":"Photo Restore"};return m[c]||c||"Creation";}
+async function loadCreations(more){
+  var w=document.getElementById("genWrap"),btn=document.getElementById("genMore");
+  var r=await api("/api/usage/history?limit=25"+((more&&genCursor)?("&cursor="+encodeURIComponent(genCursor)):""));
+  var items=(r.data&&r.data.items)||[];
+  genCursor=(r.data&&r.data.next_cursor)||null;
+  if(btn)btn.hidden=!genCursor;
+  if(!more){
+    if(!items.length){w.innerHTML='<p class="muted">No creations yet — your history appears here after your first wish.</p>';return;}
+    w.innerHTML='<table><thead><tr><th>Date</th><th>Creation</th><th>Credits</th><th>Status</th><th>Certificate</th></tr></thead><tbody id="genRows"></tbody></table>';
+    genCount=0;genCredits=0;
+  }
+  var tb=document.getElementById("genRows"); if(!tb)return;
+  tb.insertAdjacentHTML("beforeend",items.map(function(x){
+    var ok=x.status==="ok";
+    if(ok){genCount++;genCredits+=(Number(x.credits)||0);}
+    var d=String(x.ts||"").replace("T"," ").slice(0,16);
+    var mdl=x.model?' <span class="muted">· '+esc(String(x.model).split("/").pop())+'</span>':"";
+    var cert=x.cert_id?('<span class="mono" title="'+esc(x.cert_id)+'">'+esc(String(x.cert_id).slice(0,12))+'…</span>'):'—';
+    var st=ok?'<span class="st-ok">✓</span>':'<span class="st-rf" title="This creation failed — its credits were automatically refunded">refunded</span>';
+    return '<tr><td class="muted">'+esc(d)+'</td><td>'+esc(capName(x.capability))+mdl+'</td><td>'+(ok?(x.credits||0):0)+'</td><td>'+st+'</td><td>'+cert+'</td></tr>';
+  }).join(""));
+  var s=document.getElementById("genSummary");
+  if(s)s.textContent=genCount+" creation"+(genCount===1?"":"s")+" shown · "+genCredits+" credits used"+(genCursor?" (more below)":"");
+}
+document.getElementById("genMore").onclick=function(){loadCreations(true);};
 async function loadAccount(){
   var a=await api("/api/account"); var u=(a.data&&(a.data.account||a.data.user||a.data))||{};
   document.getElementById("hello").textContent=(u.email?("Signed in as "+u.email):"");
