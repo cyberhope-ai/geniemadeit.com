@@ -1,3 +1,6 @@
-# Static assets are versioned (?v= on scripts) or content-stable — cache hard.
+# HTML never goes stale on devices (tablet/phone cache bugs) — always revalidate
+/*
+  Cache-Control: no-cache
+# hashed/versioned static assets + media: cache long (query-param versioning governs JS)
 /assets/*
-  Cache-Control: public, max-age=31536000, immutable
+  Cache-Control: public, max-age=604800
