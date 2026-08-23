@@ -437,6 +437,7 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
       </dl>
       <div class="cert-actions">
         <button class="btn gold" id="lbDl">Download full-res</button>
+        <button class="btn ghost" id="lbShare">Share…</button>
         <button class="btn ghost" id="lbCert">Certificate</button>
         <button class="btn danger" id="lbDelete">Delete…</button>
         <button class="btn ghost" data-close>Close</button>
@@ -445,7 +446,29 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260823a"></script>
+<!-- share link -->
+<div class="modal" id="shareModal">
+  <div class="sheet" style="position:relative;max-width:470px">
+    <button class="x" data-close>×</button>
+    <h3>Share this creation</h3>
+    <p id="shWhat" class="fine" style="margin:2px 0 4px"></p>
+    <p>Anyone with the link can view and download the <b>full-resolution</b> original — no account needed. You can revoke it at any time.</p>
+    <label class="keepwrap"><input type="checkbox" id="shCert" checked>
+      <span><span class="kt">Include the authenticity certificate</span><br>
+      <span class="ks">Shows the sealed receipt, fingerprint and a public Verify link next to your creation.</span></span></label>
+    <div style="display:flex;gap:8px;margin-top:12px">
+      <input id="shUrl" readonly placeholder="Creating link…" style="flex:1;min-width:0;background:#0c0720;border:1px solid var(--line);border-radius:10px;color:var(--ink);padding:10px 12px;font-size:.85rem">
+      <button class="btn gold" id="shCopy">Copy</button>
+    </div>
+    <div class="cert-actions" style="margin-top:8px">
+      <button class="btn danger" id="shRevoke">Revoke link</button>
+      <button class="btn ghost" data-close>Done</button>
+    </div>
+    <p class="fine" id="shMsg" style="margin-top:10px"></p>
+  </div>
+</div>
+
+<script src="assets/studio.js?v=20260823b"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

@@ -39,6 +39,7 @@
         kind: kindOf(g.capability || "") || g.kind || "image",
         type: g.type,
         url: g.url,
+        thumb: g.thumb,
         prompt: g.prompt || "",
         model: g.model || "GenieMade",
         ts: Date.parse(g.created_at || (g.certificate && g.certificate.issued_at)) || Date.now(),
@@ -223,9 +224,12 @@
       }
       return `<div style="position:absolute;inset:0;display:grid;place-items:center;background:conic-gradient(from 210deg at 60% 40%,rgba(245,196,81,.14),rgba(102,227,232,.10),rgba(160,107,255,.14),rgba(245,196,81,.14))"><div style="font-size:2rem">🔊</div></div>`;
     }
-    if (item.type === "video" || item.kind === "video") return big
-      ? `<video src="${item.url}" autoplay loop muted playsinline poster="${item.url}"></video>`
-      : `<video src="${item.url}" muted playsinline preload="metadata"></video>`;   // vault tiles: show 1st frame, don't auto-download/loop
+    if (item.type === "video" || item.kind === "video") {
+      const poster = item.thumb ? ` poster="${item.thumb}"` : "";
+      return big
+        ? `<video src="${item.url}" autoplay loop muted playsinline controls${poster}></video>`   // controls: films have sound — let people unmute + scrub
+        : `<video src="${item.url}"${poster} muted playsinline preload="${item.thumb ? "none" : "metadata"}"></video>`;   // vault tiles: poster paints instantly, no video download until opened
+    }
     return big
       ? `<img src="${item.url}" alt="${escapeHtml(item.prompt)}">`
       : `<img src="${item.url}" loading="lazy" decoding="async" alt="${escapeHtml(item.prompt)}">`;   // vault tiles: only load when scrolled into view
@@ -279,6 +283,7 @@
     var d1 = $("#lbDl"); if (d1) d1.onclick = () => gmDownload(item);
     var d2 = $("#lbCert"); if (d2) d2.onclick = () => gmDownloadCert(item);
     var d3 = $("#lbDelete"); if (d3) d3.onclick = () => openDelete(item);
+    var d4 = $("#lbShare"); if (d4) d4.onclick = () => openShare(item);
     $("#lightbox").classList.add("on");
   }
 
@@ -338,6 +343,46 @@
       } else if (m) { m.textContent = d.message || d.error || "Couldn't delete."; }
     } catch (e) { if (m) m.textContent = "Network error — try again."; }
   }
+
+  // ---- sharing: one public full-res link per creation; authenticity optional; revocable ----
+  var _shareItem = null;
+  async function shareCall(includeCert) {
+    var r = await fetch("/api/share", { method: "POST", credentials: "same-origin",
+      headers: { "content-type": "application/json" },
+      body: JSON.stringify({ id: _shareItem.id, include_cert: !!includeCert }) });
+    return r.json().catch(function(){ return {}; });
+  }
+  function openShare(item) {
+    _shareItem = item; if (!item || !item.id) return;
+    var w = $("#shWhat"); if (w) w.textContent = item.prompt ? "“" + item.prompt.slice(0, 55) + "”" : "";
+    var u = $("#shUrl"); if (u) u.value = "";
+    var m = $("#shMsg"); if (m) m.textContent = "Creating your link…";
+    var c = $("#shCert"); if (c) c.checked = true;
+    openModal("shareModal");
+    shareCall(true).then(function(d){
+      if (d.ok && u) { u.value = d.url; if (m) m.textContent = "Anyone with this link can view + download the full-resolution original."; }
+      else if (m) m.textContent = d.message || "Couldn't create the link — try again.";
+    });
+  }
+  var _shc = $("#shCert"); if (_shc) _shc.onchange = async function(e){
+    if (!_shareItem) return;
+    var d = await shareCall(e.target.checked);
+    var m = $("#shMsg");
+    if (m) m.textContent = d.ok ? (e.target.checked ? "Authenticity certificate attached to the link." : "Link now shares the media only — no certificate.") : (d.message || "Update failed.");
+  };
+  var _shcp = $("#shCopy"); if (_shcp) _shcp.onclick = async function(){
+    var u = $("#shUrl"); if (!u || !u.value) return;
+    try { await navigator.clipboard.writeText(u.value); } catch (_) { u.select(); document.execCommand("copy"); }
+    var m = $("#shMsg"); if (m) m.textContent = "Link copied — paste it anywhere.";
+  };
+  var _shrv = $("#shRevoke"); if (_shrv) _shrv.onclick = async function(){
+    if (!_shareItem) return;
+    var r = await fetch("/api/share/revoke", { method: "POST", credentials: "same-origin",
+      headers: { "content-type": "application/json" }, body: JSON.stringify({ id: _shareItem.id }) });
+    var d = await r.json().catch(function(){ return {}; });
+    var u = $("#shUrl"); if (u) u.value = "";
+    var m = $("#shMsg"); if (m) m.textContent = d.revoked ? "Link revoked — it no longer works anywhere." : (d.message || "No active link to revoke.");
+  };
 
   // ---- modals ----
   function openModal(id) { $("#" + id).classList.add("on"); }

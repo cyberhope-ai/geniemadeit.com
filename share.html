@@ -1,0 +1,111 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Shared with you — GenieMade</title>
+<meta property="og:title" content="A GenieMade creation was shared with you">
+<meta property="og:description" content="View it in full resolution — sealed with a certificate of authenticity.">
+<style>
+  :root{--bg:#0c0720;--card:#130a26;--line:#2b1d4e;--ink:#f7f1ff;--mut:#8f7fbb;--gold:#f5c451;--gold2:#c88f2c;--teal:#66e3e8;
+        --serif:Georgia,"Times New Roman",serif}
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{overflow-x:clip}
+  body{background:radial-gradient(1200px 700px at 50% -10%,#1d1040 0%,var(--bg) 55%);color:var(--ink);
+       font:16px/1.6 system-ui,-apple-system,"Segoe UI",Roboto,sans-serif;min-height:100vh;display:flex;flex-direction:column}
+  header{display:flex;align-items:center;justify-content:space-between;gap:12px;padding:16px 20px;max-width:1040px;width:100%;margin:0 auto}
+  .brand{font-family:var(--serif);font-size:1.15rem;color:var(--gold);text-decoration:none;letter-spacing:.4px}
+  .brand span{color:var(--ink)}
+  .cta{background:linear-gradient(180deg,#ffd97a,var(--gold));color:#241303;text-decoration:none;font-weight:700;
+       padding:9px 16px;border-radius:12px;font-size:.9rem;white-space:nowrap}
+  main{flex:1;width:100%;max-width:1040px;margin:0 auto;padding:8px 20px 40px;display:grid;grid-template-columns:1.4fr 1fr;gap:22px;align-items:start}
+  @media(max-width:860px){main{grid-template-columns:1fr}}
+  .stage{border:1px solid var(--line);border-radius:18px;overflow:hidden;background:#080414;min-height:220px;display:grid;place-items:center}
+  .stage img,.stage video{display:block;width:100%;height:auto;max-height:78vh;object-fit:contain;background:#080414}
+  .panel{background:var(--card);border:1px solid var(--line);border-radius:18px;padding:22px}
+  .eyebrow{color:var(--teal);font-size:.78rem;letter-spacing:.14em;text-transform:uppercase}
+  h1{font-family:var(--serif);font-weight:600;font-size:1.35rem;margin:8px 0 2px;line-height:1.3}
+  .by{color:var(--mut);font-size:.9rem;margin-bottom:14px}
+  .btn{display:inline-block;border-radius:12px;padding:11px 18px;font-weight:700;font-size:.92rem;text-decoration:none;cursor:pointer;border:0}
+  .btn.gold{background:linear-gradient(180deg,#ffd97a,var(--gold));color:#241303}
+  .btn.ghost{background:transparent;color:var(--ink);border:1px solid var(--line)}
+  .cert{margin-top:18px;border:1px solid #4a3416;border-radius:14px;padding:16px;background:linear-gradient(180deg,rgba(245,196,81,.06),rgba(245,196,81,.02))}
+  .cert .head{display:flex;align-items:center;gap:8px;color:var(--gold);font-family:var(--serif);font-size:.98rem}
+  .kv{display:grid;grid-template-columns:auto 1fr;gap:6px 14px;margin-top:10px;font-size:.84rem}
+  .kv dt{color:var(--mut)}
+  .kv dd{overflow-wrap:anywhere}
+  .kv .mono{font-family:ui-monospace,Menlo,Consolas,monospace;font-size:.76rem}
+  .verify{color:var(--teal);text-decoration:none}
+  .note{color:var(--mut);font-size:.8rem;margin-top:14px}
+  .state{padding:60px 24px;text-align:center;color:var(--mut)}
+  footer{border-top:1px solid var(--line);padding:22px 20px;text-align:center;color:var(--mut);font-size:.85rem}
+  footer a{color:var(--gold);text-decoration:none}
+</style>
+</head>
+<body>
+<header>
+  <a class="brand" href="/">🧞 Genie<span>Made</span></a>
+  <a class="cta" href="/app">Make your own ✦</a>
+</header>
+
+<main id="main" style="display:none">
+  <div class="stage" id="stage"></div>
+  <div class="panel">
+    <div class="eyebrow">Shared with you</div>
+    <h1 id="title">A GenieMade creation</h1>
+    <div class="by" id="by"></div>
+    <a class="btn gold" id="dl" href="#" download>Download full resolution</a>
+    <div class="cert" id="cert" style="display:none">
+      <div class="head"><svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2l2.4 1.7 2.9-.2 1 2.7 2.4 1.6-.6 2.9 1 2.7-2 2.1.1 2.9-2.8.9-1.6 2.4-2.8-.7-2.8.7-1.6-2.4-2.8-.9.1-2.9-2-2.1 1-2.7-.6-2.9L4.7 6.2l1-2.7 2.9.2L12 2z" fill="none" stroke="#c88f2c" stroke-width="1.3"/><path d="M8.5 12l2.3 2.3 4.7-4.7" fill="none" stroke="#f5c451" stroke-width="1.7" stroke-linecap="round" stroke-linejoin="round"/></svg>
+        Certified authentic</div>
+      <dl class="kv">
+        <dt>Receipt</dt><dd class="mono" id="cReceipt"></dd>
+        <dt>Sealed</dt><dd id="cTime"></dd>
+        <dt>Fingerprint</dt><dd class="mono" id="cHash"></dd>
+        <dt>Registry</dt><dd><a class="verify" id="cVerify" href="#">Verify this creation →</a></dd>
+      </dl>
+    </div>
+    <p class="note">This creation lives in a private PrecognitionOS Vault. The owner can revoke this link at any time.</p>
+  </div>
+</main>
+
+<div class="state" id="loading">Opening the Vault…</div>
+<div class="state" id="gone" style="display:none">
+  <div style="font-size:2rem;margin-bottom:10px">🔒</div>
+  This share link is no longer available.<br>
+  <a class="btn ghost" href="/" style="margin-top:18px">Visit GenieMade</a>
+</div>
+
+<footer>Made with <a href="/">GenieMade</a> — every creation sealed with a certificate of authenticity.</footer>
+
+<script>
+(function(){
+  var token = (location.pathname.match(/^\/s\/([0-9a-f]{16,64})/) || [])[1];
+  var $ = function(id){ return document.getElementById(id); };
+  function gone(){ $("loading").style.display = "none"; $("gone").style.display = "block"; }
+  if (!token) return gone();
+  fetch("/api/share/" + token, { headers: { accept: "application/json" } })
+    .then(function(r){ return r.ok ? r.json() : null; })
+    .then(function(d){
+      if (!d || !d.ok) return gone();
+      $("loading").style.display = "none"; $("main").style.display = "";
+      if (d.title) { $("title").textContent = "“" + d.title + "”"; document.title = d.title + " — GenieMade"; }
+      $("by").textContent = (d.owner ? "by " + d.owner + " · " : "") + "shared " + new Date(d.shared_at).toLocaleDateString();
+      $("stage").innerHTML = d.kind === "video"
+        ? '<video src="' + d.media_url + '" controls autoplay muted playsinline' + (d.thumb_url ? ' poster="' + d.thumb_url + '"' : '') + '></video>'
+        : '<img src="' + d.media_url + '" alt="">';
+      $("dl").href = d.download_url;
+      if (d.cert) {
+        $("cert").style.display = "";
+        $("cReceipt").textContent = d.cert.receipt_id;
+        $("cTime").textContent = new Date(d.cert.issued_at).toLocaleString();
+        $("cHash").textContent = (d.cert.hash || "").slice(0, 20) + "…";
+        $("cVerify").href = d.cert.verify_url;
+      }
+    })
+    .catch(gone);
+})();
+</script>
+</body>
+</html>
