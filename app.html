@@ -445,7 +445,7 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260822b"></script>
+<script src="assets/studio.js?v=20260823a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
