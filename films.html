@@ -100,8 +100,10 @@
     <a class="btn ghost" href="#how" style="margin-left:8px">How it works</a></p>
   </div>
   <div class="reel">
-    <video src="/assets/demo/rick-noir-v2.mp4" controls muted autoplay loop playsinline></video>
-    <div class="cap">From “The Case of the Missing Presents” — a GenieMade family noir. Every frame generated from a single portrait.</div>
+    <!-- poster-first: ZERO video bytes until the visitor presses play; then the FULL film streams
+         (range requests) from the Cloudflare edge cache — no per-view origin/egress burn -->
+    <video src="/assets/demo/noir-film-v4.mp4" poster="/assets/demo/noir-film-v4-poster.jpg" controls preload="none" playsinline></video>
+    <div class="cap">▶ Watch “The Case of the Missing Presents” — the complete GenieMade family noir, with score. Every frame generated from single portraits.</div>
   </div>
 </div>
 

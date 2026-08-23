@@ -100,6 +100,9 @@ export default {
     // path client-side and fetches /api/share/<token> (proxied below) for the media + cert.
     if (url.pathname.startsWith("/s/"))
       return env.ASSETS.fetch(new Request(new URL("/share", url), request));
+    // SkillDNA vault-connect approve screen (opened from SkillDNA -> Connections)
+    if (url.pathname === "/connect/skilldna")
+      return env.ASSETS.fetch(new Request(new URL("/connect-skilldna", url), request));
     // API glue: proxy the rest of /api/* to the GenieMade engine so the Studio
     // calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
