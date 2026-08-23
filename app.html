@@ -228,7 +228,7 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
         <ellipse cx="21.5" cy="30" rx="15.5" ry="6.6" fill="none" stroke="#b9832a" stroke-width="1" opacity=".5"/></svg>
       <span class="wm">Genie<b>Made</b></span>
     </a>
-    <nav class="links"><a href="/">Home</a><a href="/people">👥 My People</a><a href="/studio-you">Studio You</a><a href="/#pricing">Pricing</a><a href="/import">Import</a><a href="/verify.html">Verify</a></nav>
+    <nav class="links"><a href="/">Home</a><a href="/people">👥 My People</a><a href="/studio-you">Studio You</a><a href="/films">🎬 Films</a><a href="/#pricing">Pricing</a><a href="/import">Import</a><a href="/verify.html">Verify</a></nav>
     <div class="spacer"></div>
     <a class="btn gold" href="#vault" title="Jump straight to your photo Vault">🖼 My Vault</a>
     <div class="credits" title="Wishes remaining"><span>✦</span> <span class="n" id="creditN">3</span> wishes</div>
@@ -468,7 +468,7 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260823b"></script>
+<script src="assets/studio.js?v=20260823c"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

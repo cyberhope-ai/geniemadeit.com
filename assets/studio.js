@@ -40,6 +40,7 @@
         type: g.type,
         url: g.url,
         thumb: g.thumb,
+        by: g.by,
         prompt: g.prompt || "",
         model: g.model || "GenieMade",
         ts: Date.parse(g.created_at || (g.certificate && g.certificate.issued_at)) || Date.now(),
@@ -265,7 +266,7 @@
     els.grid.innerHTML = state.vault.map((g, i) => `
       <div class="card" data-i="${i}">
         ${mediaEl(g, false)}
-        <div class="cert">◈ Certified</div>
+        <div class="cert">${g.by ? "◈ by " + escapeHtml(g.by) : "◈ Certified"}</div>
         <div class="cap">“${escapeHtml(g.prompt.slice(0, 44))}${g.prompt.length > 44 ? "…" : ""}”</div>
       </div>`).join("");
     $$(".card", els.grid).forEach((c) => c.onclick = () => openLightbox(state.vault[Number(c.dataset.i)]));
@@ -275,7 +276,9 @@
   function openLightbox(item) {
     $("#lbBig").innerHTML = mediaEl(item, true);
     $("#lbTitle").textContent = `“${item.prompt}”`;
-    $("#lbDesc").textContent = "Sealed in your PrecognitionOS Vault — provably yours.";
+    $("#lbDesc").textContent = item.by
+      ? `Created by ${item.by} — its home is in their Vault, shared into yours.`
+      : "Sealed in your PrecognitionOS Vault — provably yours.";
     $("#lbModel").textContent = item.model;
     $("#lbReceipt").textContent = item.certificate.receipt_id;
     $("#lbTime").textContent = fmtTime(item.certificate.issued_at);
