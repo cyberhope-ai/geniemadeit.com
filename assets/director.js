@@ -72,6 +72,9 @@
 
   function eyeRow(id, name, craft) {
     const el = document.createElement("div");
+    // The row carries its persona id. Reopening a project matches on this, not on the
+    // visible name: the project stores "villeneuve" while the row reads "Denis Villeneuve".
+    el.dataset.persona = id;
     el.className = "eye" + (id === state.persona ? " on" : "");
     el.innerHTML = `<div><div class="nm">${name}</div><div class="cr">${craft}</div></div>`;
     el.onclick = () => {
@@ -131,11 +134,12 @@
     $("projLogline").value = d.project.logline || "";
     $("projGenre").value = d.project.genre || "";
     $("projTone").value = d.project.tone || "";
-    if (d.project.persona) {
-      state.persona = d.project.persona;
-      [...$("personas").children].forEach((c) =>
-        c.classList.toggle("on", c.querySelector(".nm")?.textContent === d.project.persona));
-    }
+    // Always reconcile, including the empty case: switching from a project that has an eye to
+    // one that doesn't must clear both the highlight and the state, or the next shot is composed
+    // through an eye the page is no longer showing.
+    state.persona = d.project.persona || "";
+    [...$("personas").children].forEach((c) =>
+      c.classList.toggle("on", c.dataset.persona === state.persona));
     // Items carry the generation id; the Vault holds the pixels.
     renderShots((d.items || []).map((i) => ({
       url: `/asset/gen/${i.user_id}/${i.generation_id}.png`,
