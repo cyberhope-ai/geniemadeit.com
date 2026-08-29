@@ -299,6 +299,57 @@ function structuredData(file, current, html) {
 }
 
 const SD_SLOT = "\u0001SD\u0001";
+
+/* Render the FAQ that the page already claims to have.
+ *
+ * 39 make/ pages shipped FAQPage structured data whose questions appeared NOWHERE in the visible
+ * page -- "How do I make a AI birthday card?", "What's a good personalized birthday gift for Dad?".
+ * Google requires FAQ markup to correspond to content the user can see, so that was a policy
+ * violation with manual-action risk, on the whole occasion set, right as the site was submitted for
+ * indexing for the first time.
+ *
+ * The fix is to SHOW it, not to delete it. The answers were already written and they are good --
+ * 40 distinct questions targeting exactly the long-tail queries these pages exist to win. Deleting
+ * the markup would have removed the risk and thrown away the content; rendering it removes the risk
+ * AND puts the content on the page.
+ *
+ * Rendered FROM the markup, so the two can never disagree again -- which is what made this possible
+ * to get wrong in the first place. Pages with no FAQPage node render nothing. */
+const FAQ_CSS = `
+.gmn-faq{max-width:820px;margin:44px auto 8px;padding:0 20px;
+font:16px/1.7 -apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif}
+.gmn-faq h2{font-size:22px;margin:0 0 6px;letter-spacing:-.01em}
+.gmn-faq .gmn-faq-sub{opacity:.62;font-size:14.5px;margin:0 0 18px}
+.gmn-faq details{border-top:1px solid rgba(128,128,128,.24);padding:13px 0}
+.gmn-faq details:last-of-type{border-bottom:1px solid rgba(128,128,128,.24)}
+.gmn-faq summary{cursor:pointer;font-weight:600;font-size:16.5px;list-style:none;
+display:flex;justify-content:space-between;gap:14px;align-items:flex-start}
+.gmn-faq summary::-webkit-details-marker{display:none}
+.gmn-faq summary::after{content:"+";opacity:.5;font-weight:400;font-size:20px;line-height:1}
+.gmn-faq details[open] summary::after{content:"\u2013"}
+.gmn-faq p{margin:9px 0 2px;opacity:.82}`.trim();
+
+const esc2 = (x) => String(x).replace(/&(?!#?\w+;)/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
+
+function renderFaq(html) {
+  let faq = null;
+  for (const m of html.matchAll(/<script type="application\/ld\+json">([\s\S]*?)<\/script>/g)) {
+    let d; try { d = JSON.parse(m[1]); } catch { continue; }
+    for (const n of (d["@graph"] || [d])) if (n["@type"] === "FAQPage" && n.mainEntity?.length) faq = n;
+  }
+  if (!faq) return "";
+  const items = faq.mainEntity.map((q) => {
+    const a = q.acceptedAnswer?.text || "";
+    if (!a) return "";
+    // The markup stores HTML entities; decode once so the visible text matches it exactly.
+    const dec = (x) => String(x).replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').replace(/&amp;/g, "&");
+    return `<details><summary>${esc2(dec(q.name))}</summary><p>${esc2(dec(a))}</p></details>`;
+  }).join("");
+  if (!items) return "";
+  return `<style>${FAQ_CSS}</style>\n<section class="gmn-faq"><h2>Questions</h2>` +
+         `<p class="gmn-faq-sub">The things people ask before they make one.</p>${items}</section>`;
+}
+
 function block(current) {
   return [
     START,
@@ -350,8 +401,13 @@ function apply(html, current) {
     if (hdr) html = html.replace(hdr[0], "\u0000GMNAV\u0000");
     else html = html.replace(/(<body[^>]*>)/i, `$1\n\u0000GMNAV\u0000`);
   }
-  const out = stripLegacyTracking(html).replace("\u0000GMNAV\u0000", want);
-  return out.replace(SD_SLOT, structuredData(currentFile, current, html));
+  let out = stripLegacyTracking(html).replace("\u0000GMNAV\u0000", want);
+  out = out.replace(SD_SLOT, structuredData(currentFile, current, html));
+  // Drop any previously generated FAQ before re-rendering, so rebuilds don't stack copies.
+  out = out.replace(/<style>\.gmn-faq\{[\s\S]*?<\/section>\s*/g, "");
+  const faq = renderFaq(html);
+  if (faq) out = out.replace(/<footer/, faq + "\n<footer");
+  return out;
 }
 
 let stale = [];
