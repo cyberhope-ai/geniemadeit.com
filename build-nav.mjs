@@ -163,6 +163,29 @@ function renderNav(current) {
   return parts.join("");
 }
 
+/* Sitewide tracking, injected with the header so coverage is structural.
+ *
+ * It was not before: the Rewardful affiliate script sat on make/ (39/39) and on 8 of 17 root
+ * pages, but on NONE of invitations/, holidays/, studio-you/, people/ or card/. Rewardful is a
+ * live network with active campaigns, so an affiliate promoting /holidays/christmas -- the most
+ * seasonally valuable page on the site -- set no referral cookie and earned nothing on the sale.
+ * That is a revenue-integrity bug, not a tagging nicety.
+ *
+ * ANALYTICS_ID is empty until a GA4 measurement ID exists; the block is omitted entirely rather
+ * than emitting a broken tag. Set it here and every one of the pages gets it on the next build. */
+const REWARDFUL_ID = "3b9f63";
+const ANALYTICS_ID = "";   // e.g. "G-XXXXXXXXXX"
+
+const TRACKING = [
+  `<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>`,
+  `<script async src='https://r.wdfl.co/rw.js' data-rewardful='${REWARDFUL_ID}'></script>`,
+  ...(ANALYTICS_ID ? [
+    `<script async src="https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_ID}"></script>`,
+    `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}` +
+      `gtag('js',new Date());gtag('config','${ANALYTICS_ID}');</script>`,
+  ] : []),
+].join("\n");
+
 /* Signed-in and signed-out states are decided here, once, from /api/me — rather than by
  * each page rolling its own. #gmSignout, #creditN and #accountBtn keep their ids because
  * nine pages plus studio.js and director.js already drive them. */
@@ -208,19 +231,32 @@ function block(current) {
     `<a class="gmn-btn gold" href="/app" data-out>Open the Studio</a>`,
     `</div></div></header>`,
     `<script>${RUNTIME}</script>`,
+    TRACKING,
     END,
   ].join("\n");
 }
 
 /* Replace whatever header the page currently has: a previously generated block, or the
  * hand-written <header>…</header> it still carries. */
+/* The 47 pages that already carried a hand-placed Rewardful snippet must lose it, or the script
+ * loads twice and the second init can clobber the first referral. Removed only outside the
+ * generated block, which is rewritten wholesale anyway. */
+function stripLegacyTracking(html) {
+  return html
+    .replace(/<script>\(function\(w,r\)\{w\._rwq[\s\S]*?rewardful'\);?<\/script>\s*/g, "")
+    .replace(/<script[^>]*r\.wdfl\.co\/rw\.js[^>]*><\/script>\s*/g, "");
+}
+
 function apply(html, current) {
   const want = block(current);
   const marked = new RegExp(`${START.replace(/[.*+?^${}()|[\]\\—]/g, "\\$&")}[\\s\\S]*?${END}`);
-  if (marked.test(html)) return html.replace(marked, want);
-  const hdr = html.match(/<header[\s\S]*?<\/header>/);
-  if (hdr) return html.replace(hdr[0], want);
-  return html.replace(/(<body[^>]*>)/i, `$1\n${want}`);
+  if (marked.test(html)) html = html.replace(marked, "\u0000GMNAV\u0000");
+  else {
+    const hdr = html.match(/<header[\s\S]*?<\/header>/);
+    if (hdr) html = html.replace(hdr[0], "\u0000GMNAV\u0000");
+    else html = html.replace(/(<body[^>]*>)/i, `$1\n\u0000GMNAV\u0000`);
+  }
+  return stripLegacyTracking(html).replace("\u0000GMNAV\u0000", want);
 }
 
 let stale = [];
@@ -233,6 +269,69 @@ for (const [file, path] of PAGES) {
   else writeFileSync(file, after);
 }
 
+/* sitemap.xml is generated from the same page list, because a hand-kept one drifts exactly like a
+ * hand-kept header did: it listed 10 URLs while 81 pages were indexable, so all 39 make/, all 13
+ * invitations/ and all 13 holidays/ pages -- the entire organic-traffic strategy -- were never
+ * submitted to Google. A page is included unless it declares noindex; that keeps /app, /account,
+ * /director and the recipient card views out without a second list to maintain. */
+function urlFor(file) {
+  let u = "/" + file.replace(/\.html$/, "");
+  return (u.replace(/\/index$/, "/") || "/").replace(/^\/index$/, "/");
+}
+
+function buildSitemap() {
+  const urls = [];
+  for (const [file] of PAGES) {
+    const html = readFileSync(file, "utf8");
+    if (/name="robots"[^>]*noindex/.test(html)) continue;
+    const u = urlFor(file);
+    // Landing pages earn their traffic; the roots outrank them.
+    const pri = u === "/" ? "1.0" : u.split("/").length <= 2 ? "0.9" : "0.8";
+    urls.push(`<url><loc>https://geniemadeit.com${u}</loc><priority>${pri}</priority></url>`);
+  }
+  return { xml: `<?xml version="1.0" encoding="UTF-8"?>\n` +
+    `<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n${urls.join("\n")}\n</urlset>\n`,
+    count: urls.length };
+}
+
+/* Cloudflare serves a default robots.txt containing only content-signal boilerplate — no
+ * Sitemap: line, so crawlers were never pointed at the sitemap at all. This replaces it and keeps
+ * the existing AI-scraper blocks. */
+const ROBOTS = `User-agent: *
+Allow: /
+
+# Private, functional or recipient-facing — no value in the index.
+Disallow: /account
+Disallow: /admin
+Disallow: /share
+Disallow: /c/
+
+# AI scrapers we do not grant training rights to.
+User-agent: Amazonbot
+Disallow: /
+User-agent: Applebot-Extended
+Disallow: /
+User-agent: Bytespider
+Disallow: /
+User-agent: CCBot
+Disallow: /
+User-agent: GPTBot
+Disallow: /
+
+Sitemap: https://geniemadeit.com/sitemap.xml
+`;
+
+const sm = buildSitemap();
+if (CHECK) {
+  const cur = existsSync("sitemap.xml") ? readFileSync("sitemap.xml", "utf8") : "";
+  if (cur !== sm.xml) stale.push("sitemap.xml");
+  const curR = existsSync("robots.txt") ? readFileSync("robots.txt", "utf8") : "";
+  if (curR !== ROBOTS) stale.push("robots.txt");
+} else {
+  writeFileSync("sitemap.xml", sm.xml);
+  writeFileSync("robots.txt", ROBOTS);
+}
+
 if (CHECK) {
   if (stale.length) {
     console.error(`\nThe header is STALE in ${stale.length} page(s):\n  ${stale.join("\n  ")}\n\n` +
@@ -243,5 +342,6 @@ if (CHECK) {
   console.log(`header is current in all ${PAGES.length} pages.`);
 } else {
   console.log(`header written into ${PAGES.length} pages`);
+  console.log(`  sitemap.xml: ${sm.count} indexable URLs · robots.txt written`);
   console.log(`  top level: ${MAIN.map((g) => g.label + (g.items ? "▾" : "")).join(" · ")}`);
 }
