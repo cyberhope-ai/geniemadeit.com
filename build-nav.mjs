@@ -207,6 +207,51 @@ const RUNTIME = `
   }).catch(function(){});
 })();`.trim();
 
+/* Structured data, derived from what is already on the page — never invented.
+ *
+ * make/ had WebApplication + BreadcrumbList + FAQPage; invitations/ (0/13), holidays/ (0/13) and
+ * studio-you/ (1/7) had none, so the highest commercial-intent pages on the site were the ones
+ * Google understood least.
+ *
+ * ⚠ FAQPage is deliberately NOT generated. The existing make/ blocks declare questions that appear
+ * nowhere in the visible page, which is a structured-data policy violation ("content must be
+ * visible to the user"), and Google retired FAQ rich results for most sites in 2023 — so it
+ * carries real manual-action risk for no upside. Fix those by writing a real FAQ section, not by
+ * spreading the markup further.
+ *
+ * Everything below is verifiable from the page itself: its title, its description, its URL. */
+function structuredData(file, current, html) {
+  if (/name="robots"[^>]*noindex/.test(html)) return "";        // don't describe what we hide
+  if (/"@type"\s*:\s*"WebApplication"/.test(html)) return "";   // make/ already has its own
+  const t = html.match(/<title>(.*?)<\/title>/s);
+  const d = html.match(/name="description"\s+content="(.*?)"/s);
+  if (!t || !d) return "";
+  const dec = (x) => x.replace(/&amp;/g, "&").replace(/&#x27;|&#39;/g, "'").replace(/&quot;/g, '"').trim();
+  const name = dec(t[1]).split("|")[0].split("—")[0].trim();
+  const url = "https://geniemadeit.com" + urlFor(file);
+
+  // Breadcrumbs mirror the real URL depth, so /invitations/wedding is Home > Invitations > Wedding.
+  const segs = urlFor(file).split("/").filter(Boolean);
+  const crumbs = [{ "@type": "ListItem", position: 1, name: "Home", item: "https://geniemadeit.com/" }];
+  segs.forEach((seg, i) => crumbs.push({
+    "@type": "ListItem", position: i + 2,
+    name: seg.replace(/-/g, " ").replace(/\b\w/g, (c) => c.toUpperCase()),
+    item: "https://geniemadeit.com/" + segs.slice(0, i + 1).join("/"),
+  }));
+
+  const graph = [
+    { "@type": "WebApplication", name, url, description: dec(d[1]),
+      applicationCategory: "MultimediaApplication", operatingSystem: "Any",
+      publisher: { "@type": "Organization", name: "GenieMade", url: "https://geniemadeit.com/" },
+      // The free tier is real: three wishes, no card. Offers must not overstate.
+      offers: { "@type": "Offer", price: "0", priceCurrency: "USD",
+                description: "3 free wishes to start, no card needed" } },
+    { "@type": "BreadcrumbList", itemListElement: crumbs },
+  ];
+  return `<script type="application/ld+json">${JSON.stringify({ "@context": "https://schema.org", "@graph": graph })}</script>`;
+}
+
+const SD_SLOT = "\u0001SD\u0001";
 function block(current) {
   return [
     START,
@@ -232,6 +277,7 @@ function block(current) {
     `</div></div></header>`,
     `<script>${RUNTIME}</script>`,
     TRACKING,
+    SD_SLOT,
     END,
   ].join("\n");
 }
@@ -247,6 +293,7 @@ function stripLegacyTracking(html) {
     .replace(/<script[^>]*r\.wdfl\.co\/rw\.js[^>]*><\/script>\s*/g, "");
 }
 
+let currentFile = "";
 function apply(html, current) {
   const want = block(current);
   const marked = new RegExp(`${START.replace(/[.*+?^${}()|[\]\\—]/g, "\\$&")}[\\s\\S]*?${END}`);
@@ -256,13 +303,15 @@ function apply(html, current) {
     if (hdr) html = html.replace(hdr[0], "\u0000GMNAV\u0000");
     else html = html.replace(/(<body[^>]*>)/i, `$1\n\u0000GMNAV\u0000`);
   }
-  return stripLegacyTracking(html).replace("\u0000GMNAV\u0000", want);
+  const out = stripLegacyTracking(html).replace("\u0000GMNAV\u0000", want);
+  return out.replace(SD_SLOT, structuredData(currentFile, current, html));
 }
 
 let stale = [];
 for (const [file, path] of PAGES) {
   if (!existsSync(file)) { console.error(`missing ${file}`); process.exit(1); }
   const before = readFileSync(file, "utf8");
+  currentFile = file;
   const after = apply(before, path);
   if (before === after) continue;
   if (CHECK) stale.push(file);
