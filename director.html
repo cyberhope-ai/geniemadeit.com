@@ -1,0 +1,190 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>The Director — GenieMade</title>
+<meta name="description" content="Plan a film before you shoot it. Storyboards, concept art, location scouts and lighting studies — framed by a legendary eye, kept together as a project.">
+<meta name="robots" content="noindex, follow">
+<style>
+  :root{
+    --night:#130a26; --night2:#1c1140; --panel:#231553; --panel2:#2b1b63; --line:#3a2a6b;
+    --ink:#f7f1ff; --mut:#c6b6ea; --faint:#8f7fbb;
+    --gold:#f5c451; --gold2:#ffe390; --goldd:#c88f2c; --magic:#66e3e8; --viol:#a06bff;
+    --serif:ui-serif,"Iowan Old Style",Georgia,"Times New Roman",serif;
+    --sans:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;
+  }
+  *{box-sizing:border-box}
+  html,body{margin:0;min-height:100%}
+  body{background:
+      radial-gradient(1200px 620px at 82% -10%, rgba(245,196,81,.14), transparent 62%),
+      radial-gradient(900px 640px at 4% 112%, rgba(102,227,232,.09), transparent 60%),
+      linear-gradient(178deg,var(--night2),var(--night));
+    background-attachment:fixed;color:var(--ink);font:16px/1.6 var(--sans);-webkit-font-smoothing:antialiased}
+  a{color:inherit}
+  .wrap{max-width:1320px;margin:0 auto;padding:0 22px 70px}
+
+  header{position:sticky;top:0;z-index:30;backdrop-filter:blur(10px);
+    background:linear-gradient(180deg,rgba(19,10,38,.9),rgba(19,10,38,.55));border-bottom:1px solid var(--line)}
+  .bar{max-width:1320px;margin:0 auto;padding:12px 22px;display:flex;align-items:center;gap:14px}
+  .links{display:flex;gap:18px;font-size:14px;margin-left:8px}
+  .links a{color:var(--mut);text-decoration:none}.links a:hover{color:var(--ink)}
+  .links a.on{color:var(--gold)}
+  @media(max-width:980px){.links{display:none}}
+  .brand{display:flex;align-items:center;gap:10px;text-decoration:none}
+  .lamp{width:30px;height:30px;filter:drop-shadow(0 3px 10px rgba(245,196,81,.5))}
+  .wm{font-family:var(--serif);font-size:1.28rem;font-weight:600}.wm b{color:var(--gold);font-weight:600}
+  .spacer{flex:1}
+  .btn{display:inline-flex;align-items:center;gap:7px;border-radius:10px;padding:8px 13px;font-size:14px;
+    text-decoration:none;cursor:pointer;border:1px solid var(--line);background:transparent;color:var(--ink);font-family:var(--sans)}
+  .btn.gold{background:linear-gradient(180deg,var(--gold2),var(--goldd));color:#2a1a05;border:0;font-weight:650}
+  .btn.gold[disabled]{opacity:.5;cursor:progress}
+  .btn:hover{border-color:var(--gold)}
+  .credits{font-size:13px;color:var(--gold2);border:1px solid var(--line);border-radius:99px;padding:5px 11px;white-space:nowrap}
+
+  h1{font-family:var(--serif);font-size:clamp(28px,4vw,42px);margin:26px 0 6px;font-weight:600}
+  h1 b{color:var(--gold)}
+  .dek{color:var(--mut);max-width:62ch;margin:0 0 22px}
+
+  .stage{display:grid;grid-template-columns:236px 1fr 300px;gap:16px;align-items:start}
+  @media(max-width:1180px){.stage{grid-template-columns:1fr}}
+  .col{background:linear-gradient(180deg,rgba(43,27,99,.55),rgba(35,21,83,.4));
+    border:1px solid var(--line);border-radius:14px;padding:15px}
+  .col h3{font-family:var(--sans);font-size:11px;letter-spacing:.14em;text-transform:uppercase;
+    color:var(--faint);margin:0 0 11px;font-weight:600}
+
+  .eye{display:flex;gap:10px;align-items:flex-start;padding:9px 10px;border-radius:10px;cursor:pointer;
+    border:1px solid transparent}
+  .eye:hover{background:rgba(160,107,255,.12)}
+  .eye.on{background:rgba(245,196,81,.13);border-color:rgba(245,196,81,.4)}
+  .eye .nm{font-size:14px;font-weight:600;line-height:1.25}
+  .eye .cr{font-size:11.5px;color:var(--faint);line-height:1.3}
+
+  label.f{display:block;font-size:11px;letter-spacing:.1em;text-transform:uppercase;color:var(--faint);margin:12px 0 5px}
+  input.i,select.i,textarea.i{width:100%;background:rgba(19,10,38,.6);border:1px solid var(--line);
+    color:var(--ink);border-radius:10px;padding:9px 11px;font:14px/1.5 var(--sans);outline:none}
+  input.i:focus,select.i:focus,textarea.i:focus{border-color:var(--gold)}
+  textarea.i{resize:vertical}
+  .row{display:flex;gap:8px}.row>*{flex:1}
+
+  .stat{font-size:13px;color:var(--mut);min-height:1.3em;margin-top:10px}
+  .stat.err{color:#ff9b8a}.stat.ok{color:var(--magic)}
+
+  .shots{display:grid;grid-template-columns:repeat(auto-fill,minmax(190px,1fr));gap:11px;margin-top:16px}
+  .shot{position:relative;border:1px solid var(--line);border-radius:11px;overflow:hidden;background:rgba(19,10,38,.5)}
+  .shot img,.shot video{width:100%;display:block;aspect-ratio:16/9;object-fit:cover;background:#0d0619}
+  .shot .cap{padding:7px 9px;font-size:11.5px;color:var(--mut);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+  .shot .seal{position:absolute;top:6px;right:6px;font-size:10px;background:rgba(19,10,38,.85);
+    color:var(--magic);border:1px solid rgba(102,227,232,.35);border-radius:5px;padding:2px 6px}
+  .shot .kind{position:absolute;top:6px;left:6px;font-size:10px;background:rgba(19,10,38,.85);
+    color:var(--gold2);border:1px solid rgba(245,196,81,.3);border-radius:5px;padding:2px 6px}
+
+  .empty{border:1px dashed var(--line);border-radius:12px;padding:26px;text-align:center;color:var(--faint);
+    font-size:14px;margin-top:16px}
+  .note{font-size:12.5px;color:var(--faint);line-height:1.5;margin-top:10px}
+  .gate{background:rgba(245,196,81,.08);border:1px solid rgba(245,196,81,.3);border-radius:12px;
+    padding:15px 17px;margin:18px 0;font-size:14.5px}
+</style>
+</head>
+<body>
+
+<header>
+  <div class="bar">
+    <a class="brand" href="/">
+      <svg class="lamp" viewBox="0 0 48 48" aria-hidden="true"><defs><linearGradient id="lg" x1="0" y1="0" x2="1" y2="1"><stop offset="0" stop-color="#ffe390"/><stop offset="1" stop-color="#e0a52f"/></linearGradient></defs>
+        <path d="M6 30c0-4 6-7 15-7 3 0 5 .3 7 .8l7-3.5c1.4-.7 2.6.9 1.7 2.2l-2.3 3.2c2 1.3 3.2 2.8 3.2 4.3 0 4-7 7-16.5 7S6 34 6 30Z" fill="url(#lg)"/>
+        <ellipse cx="21.5" cy="30" rx="15.5" ry="6.6" fill="none" stroke="#b9832a" stroke-width="1" opacity=".5"/></svg>
+      <span class="wm">Genie<b>Made</b></span>
+    </a>
+    <nav class="links">
+      <a href="/">Home</a><a href="/app">Studio</a><a href="/films">🎬 Films</a>
+      <a href="/director" class="on">🎥 Director</a><a href="/people">👥 My People</a>
+      <a href="/#pricing">Pricing</a><a href="/verify.html">Verify</a>
+    </nav>
+    <div class="spacer"></div>
+    <div class="credits" title="Wishes remaining">✦ <span id="creditN">—</span> wishes</div>
+    <a class="btn ghost" href="/account">Account</a>
+  </div>
+</header>
+
+<div class="wrap">
+  <h1>The <b>Director</b></h1>
+  <p class="dek">Plan the film before you shoot it. Describe a moment, choose the eye that frames it,
+    and get a storyboard panel, a concept painting, a location scout or a lighting study — kept
+    together as a project, each sealed with its certificate.</p>
+
+  <div id="gate" class="gate" style="display:none">
+    <b>Sign in to direct.</b> The Director works from your account so your projects and creations
+    stay in your Vault. <a href="/app" style="color:var(--gold)">Open the Studio to sign in →</a>
+  </div>
+
+  <div class="stage">
+
+    <!-- the eye -->
+    <div class="col">
+      <h3>The Eye</h3>
+      <div id="personas"></div>
+      <p class="note">A persona shapes light, lens and staging. It never changes the medium —
+        a watercolor film framed by Deakins stays watercolor.</p>
+    </div>
+
+    <!-- the shot -->
+    <div class="col">
+      <h3>The Shot</h3>
+      <label class="f" for="scene">Describe the moment</label>
+      <textarea class="i" id="scene" rows="3"
+        placeholder="A diver surfaces inside a flooded stone church, light through broken glass"></textarea>
+
+      <div class="row">
+        <div>
+          <label class="f" for="shot">Shot type</label>
+          <select class="i" id="shot"></select>
+        </div>
+        <div>
+          <label class="f" for="style">Style</label>
+          <select class="i" id="style"><option value="">— none —</option></select>
+        </div>
+        <div>
+          <label class="f" for="aspect">Aspect</label>
+          <select class="i" id="aspect">
+            <option value="16:9" selected>16:9</option>
+            <option value="1:1">1:1</option>
+            <option value="9:16">9:16</option>
+          </select>
+        </div>
+      </div>
+
+      <label class="f">&nbsp;</label>
+      <button class="btn gold" id="go" style="width:100%;justify-content:center">✨ Compose &amp; render</button>
+      <div class="stat" id="stat"></div>
+
+      <div id="shots" class="shots"></div>
+      <div id="empty" class="empty">Nothing shot yet. Describe a moment above.</div>
+    </div>
+
+    <!-- the project -->
+    <div class="col">
+      <h3>The Project</h3>
+      <select class="i" id="projSel"><option value="">— no project —</option></select>
+      <label class="f" for="projTitle">New project</label>
+      <div class="row">
+        <input class="i" id="projTitle" placeholder="Title…">
+        <button class="btn" id="projAdd" style="flex:0 0 auto">Add</button>
+      </div>
+      <label class="f" for="projLogline">Logline</label>
+      <textarea class="i" id="projLogline" rows="3" placeholder="Your story in a sentence or two…"></textarea>
+      <div class="row">
+        <div><label class="f" for="projGenre">Genre</label><input class="i" id="projGenre" placeholder="thriller"></div>
+        <div><label class="f" for="projTone">Tone</label><input class="i" id="projTone" placeholder="cold, patient"></div>
+      </div>
+      <button class="btn" id="projSave" style="width:100%;justify-content:center;margin-top:12px">Save project</button>
+      <p class="note">Frames you shoot are attached to the selected project, so the work for one
+        film stays together. Deleting a project never deletes your creations.</p>
+    </div>
+
+  </div>
+</div>
+
+<script src="assets/director.js?v=20260829a"></script>
+</body>
+</html>

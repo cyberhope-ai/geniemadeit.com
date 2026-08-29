@@ -25,3 +25,8 @@ The generation engine, Vault, auth, billing, and provenance live in the private 
 `cyberhope-ai/pcos-geniemade-vault-code`.
 
 (c) CyberHope AI
+
+- `director.html` — **The Director** (`/director`): plan a film before you shoot it. Describe a
+  moment, choose the eye that frames it (persona), and get a storyboard panel, concept painting,
+  location scout or lighting study — kept together as a project. Loads `assets/director.js`.
+  Backed by `/api/shot/compose`, `/api/director/menu` and `/api/projects` in the engine.
