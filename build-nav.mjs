@@ -174,7 +174,7 @@ function renderNav(current) {
  * ANALYTICS_ID is empty until a GA4 measurement ID exists; the block is omitted entirely rather
  * than emitting a broken tag. Set it here and every one of the pages gets it on the next build. */
 const REWARDFUL_ID = "3b9f63";
-const ANALYTICS_ID = "";   // e.g. "G-XXXXXXXXXX"
+const ANALYTICS_ID = "G-V33LHDZQX3";   // GenieMade property, CyberHope AI account
 
 const TRACKING = [
   `<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>`,
