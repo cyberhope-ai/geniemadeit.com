@@ -111,9 +111,12 @@
     if (btn) { btn.textContent = "Loading…"; btn.disabled = true; }
     try {
       const referral = (window.Rewardful && window.Rewardful.referral) || undefined;
+      // The GA4 client id rides through Stripe metadata so the webhook can credit the purchase to
+      // the session that earned it. Without it the sale reports as "direct".
+      const gaCid = (window.gmGaCid && window.gmGaCid()) || undefined;
       const payload = opts.mode === "subscription"
-        ? { mode: "subscription", plan: opts.plan, interval: opts.interval, client_reference_id: referral }
-        : { pack: opts.pack, client_reference_id: referral };
+        ? { mode: "subscription", plan: opts.plan, interval: opts.interval, client_reference_id: referral, ga_cid: gaCid }
+        : { pack: opts.pack, client_reference_id: referral, ga_cid: gaCid };
       const r = await fetch("/api/billing/checkout", {
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
         body: JSON.stringify(payload),

@@ -815,7 +815,7 @@
       const referral = (window.Rewardful && window.Rewardful.referral) || undefined;
       const r = await fetch("/api/billing/checkout", {
         method: "POST", headers: { "content-type": "application/json" }, credentials: "same-origin",
-        body: JSON.stringify({ mode: "subscription", plan, interval: interval || "month", client_reference_id: referral }),
+        body: JSON.stringify({ mode: "subscription", plan, interval: interval || "month", client_reference_id: referral, ga_cid: (window.gmGaCid && window.gmGaCid()) || undefined }),
       });
       if (r.status === 401) { openAuth("signup"); return; }
       const j = await r.json().catch(() => ({}));
