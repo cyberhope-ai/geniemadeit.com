@@ -35,21 +35,32 @@ backdrop-filter:blur(10px);border-bottom:1px solid #3a2a6b;font:15px/1.4 -apple-
 .gmn-wm b{color:#f5c451;font-weight:600}
 .gmn-nav{display:flex;align-items:center;gap:2px;flex:1 1 auto;min-width:0}
 .gmn-nav>a,.gmn-t{display:inline-flex;align-items:center;gap:4px;padding:8px 11px;border-radius:9px;
-color:#c6b6ea;text-decoration:none;white-space:nowrap;font-size:14.5px}
+color:#d7cbf2;text-decoration:none;white-space:nowrap;font-size:15px;font-weight:600;letter-spacing:.005em}
 .gmn-nav>a:hover,.gmn-t:hover{color:#f7f1ff;background:rgba(160,107,255,.14)}
 .gmn-nav>a.on,.gmn-dd.on>.gmn-t{color:#f5c451}
 .gmn-dd{position:relative}
 .gmn-caret{font-size:10px;opacity:.7}
-.gmn-menu{position:absolute;top:calc(100% + 6px);left:0;min-width:212px;padding:7px;
+/* Anchored flush to the trigger, not 6px below it. That gap was a dead zone: the pointer left
+ * .gmn-dd on the way down and the menu closed before it could be reached. The visual separation
+ * now comes from the transparent ::before bridge, which is part of the hover area. */
+.gmn-menu{position:absolute;top:100%;left:0;min-width:212px;padding:7px;margin-top:8px;
 background:#1c1140;border:1px solid #3a2a6b;border-radius:12px;box-shadow:0 18px 40px rgba(0,0,0,.5);
 display:none;flex-direction:column;gap:1px;max-height:min(70vh,520px);overflow-y:auto}
+/* Bridge the 8px gap so travelling from the trigger down to the menu never leaves the hover
+ * region. It has to hang off .gmn-dd, NOT off .gmn-menu: the menu is display:none until the
+ * parent is hovered, so a bridge drawn on the menu disappears at the exact moment it is needed
+ * and the menu shuts as the pointer enters the gap. Generated content counts as part of the
+ * parent's box for hit-testing, so this keeps :hover continuous. */
+.gmn-dd:hover::after,.gmn-dd:focus-within::after{content:"";position:absolute;top:100%;left:0;
+right:-8px;height:12px}
 .gmn-dd:hover>.gmn-menu,.gmn-dd:focus-within>.gmn-menu{display:flex}
-.gmn-menu a{padding:8px 11px;border-radius:8px;color:#e6dcff;text-decoration:none;font-size:14px;white-space:nowrap}
+.gmn-menu a{padding:8px 11px;border-radius:8px;color:#e9e0ff;text-decoration:none;font-size:14.5px;
+font-weight:560;white-space:nowrap}
 .gmn-menu a:hover{background:rgba(245,196,81,.14);color:#fff}
 .gmn-right{display:flex;align-items:center;gap:8px;flex:0 0 auto}
-.gmn-chip{font-size:13px;color:#ffe390;border:1px solid #3a2a6b;border-radius:99px;padding:5px 11px;white-space:nowrap}
+.gmn-chip{font-size:13px;font-weight:600;color:#ffe390;border:1px solid #3a2a6b;border-radius:99px;padding:5px 11px;white-space:nowrap}
 .gmn-btn{display:inline-flex;align-items:center;padding:7px 13px;border-radius:10px;border:1px solid #3a2a6b;
-background:transparent;color:#f7f1ff;text-decoration:none;white-space:nowrap;font-size:14px;cursor:pointer;font-family:inherit;
+background:transparent;color:#f7f1ff;text-decoration:none;white-space:nowrap;font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;
 /* width/margin stated because verify.html ships `button{width:100%;margin-top:16px}` */
 width:auto;margin:0;min-width:0;line-height:1.4}
 .gmn-btn:hover{border-color:#f5c451}
@@ -62,7 +73,8 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   .gmn-nav{display:none;position:absolute;top:100%;left:0;right:0;flex-direction:column;align-items:stretch;
     background:#1c1140;border-bottom:1px solid #3a2a6b;padding:8px;gap:2px;max-height:78vh;overflow-y:auto}
   .gmn.open .gmn-nav{display:flex}
-  .gmn-menu{position:static;display:flex;border:0;background:transparent;box-shadow:none;padding:0 0 4px 14px;max-height:none}
+  .gmn-menu{position:static;display:flex;border:0;background:transparent;box-shadow:none;padding:0 0 4px 14px;max-height:none;margin-top:0}
+  .gmn-dd:hover::after{display:none}
   .gmn-dd>.gmn-t{width:100%}
 }
 @media(max-width:560px){.gmn-chip,.gmn-signout{display:none}}</style>
