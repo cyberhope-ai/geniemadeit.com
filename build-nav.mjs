@@ -176,6 +176,13 @@ function renderNav(current) {
 const REWARDFUL_ID = "3b9f63";
 const ANALYTICS_ID = "G-V33LHDZQX3";   // GenieMade property, CyberHope AI account
 
+/* Exposed on every page so the checkout calls can attach it. GA4 stores its client id in the _ga
+ * cookie as GA1.1.<cid>; the cid is the last two dot-separated parts. It has to reach the Stripe
+ * webhook or the purchase is attributed to "direct" and the affiliate that earned it gets nothing. */
+const GA_CID_HELPER = `<script>window.gmGaCid=function(){try{` +
+  `var m=document.cookie.match(/_ga=GA\\d\\.\\d\\.(\\d+\\.\\d+)/);return m?m[1]:"";` +
+  `}catch(e){return""}};</script>`;
+
 const TRACKING = [
   `<script>(function(w,r){w._rwq=r;w[r]=w[r]||function(){(w[r].q=w[r].q||[]).push(arguments)}})(window,'rewardful');</script>`,
   `<script async src='https://r.wdfl.co/rw.js' data-rewardful='${REWARDFUL_ID}'></script>`,
@@ -184,6 +191,7 @@ const TRACKING = [
     `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}` +
       `gtag('js',new Date());gtag('config','${ANALYTICS_ID}');</script>`,
   ] : []),
+  GA_CID_HELPER,
 ].join("\n");
 
 /* Signed-in and signed-out states are decided here, once, from /api/me — rather than by
