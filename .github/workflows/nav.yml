@@ -1,0 +1,17 @@
+# The header is generated into every page by build-nav.mjs. Because the generated HTML is
+# committed (Pages serves static files, there is no build step), a page header can be edited
+# by hand and silently drift from nav/menu.mjs — which is the failure this replaced.
+name: nav
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths: ["nav/**", "build-nav.mjs", "*.html"]
+jobs:
+  header-matches-menu:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with: { node-version: "20" }
+      - run: node build-nav.mjs --check
