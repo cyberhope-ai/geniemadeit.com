@@ -228,6 +228,43 @@ const RUNTIME = `
  * spreading the markup further.
  *
  * Everything below is verifiable from the page itself: its title, its description, its URL. */
+/* Paid products, for Merchant Center and price-rich results.
+ *
+ * Prices are the engine's own (STUDIO_SESSIONS: 1900 / 3900 cents) and match the $19 / $39 shown on
+ * the page. Merchant Center rejects a product whose markup disagrees with the visible price, and
+ * Google can issue a manual action for it, so these must be changed together with the page copy and
+ * with STUDIO_SESSIONS -- never independently. */
+const PRODUCTS = {
+  "studio-you.html": {
+    name: "Studio You — your own private AI portrait model",
+    sku: "studio-you",
+    offers: [
+      { name: "Studio You Taster",  price: "19.00", sku: "studio_session_taster" },
+      { name: "Studio You Session", price: "39.00", sku: "studio_session_session" },
+    ],
+  },
+};
+
+function productNode(file, html) {
+  const prod = PRODUCTS[file];
+  if (!prod) return null;
+  const d = html.match(/name="description"\s+content="(.*?)"/s);
+  const img = html.match(/property="og:image"\s+content="(.*?)"/s);
+  const url = "https://geniemadeit.com" + urlFor(file);
+  return {
+    "@type": "Product", name: prod.name, sku: prod.sku,
+    description: d ? d[1].replace(/&amp;/g, "&").trim() : undefined,
+    image: img ? img[1] : undefined,
+    brand: { "@type": "Brand", name: "GenieMade" },
+    offers: prod.offers.map((o) => ({
+      "@type": "Offer", name: o.name, sku: o.sku, price: o.price, priceCurrency: "USD",
+      availability: "https://schema.org/InStock",
+      // Digital delivery: no shipping, and the buyer receives it immediately.
+      itemCondition: "https://schema.org/NewCondition", url,
+    })),
+  };
+}
+
 function structuredData(file, current, html) {
   if (/name="robots"[^>]*noindex/.test(html)) return "";        // don't describe what we hide
   if (/"@type"\s*:\s*"WebApplication"/.test(html)) return "";   // make/ already has its own
@@ -247,7 +284,9 @@ function structuredData(file, current, html) {
     item: "https://geniemadeit.com/" + segs.slice(0, i + 1).join("/"),
   }));
 
+  const prod = productNode(file, html);
   const graph = [
+    ...(prod ? [prod] : []),
     { "@type": "WebApplication", name, url, description: dec(d[1]),
       applicationCategory: "MultimediaApplication", operatingSystem: "Any",
       publisher: { "@type": "Organization", name: "GenieMade", url: "https://geniemadeit.com/" },
