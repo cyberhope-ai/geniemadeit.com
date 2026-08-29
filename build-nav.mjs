@@ -17,7 +17,7 @@
  * existing `gm-header`/`gm-nav` names: the marketing pages still ship those rules in
  * their own stylesheets, and reusing the names would have the two cascades fight.
  */
-import { readFileSync, writeFileSync, existsSync } from "node:fs";
+import { readFileSync, writeFileSync, existsSync, readdirSync } from "node:fs";
 import { MAIN } from "./nav/menu.mjs";
 
 const CHECK = process.argv.includes("--check");
@@ -27,7 +27,7 @@ const END = "<!-- GMNAV:END -->";
 /* Pages that get the canonical header, and the path each one lives at (used to mark the
  * current section). admin/share/video-lab/geniemade-cyberhope are intentionally absent:
  * they are internal or standalone and do not carry the public bar. */
-const PAGES = [
+const ROOT_PAGES = [
   ["index.html", "/"],
   ["app.html", "/app"],
   ["director.html", "/director"],
@@ -42,12 +42,46 @@ const PAGES = [
   ["terms.html", "/terms"],
 ];
 
+/* The occasion landing pages — 65 of them — are DISCOVERED, not listed. They were the
+ * whole problem in miniature: they carry the old gm-header, so /invitations/wedding looked
+ * like a different site, and a hand-written list here would go stale the first time someone
+ * adds a new occasion. Anything matching these directories gets the canonical header
+ * automatically, including pages that do not exist yet. */
+const SECTION_DIRS = [
+  ["invitations", "/invitations"],
+  ["holidays", "/holidays"],
+  ["make", "/make"],
+  ["studio-you", "/studio-you"],
+  ["people", "/people"],   // linked from the Studio menu, so it cannot be left on the old bar
+  ["card", "/card"],
+];
+/* Deliberately excluded, and they should stay that way:
+ *   c/           — the recipient's view of a card someone was sent. It is the delivered thing,
+ *                  not a page of the site; it carries no site chrome and should not.
+ *   share.html   — same reasoning.
+ *   admin.html, video-lab.html, geniemade-cyberhope.html — internal. */
+
+const PAGES = [...ROOT_PAGES];
+for (const [dir, path] of SECTION_DIRS) {
+  if (!existsSync(dir)) continue;
+  for (const f of readdirSync(dir).filter((x) => x.endsWith(".html")).sort())
+    PAGES.push([`${dir}/${f}`, path]);
+}
+
 const esc = (s) => String(s).replace(/&(?!#?\w+;)/g, "&amp;").replace(/</g, "&lt;");
 
 /* One line, because the bar has to stay one line. The old /app header carried twelve
  * top-level items and wrapped onto a second row — which is what stretched "My Vault"
  * into a two-line button. Single words up top, detail in the dropdown. */
 const CSS = `
+/* position:sticky is defeated by a scrolling ancestor, and these pages set
+ * \`body{overflow-x:hidden}\` — which makes body a scroll container, so the bar pinned itself to
+ * a scrollport that never moves and simply scrolled away. Observed on /#pricing: the header sat
+ * at rectTop -3411 with the page scrolled to 3411. \`clip\` suppresses horizontal overflow the
+ * same way WITHOUT creating a scroll container, and html already uses clip here, so this matches
+ * the pattern the site had already settled on. */
+body{overflow-x:clip}
+
 /* Defensive reset FIRST. Six of these pages still ship a bare \`header{...}\` element rule from
  * their old bespoke bar — films.html and verify.html set \`display:flex\` on it. A class beats an
  * element selector only for properties the class actually declares; anything left undeclared
