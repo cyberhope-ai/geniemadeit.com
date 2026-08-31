@@ -184,6 +184,24 @@ export const INVITATIONS = {
     ]
   };
 
+/* Proof — the one thing no competitor offers, so it gets its own group.
+ *
+ * This is a dropdown rather than a seventh top-level word because the bar must stay on ONE
+ * line (see the note at the top of this file). A caret costs nothing; "Guides" costs ~60px.
+ *
+ * It also fixes an orphan: /guides shipped 2026-08-31 with five articles that nothing on the
+ * site linked to. They were in the sitemap, so Google could crawl them, but no visitor could
+ * reach them and no internal link equity flowed to them. /import appears here as well as in
+ * Studio on purpose — a nav is for finding things, not for describing the file tree once. */
+export const PROOF = {
+  label: "Verify", href: "/verify",
+  items: [
+    ["/verify", "\u{1F50E} Verify a file"],
+    ["/import", "⬆ Register your work"],
+    ["/guides/", "\u{1F4D6} Guides"],
+  ],
+};
+
 // Left-hand bar, in order. Dropdowns carry `items`; plain links do not.
 export const MAIN = [
   STUDIO,
@@ -191,5 +209,5 @@ export const MAIN = [
   { label: "Occasions", href: OCCASIONS.href, items: OCCASIONS.items },
   { label: "Invitations", href: INVITATIONS.href, items: INVITATIONS.items },
   { label: "Pricing", href: "/#pricing" },
-  { label: "Verify", href: "/verify" },
+  PROOF,
 ];
