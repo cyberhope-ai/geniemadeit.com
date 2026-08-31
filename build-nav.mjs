@@ -501,6 +501,23 @@ if (CHECK) {
   writeFileSync("robots.txt", ROBOTS);
 }
 
+/* ⚠ TRADEMARK GUARD — runs in both modes, on every page.
+ * "Starring You" is a registered mark of JibJab, used for the same goods this site sells
+ * (personalized ecards). It was on 29 files and 106 instances until 2026-08-31, including
+ * <title> tags. It must not come back: a complaint would land on a Google Ads account that was
+ * suspended for misrepresentation on 2026-08-29.
+ * The plain verb is fine ("starring in a real movie") — only the two-word mark is caught. */
+{
+  const offenders = PAGES.map(([f]) => f)
+    .filter((f) => existsSync(f) && /starring\s+you\b/i.test(readFileSync(f, "utf8")));
+  if (offenders.length) {
+    console.error(`\n"Starring You" is JibJab's registered mark and is present in ` +
+      `${offenders.length} page(s):\n  ${offenders.join("\n  ")}\n\n` +
+      `Use "with you in it", "put yourself in it" or "featuring you" instead.\n`);
+    process.exit(1);
+  }
+}
+
 if (CHECK) {
   if (stale.length) {
     console.error(`\nThe header is STALE in ${stale.length} page(s):\n  ${stale.join("\n  ")}\n\n` +

@@ -441,7 +441,7 @@ function renderDetail(d){
     var anc=x.anchor?'<span class="'+(x.anchor.status==="confirmed"?"ok":"muted")+'" title="'+esc(x.anchor.chain||"bitcoin")+(x.anchor.block_height?" · block "+num(x.anchor.block_height):"")+'">'+esc(x.anchor.status)+'</span>':'<span class="muted">—</span>';
     var ev=x.eververify_url?'<a class="rcpt" href="'+esc(x.eververify_url)+'" target="_blank" rel="noopener">Registry ↗</a>':(x.registered?'<span class="muted">private</span>':'<span class="muted">—</span>');
     var nm=x.image_name||"—";
-    var badge=(x.tier==="premium")?' <span class="ok" title="Studio You premium'+(x.starring?" · Starring You (face reference)":"")+'">★</span>':'';
+    var badge=(x.tier==="premium")?' <span class="ok" title="Studio You premium'+(x.starring?" · Face reference":"")+'">★</span>':'';
     var recipe=x.job_id?' <a href="#" class="rcpt" style="font-size:.8em" onclick="return showRecipe(event,\''+esc(c.account_number||c.id||"")+'\',\''+esc(x.job_id)+'\')">recipe</a>':'';
     return '<tr><td>'+img+'</td><td title="'+esc(nm)+' ('+esc(x.capability_name||x.capability||"")+')">'+esc(nm.slice(0,38))+(nm.length>38?"…":"")+badge+recipe+'</td><td>'+num(x.list_credits)+'</td><td>'+charged+'</td><td class="muted">'+usd(x.provider_cost_usd)+'</td><td>'+cert+'</td><td>'+hash+'</td><td>'+seal+'</td><td>'+anc+'</td><td>'+ev+'</td></tr>';
   }),"No creations yet.")+'</div>';

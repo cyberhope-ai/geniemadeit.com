@@ -15,7 +15,7 @@
     aspect: "1:1",
     refUrl: "",       // uploaded reference photo (same-origin /asset URL)
     uploading: false,
-    packMode: false,  // user picked an occasion pack — a face photo is required ("Starring You")
+    packMode: false,  // user picked an occasion pack — a face photo is required ("With You In It")
     pack: null,       // { id, look, label } — we send ids, never the (server-side, secret) prompt
     get credits() { const v = LS.getItem("gm_credits"); return v === null ? 3 : Number(v); },
     set credits(n) { LS.setItem("gm_credits", String(Math.max(0, n))); paintCredits(); },
@@ -696,7 +696,7 @@
               </button>`).join("")}
           </div>
           <button class="starron" data-pi="${pi}">✦ Create My Image →</button>
-          <div class="starsub">Add your face · Starring You · certified</div>
+          <div class="starsub">Add your face · With You In It · certified</div>
         </div>
       </div>`).join("");
     // Tile click: JUST swap it into the big cover (preview) + arm it — no scroll/applyPack (that's the button's job)
