@@ -176,6 +176,12 @@ function renderNav(current) {
 const REWARDFUL_ID = "3b9f63";
 const ANALYTICS_ID = "G-V33LHDZQX3";   // GenieMade property, CyberHope AI account
 
+/* Microsoft Clarity — heatmaps and session recordings. Same drift as Rewardful had: it was
+ * hand-placed on 46 of 92 pages, and absent from ALL of holidays/ (13 seasonal landing pages),
+ * director.html, films.html and card/. Heatmaps for half a site answer no question honestly,
+ * because the pages you most want to study are the ones missing the tag. */
+const CLARITY_ID = "y21d6q7oku";
+
 /* Exposed on every page so the checkout calls can attach it. GA4 stores its client id in the _ga
  * cookie as GA1.1.<cid>; the cid is the last two dot-separated parts. It has to reach the Stripe
  * webhook or the purchase is attributed to "direct" and the affiliate that earned it gets nothing. */
@@ -190,6 +196,11 @@ const TRACKING = [
     `<script async src="https://www.googletagmanager.com/gtag/js?id=${ANALYTICS_ID}"></script>`,
     `<script>window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments)}` +
       `gtag('js',new Date());gtag('config','${ANALYTICS_ID}');</script>`,
+  ] : []),
+  ...(CLARITY_ID ? [
+    `<script type="text/javascript">(function(c,l,a,r,i,t,y){c[a]=c[a]||function(){(c[a].q=c[a].q||[]).push(arguments)};` +
+      `t=l.createElement(r);t.async=1;t.src="https://www.clarity.ms/tag/"+i;` +
+      `y=l.getElementsByTagName(r)[0];y.parentNode.insertBefore(t,y);})(window,document,"clarity","script","${CLARITY_ID}");</script>`,
   ] : []),
   GA_CID_HELPER,
 ].join("\n");
@@ -388,7 +399,12 @@ function block(current) {
 function stripLegacyTracking(html) {
   return html
     .replace(/<script>\(function\(w,r\)\{w\._rwq[\s\S]*?rewardful'\);?<\/script>\s*/g, "")
-    .replace(/<script[^>]*r\.wdfl\.co\/rw\.js[^>]*><\/script>\s*/g, "");
+    .replace(/<script[^>]*r\.wdfl\.co\/rw\.js[^>]*><\/script>\s*/g, "")
+    /* Clarity double-loads badly: two tags on one page open two sessions and split the
+     * recording, so the hand-placed copies on 46 pages have to go before the generated
+     * one lands. The HTML comment above them goes too, or the page keeps a dangling label. */
+    .replace(/<!--\s*Microsoft Clarity\s*-->\s*/gi, "")
+    .replace(/<script[^>]*>\(function\(c,l,a,r,i,t,y\)[\s\S]*?clarity","script"[\s\S]*?<\/script>\s*/g, "");
 }
 
 let currentFile = "";
