@@ -408,6 +408,28 @@ function stripLegacyTracking(html) {
     .replace(/<script[^>]*>\(function\(c,l,a,r,i,t,y\)[\s\S]*?clarity","script"[\s\S]*?<\/script>\s*/g, "");
 }
 
+/* A link with no og:image renders as a bare grey rectangle in Slack, iMessage, WhatsApp,
+ * Discord and X. 56 of 98 pages had none — including every guide and every holiday page, i.e.
+ * exactly the URLs we are about to hand to directories, newsletters and Reddit. That is a
+ * click-through tax on every share, so the default is injected structurally like everything
+ * else. Pages that already set their own image keep it; this only fills the gap. */
+const OG_DEFAULT = "https://geniemadeit.com/assets/social/og-default.jpg";
+function ensureSocialImage(html) {
+  const add = [];
+  if (!/property=["']og:image["']/i.test(html))
+    add.push(`<meta property="og:image" content="${OG_DEFAULT}">`,
+             `<meta property="og:image:width" content="1200">`,
+             `<meta property="og:image:height" content="630">`);
+  if (!/name=["']twitter:image["']/i.test(html))
+    add.push(`<meta name="twitter:image" content="${OG_DEFAULT}">`);
+  if (!/name=["']twitter:card["']/i.test(html))
+    add.push(`<meta name="twitter:card" content="summary_large_image">`);
+  if (!add.length) return html;
+  return /<\/head>/i.test(html)
+    ? html.replace(/<\/head>/i, add.join("\n") + "\n</head>")
+    : html;
+}
+
 let currentFile = "";
 function apply(html, current) {
   const want = block(current);
@@ -420,6 +442,7 @@ function apply(html, current) {
   }
   let out = stripLegacyTracking(html).replace("\u0000GMNAV\u0000", want);
   out = out.replace(SD_SLOT, structuredData(currentFile, current, html));
+  out = ensureSocialImage(out);
   // Drop any previously generated FAQ before re-rendering, so rebuilds don't stack copies.
   out = out.replace(/<style>\.gmn-faq\{[\s\S]*?<\/section>\s*/g, "");
   const faq = renderFaq(html);
