@@ -478,12 +478,17 @@ for (const [name, html] of Object.entries(files)) {
  * script owns the article, build-nav.mjs owns the header. Running build-guides then build-nav is
  * the correct order; the reverse just means nav has to run again. */
 const NAV_BLOCK = /<!-- GMNAV:START[\s\S]*?<!-- GMNAV:END -->\n?/;
-const mine = (s) => (s == null ? null : s.replace(NAV_BLOCK, ""));
+/* build-nav.mjs also fills in og:image / twitter:image / twitter:card on any page missing them
+ * (ensureSocialImage). Those land in <head> AFTER this script writes the file, so a byte
+ * comparison counts them as drift and --check goes red on every guide. Strip them too: this
+ * script owns the article, build-nav.mjs owns the header AND the social tags. */
+const NAV_META = /<meta (?:property="og:image(?::width|:height)?"|name="twitter:(?:image|card)")[^>]*>\n?/g;
+const mine = (s) => (s == null ? null : s.replace(NAV_BLOCK, "").replace(NAV_META, ""));
 
 let drift = 0;
 for (const [name, html] of Object.entries(files)) {
   const cur = existsSync(name) ? readFileSync(name, "utf8") : null;
-  if (mine(cur) === html) continue;
+  if (mine(cur) === mine(html)) continue;   /* normalise BOTH sides: this script emits twitter:card itself */
   /* Writing would discard the header; let build-nav.mjs put it back. */
   drift++;
   if (CHECK) console.log(`  drift: ${name}`);
