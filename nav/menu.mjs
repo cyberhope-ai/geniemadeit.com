@@ -21,13 +21,13 @@ export const STUDIO = {
     ["/director", "\u{1F3A5} Director"],
     ["/films", "\u{1F3AC} Films"],
     ["/studio-you", "\u2728 Studio You"],
-    ["/people", "\u{1F465} My People"],
+    ["/people/", "\u{1F465} My People"],
     ["/import", "\u2B06 Import"],
   ],
 };
 
 export const HOLIDAYS = {
-    "href": "/holidays",
+    "href": "/holidays/",
     "items": [
       [
         "/holidays/new-year",
@@ -81,7 +81,7 @@ export const HOLIDAYS = {
   };
 
 export const OCCASIONS = {
-    "href": "/make",
+    "href": "/make/",
     "items": [
       [
         "/make/birthday",
@@ -131,7 +131,7 @@ export const OCCASIONS = {
   };
 
 export const INVITATIONS = {
-    "href": "/invitations",
+    "href": "/invitations/",
     "items": [
       [
         "/invitations/birthday-party",

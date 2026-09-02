@@ -197,7 +197,10 @@
   }
   function wireSignin() {
     paintAccount();
-    $("#authSubmit").onclick = doAuth;
+    /* Bind the FORM submit, not the button click. The button is type="submit" inside #authForm, so a
+       click and the Enter key both arrive here through one path — no double-fire, and preventDefault
+       stops the page reloading. Binding click instead would let Enter reload the modal away. */
+    $("#authForm").addEventListener("submit", (e) => { e.preventDefault(); doAuth(); });
     $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?return_to=/app"; };
     const msB = $("#msBtn"), fbB = $("#fbBtn");
     if (msB) msB.onclick = () => { window.location.href = "/api/auth/ms/start?return_to=/app"; };
@@ -211,7 +214,7 @@
     $("#authModal").addEventListener("click", (e) => { if (e.target.id === "authModal") closeAuth(); });
     document.addEventListener("keydown", (e) => { if (e.key === "Escape") closeAuth(); });
     $("#authEmail").addEventListener("keydown", (e) => { if (e.key === "Enter") $("#authPass").focus(); });
-    $("#authPass").addEventListener("keydown", (e) => { if (e.key === "Enter") doAuth(); });
+    /* Enter is handled by the form submit above; the manual keydown listener would double-fire. */
     // gate "Start creating" CTAs: unauthenticated -> signup first (mandatory registration)
     document.querySelectorAll('a[href="/app"]').forEach((a) => a.addEventListener("click", (e) => {
       if (!currentUser) { e.preventDefault(); openAuth("signup"); }

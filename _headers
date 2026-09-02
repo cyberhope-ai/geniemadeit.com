@@ -1,6 +1,24 @@
-# HTML never goes stale on devices (tablet/phone cache bugs) — always revalidate
+# HTML never goes stale on devices (tablet/phone cache bugs) — always revalidate.
+#
+# Security headers live in this same /* block rather than a second one: Cloudflare applies every
+# matching rule, but two blocks with the same pattern is ambiguous to read and invites someone to
+# "fix" the duplicate by deleting the wrong one.
+#
+# ⚠ Permissions-Policy deliberately does NOT include `payment=()`. That would disable the Payment
+# Request API and kill Apple Pay / Google Pay the moment checkout moves from a Stripe redirect to
+# embedded Elements. On a site whose whole job is taking payment, that is the wrong default.
+#
+# ⚠ No full Content-Security-Policy. These pages carry inline <script> and inline styles
+# throughout, so any CSP that actually loaded would need `unsafe-inline` — which buys nothing.
+# Doing it properly means a nonce/hash pass in build-nav.mjs first. `frame-ancestors` is set on
+# its own because it is the clickjacking control and costs nothing to get right today.
 /*
   Cache-Control: no-cache
+  Strict-Transport-Security: max-age=31536000; includeSubDomains
+  Content-Security-Policy: frame-ancestors 'self'
+  X-Frame-Options: SAMEORIGIN
+  Permissions-Policy: geolocation=(), microphone=(), camera=(), interest-cohort=()
+
 # hashed/versioned static assets + media: cache long (query-param versioning governs JS)
 /assets/*
   Cache-Control: public, max-age=604800

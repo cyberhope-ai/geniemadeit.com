@@ -40,6 +40,11 @@ const ROOT_PAGES = [
   ["affiliates.html", "/affiliates"],
   ["privacy.html", "/privacy"],
   ["terms.html", "/terms"],
+  /* 404 gets the nav so a lost visitor can recover. It declares noindex, which is what keeps it
+   * out of sitemap.xml — see the sitemap comment below. Cloudflare Pages serves /404.html with a
+   * real 404 status for any unmatched route; without this file every bogus URL returned 200 + the
+   * homepage (a soft 404 Google penalises). */
+  ["404.html", "/"],
 ];
 
 /* The occasion landing pages — 65 of them — are DISCOVERED, not listed. They were the
