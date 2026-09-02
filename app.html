@@ -464,7 +464,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
          fields loose in a div they frequently never offer to save the credential, which costs
          signups. Submission is bound in JS (form "submit", not button "click") so Enter works
          and nothing reloads the page. -->
-    <form id="authForm">
+    <form id="authForm" onsubmit="event.preventDefault()">
       <input class="field" id="authEmail" type="email" placeholder="your@email.com" autocomplete="email">
       <input class="field" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
       <div id="tsBox" style="margin:10px 0 2px"></div>
@@ -566,7 +566,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260829d"></script>
+<script src="assets/studio.js?v=20260902a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>
