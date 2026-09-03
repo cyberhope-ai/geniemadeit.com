@@ -372,10 +372,22 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
         </div>
         <span id="refHint" style="font-size:.8rem;color:var(--faint,#8b959f)"></span>
       </div>
-      <div id="myPhotos" style="display:none;margin-top:11px">
-        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px">
+      <!-- ⚠ This block must NOT be display:none by default. It used to hide itself whenever the
+           library was empty, which made a working feature look deleted: there was no way to add
+           photos deliberately (savePhoto only ever ran as a side effect of a ref-box upload), so a
+           new account never saw it at all. It now always renders, with an empty state and its own
+           multi-file "Add photos" control. PHOTO_CAP in the engine is 30. -->
+      <div id="myPhotos" style="margin-top:11px">
+        <div style="display:flex;align-items:center;gap:8px;margin-bottom:7px;flex-wrap:wrap">
           <span style="font-size:.7rem;letter-spacing:.13em;text-transform:uppercase;color:var(--gold2,#ffe390);font-weight:600">★ Your photos</span>
-          <span style="font-size:.78rem;color:var(--faint,#8b959f)">tap one to reuse — no hunting on your device</span>
+          <span id="myPhotosCount" style="font-size:.72rem;color:var(--faint,#8b959f)"></span>
+          <input type="file" id="myPhotosInput" accept="image/png,image/jpeg,image/webp" multiple style="display:none" />
+          <button type="button" id="myPhotosAdd" style="margin-left:auto;display:inline-flex;align-items:center;gap:6px;padding:5px 11px;border:1px solid var(--line,#3a3f4a);border-radius:10px;background:transparent;color:var(--fg,#e9eef4);cursor:pointer;font-size:.78rem">
+            <span style="font-size:.95rem">＋</span> Add photos
+          </button>
+        </div>
+        <div id="myPhotosEmpty" style="font-size:.82rem;color:var(--faint,#8b959f);border:1px dashed var(--line,#3a3f4a);border-radius:12px;padding:13px 15px;line-height:1.55">
+          Save up to 30 photos of yourself here once, and reuse them every time — no re-finding them on your device. They stay in your account as your original photos.
         </div>
         <div id="myPhotosRow" style="display:flex;gap:9px;overflow-x:auto;padding-bottom:4px"></div>
       </div>
@@ -566,7 +578,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260902a"></script>
+<script src="assets/studio.js?v=20260903a"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

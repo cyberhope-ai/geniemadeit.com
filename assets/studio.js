@@ -542,19 +542,33 @@
   }
   function setRefHint(t) { const h = $("#refHint"); if (h) h.textContent = t || ""; }
   // ---- My Photos: the customer's saved reference photos, reusable without re-finding on device ----
+  const PHOTO_CAP = 30;   // mirrors PHOTO_CAP in the engine; keep the two in step
   async function loadMyPhotos() {
-    if (!state.signedIn) { const w0 = $("#myPhotos"); if (w0) w0.style.display = "none"; return; }
+    /* Signed-out is the ONLY case that hides the block. Hiding it when the library is merely empty
+       is what made this feature look deleted — there was no empty state and no way to add. */
+    const w0 = $("#myPhotos"); if (!w0) return;
+    if (!state.signedIn) { w0.style.display = "none"; return; }
+    w0.style.display = "";
     try {
       const r = await fetch("/api/photos", { credentials: "same-origin", headers: { accept: "application/json" } });
       const j = await r.json().catch(() => ({}));
       renderMyPhotos((j && j.photos) || []);
-    } catch (_) {}
+    } catch (_) { renderMyPhotos([]); }
   }
   function renderMyPhotos(list) {
     const wrap = $("#myPhotos"), row = $("#myPhotosRow");
     if (!wrap || !row) return;
-    if (!list.length) { wrap.style.display = "none"; return; }
+    if (!state.signedIn) { wrap.style.display = "none"; return; }
     wrap.style.display = "";
+    const empty = $("#myPhotosEmpty"), count = $("#myPhotosCount"), addBtn = $("#myPhotosAdd");
+    if (empty) empty.style.display = list.length ? "none" : "";
+    if (count) count.textContent = list.length ? `${list.length} of ${PHOTO_CAP} saved` : "";
+    if (addBtn) {
+      const full = list.length >= PHOTO_CAP;
+      addBtn.disabled = full;
+      addBtn.style.opacity = full ? ".5" : "";
+      addBtn.title = full ? `You've saved the maximum of ${PHOTO_CAP} photos — remove one to add another.` : "";
+    }
     row.innerHTML = list.map((ph) => `
       <div class="myph" data-id="${ph.id}" data-url="${escAttr(ph.url)}" style="position:relative;flex:0 0 auto">
         <img src="${escAttr(ph.url)}" alt="saved photo" style="width:58px;height:58px;object-fit:cover;border-radius:12px;border:1px solid var(--line);cursor:pointer;display:block">
@@ -571,6 +585,33 @@
     if ($("#refBtnLabel")) $("#refBtnLabel").textContent = "Change photo";
     setRefHint("Using your saved photo — hit Make a wish.");
   }
+  /* Deliberate multi-file add. The engine's POST /api/photos already accepts multipart directly
+     (handlePhotoSave branches on content-type), so this needs no backend change — it posts each
+     file straight to the library rather than going through /api/upload first. Sequential, not
+     Promise.all: the handler read-modify-writes a single KV key per user, so concurrent saves
+     would clobber each other and silently drop photos. */
+  async function addPhotos(files) {
+    if (!files || !files.length) return;
+    if (!state.signedIn) { openAuth("signup"); return; }
+    const list = Array.from(files).slice(0, PHOTO_CAP);
+    const btn = $("#myPhotosAdd"); const label = btn ? btn.innerHTML : "";
+    if (btn) { btn.disabled = true; btn.textContent = "Uploading…"; }
+    let last = null, failed = 0;
+    for (const file of list) {
+      if (!/^image\/(png|jpeg|webp)$/.test(file.type)) { failed++; continue; }
+      if (file.size > 12 * 1024 * 1024) { failed++; continue; }
+      try {
+        const fd = new FormData(); fd.append("file", file);
+        const r = await fetch("/api/photos", { method: "POST", body: fd, credentials: "same-origin" });
+        const j = await r.json().catch(() => ({}));
+        if (j && j.photos) last = j.photos; else failed++;
+      } catch (_) { failed++; }
+    }
+    if (btn) { btn.disabled = false; btn.innerHTML = label; }
+    if (last) renderMyPhotos(last); else loadMyPhotos();
+    if (failed) setRefHint(`${failed} photo${failed > 1 ? "s" : ""} couldn't be saved — use JPG, PNG or WebP under 12MB.`);
+  }
+
   async function savePhoto(url) {
     if (!url) return;
     try {
@@ -792,6 +833,11 @@
        click and the Enter key both arrive here through one path — no double-fire, and preventDefault
        stops the page reloading. Binding click instead would let Enter reload the modal away. */
     $("#authForm").addEventListener("submit", (e) => { e.preventDefault(); doAuth(); });
+    const mpAdd = $("#myPhotosAdd"), mpIn = $("#myPhotosInput");
+    if (mpAdd && mpIn) {
+      mpAdd.onclick = () => mpIn.click();
+      mpIn.onchange = () => { addPhotos(mpIn.files); mpIn.value = ""; };
+    }
     $("#googleBtn").onclick = () => { window.location.href = "/api/auth/google/start?return_to=/app"; };
     const msB = $("#msBtn"), fbB = $("#fbBtn");
     if (msB) msB.onclick = () => { window.location.href = "/api/auth/ms/start?return_to=/app"; };
