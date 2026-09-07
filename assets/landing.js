@@ -48,6 +48,11 @@
   // ---- pricing: subscriptions (monthly/annual, recommended) + one-time credit packs ----
   const SUB_TIERS = [
     { id: "bronze", tag: "Bronze", m: 4.95, y: 49.95, feats: ["Unlimited e-cards &amp; AI images", "Every themed pack — holidays, occasions, invitations", "Save friends &amp; family + birthday reminders", "A certificate on every creation", "Your private Vault, forever"], hot: true },
+    // Gold is the Screenwriter Studio tier. `intro` is the FIRST-MONTH price, applied by a
+    // Stripe coupon at checkout (monthly only) — shown here so the card matches what the
+    // customer is actually charged, rather than advertising $39 and billing $19.
+    { id: "gold", tag: "Gold", m: 39, y: 390, intro: 19, cta: "Choose Gold",
+      feats: ["Everything in Bronze", "<b>Screenwriter Studio</b> — AI directors &amp; crew take your idea to a finished script", "A writers&rsquo; room of legendary personas, in parallel", "Turn scenes into shots and render them", "Every script and render sealed on EverVerify"] },
   ];
   const ONE_TIME = [
     { id: "starter", credits: "150", usd: 15 },
@@ -80,10 +85,11 @@
       <div class="plan${p.hot ? " hot" : ""}">
         ${p.hot ? '<span class="popular">Most popular</span>' : ""}
         <div class="tag">${p.tag}</div>
-        <div class="price">$${annual ? p.y : p.m}<span class="per"> / ${annual ? "year" : "month"}</span></div>
-        <div class="cr">${annual ? "~2 months free · cancel anytime" : "billed monthly · cancel anytime"}</div>
+        <div class="price">$${annual ? p.y : (p.intro ?? p.m)}<span class="per"> / ${annual ? "year" : "month"}</span></div>
+        <div class="cr">${annual ? "~2 months free · cancel anytime"
+          : (p.intro ? `first month, then $${p.m}/month · cancel anytime` : "billed monthly · cancel anytime")}</div>
         <ul>${p.feats.map((f) => `<li>${f}</li>`).join("")}</ul>
-        <button class="btn ${p.hot ? "gold" : "ghost"}" data-plan="${p.id}">Choose Bronze</button>
+        <button class="btn ${p.hot ? "gold" : "ghost"}" data-plan="${p.id}">${p.cta || `Choose ${p.tag}`}</button>
       </div>`).join("");
     const tiers = freeCard + bronze + studioCard;
     const packs = ONE_TIME.map((p) => `
