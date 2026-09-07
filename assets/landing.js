@@ -69,8 +69,8 @@
       <div class="plan">
         <div class="tag">Free</div>
         <div class="price">$0</div>
-        <div class="cr">3 free wishes to start</div>
-        <ul><li>Try any pack or prompt</li><li>Certificate on every creation</li><li>No card needed</li></ul>
+        <div class="cr">3 free images to start</div>
+        <ul><li><b>3 AI images</b> — any pack or prompt</li><li>Certificate on every creation</li><li>No card needed</li><li style="color:var(--faint)">Video, avatars &amp; Studio need a plan</li></ul>
         <a class="btn ghost" href="/app" style="text-decoration:none;text-align:center;display:block">Start free</a>
       </div>`;
     const studioCard = `
