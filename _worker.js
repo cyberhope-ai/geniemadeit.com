@@ -103,6 +103,9 @@ export default {
     // SkillDNA vault-connect approve screen (opened from SkillDNA -> Connections)
     if (url.pathname === "/connect/skilldna")
       return env.ASSETS.fetch(new Request(new URL("/connect-skilldna", url), request));
+    // CineGraph vault-connect approve screen (opened from CineGraph -> Connected accounts)
+    if (url.pathname === "/connect/cinegraph")
+      return env.ASSETS.fetch(new Request(new URL("/connect-cinegraph", url), request));
     // API glue: proxy the rest of /api/* to the GenieMade engine so the Studio
     // calls same-origin and never touches a provider.
     if (url.pathname.startsWith("/api/") || url.pathname.startsWith("/asset/")) {
