@@ -909,6 +909,14 @@
     } catch (_) { /* engine offline — keep local */ }
   }
 
+  // Partner hand-off (e.g. CineGraph "Create with GenieMade"): /app?from=cinegraph&idea=<text>
+  // prefills the prompt. Never auto-submits; `from` is informational (`ref` is the affiliate param).
+  function applyIdeaParam() {
+    const idea = (new URLSearchParams(location.search).get("idea") || "").trim().slice(0, 500);
+    const p = $("#prompt");
+    if (idea && p && !p.value) { p.value = idea; p.dispatchEvent(new Event("input", { bubbles: true })); }
+  }
+
   // ---- init ----
-  paintCredits(); paintAccount(); renderVault(); wire(); dust(); hydrate();
+  paintCredits(); paintAccount(); renderVault(); wire(); applyIdeaParam(); dust(); hydrate();
 })();
