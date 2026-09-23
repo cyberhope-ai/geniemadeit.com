@@ -1,0 +1,24 @@
+name: sms-consent
+on:
+  pull_request:
+    paths:
+      - "index.html"
+      - "app.html"
+      - "studio-create.html"
+      - "privacy.html"
+      - "terms.html"
+      - "assets/sms-consent.js"
+      - "assets/landing.js"
+      - "assets/studio.js"
+      - "tests/test_sms_optin.py"
+      - ".github/workflows/sms-consent.yml"
+jobs:
+  consent-contract:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-python@v5
+        with: { python-version: "3.12" }
+      - run: python -m unittest discover -s tests -p 'test_*.py' -v

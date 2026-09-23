@@ -151,9 +151,10 @@
   }
   window.gmTsReady = renderTurnstile; // fired by the Turnstile api.js onload
   function tsToken() { try { return (window.turnstile && tsWidgetId !== null) ? window.turnstile.getResponse(tsWidgetId) : ""; } catch (_) { return ""; } }
-  const AUTH_MSG = { email_exists: "That email already has an account — try signing in.", human_check_failed: "The human check didn't pass — please try again.", bad_credentials: "Email or password is incorrect.", invalid_input: "Enter a valid email and an 8+ character password." };
+  const AUTH_MSG = { email_exists: "That email already has an account — try signing in.", human_check_failed: "The human check didn't pass — please try again.", bad_credentials: "Email or password is incorrect.", invalid_input: "Enter a valid email and an 8+ character password.", sms_opt_in_unavailable: "Text-message enrollment is temporarily unavailable. Clear the SMS fields to continue without texts.", sms_consent_store_unavailable: "We could not save your SMS consent. Clear the SMS fields to continue without texts, or try again.", sms_consent_required: "Complete both SMS consent choices, or clear the SMS fields.", sms_disclosure_changed: "The SMS terms changed. Reload the page and review them again.", invalid_sms_phone: "Enter a valid US mobile number for text updates.", invalid_sms_source: "Open the form directly on geniemadeit.com and try again." };
   function openAuth(mode) {
     authMode = mode;
+    if (window.GenieSms) window.GenieSms.showForMode("auth", mode === "signup");
     $("#authTitle").textContent = mode === "signup" ? "Create your account" : "Welcome back";
     $("#authSub").textContent = mode === "signup" ? "Sign up and your three free wishes are waiting." : "Sign in to your GenieMade account.";
     $("#authSubmit").textContent = mode === "signup" ? "Create account" : "Sign in";
@@ -176,6 +177,9 @@
       const ep = authMode === "signup" ? "/api/auth/signup" : "/api/auth/login";
       const payload = { email, password };
       if (authMode === "signup") {
+        const sms = window.GenieSms ? window.GenieSms.consentPayload("auth") : { ok: true, value: null };
+        if (!sms.ok) { $("#authErr").textContent = sms.error; return; }
+        if (sms.value) payload.sms_consent = sms.value;
         const t = tsToken();
         if (!t) { $("#authErr").textContent = "One moment — finishing the human check. Please try again."; renderTurnstile(); return; }
         payload.turnstile = t;
