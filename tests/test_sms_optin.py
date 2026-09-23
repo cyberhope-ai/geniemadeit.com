@@ -34,6 +34,27 @@ class SmsOptInSurfaceTest(unittest.TestCase):
         for phrase in ("Message and data rates may apply", "<strong>HELP</strong>", "<strong>STOP</strong>", "Carriers are not liable"):
             self.assertIn(phrase, terms)
 
+    def test_public_carrier_review_page_documents_actual_web_opt_in(self):
+        text = (ROOT / "sms-consent.html").read_text()
+        for phrase in (
+            "https://geniemadeit.com/",
+            "not pre-checked",
+            "Up to 2 messages per order or support case",
+            "Msg &amp; data rates may apply",
+            "Reply HELP for help and STOP to opt out",
+            "https://geniemadeit.com/privacy",
+            "https://geniemadeit.com/terms",
+            "/assets/sms-signup-proof.png",
+        ):
+            self.assertIn(phrase, text)
+        self.assertTrue((ROOT / "assets" / "sms-signup-proof.png").is_file())
+
+    def test_privacy_repeats_carrier_disclosures(self):
+        text = (ROOT / "privacy.html").read_text()
+        self.assertIn("up to 2 messages per order or support case", text)
+        self.assertIn("Message and data rates may apply", text)
+        self.assertIn("third parties for marketing purposes", text)
+
 
 if __name__ == "__main__":
     unittest.main()
