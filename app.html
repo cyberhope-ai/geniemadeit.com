@@ -176,6 +176,7 @@
   .x{position:absolute;top:14px;right:16px;background:none;border:none;color:var(--faint);font-size:1.4rem;cursor:pointer}
   .sheet .fine{font-size:.8rem;color:var(--faint);text-align:center;margin-top:14px}
   .sheet .fine a{color:var(--gold2)}
+  .sms-optin{border:1px solid var(--line);border-radius:12px;padding:12px;margin:2px 0 12px;text-align:left}.sms-optin[hidden]{display:none}.sms-check{display:flex;gap:9px;align-items:flex-start;color:var(--mut);font-size:.78rem;line-height:1.45;margin:8px 0}.sms-check input{width:auto;margin-top:3px;flex:none}.sms-check a{color:var(--gold2)}
   .price{display:flex;gap:12px;margin:16px 0}
   .plan{flex:1;border:1px solid var(--line);border-radius:14px;padding:16px;text-align:center}
   .plan.hot{border-color:var(--gold);background:rgba(245,196,81,.06)}
@@ -479,6 +480,11 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     <form id="authForm" onsubmit="event.preventDefault()">
       <input class="field" id="authEmail" type="email" placeholder="your@email.com" autocomplete="email">
       <input class="field" id="authPass" type="password" placeholder="Password" autocomplete="current-password">
+      <div class="sms-optin" id="authSmsOptin" data-sms-optin="auth" data-eligible="false" hidden>
+        <input class="field" id="authSmsPhone" type="tel" autocomplete="tel" placeholder="Mobile number (optional)">
+        <label class="sms-check"><input id="authSmsAccepted" type="checkbox"><span data-sms-disclosure>By checking this box, I agree to receive Geniemadeit order status and customer care text messages. Up to 2 messages per order or support case. Msg &amp; data rates may apply. Reply HELP for help and STOP to opt out. Consent is not a condition of purchase.</span></label>
+        <label class="sms-check"><input id="authSmsTerms" type="checkbox"><span>I agree to the <a href="/terms" target="_blank">Terms</a> and acknowledge the <a href="/privacy" target="_blank">Privacy Policy</a>.</span></label>
+      </div>
       <div id="tsBox" style="margin:10px 0 2px"></div>
       <button class="btn gold full" id="authSubmit" type="submit">Sign in</button>
     </form>
@@ -578,7 +584,8 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   </div>
 </div>
 
-<script src="assets/studio.js?v=20260915a"></script>
+<script src="assets/sms-consent.js?v=20260922"></script>
+<script src="assets/studio.js?v=20260922"></script>
 <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?onload=gmTsReady&render=explicit" async defer></script>
 <script>(function(){function a(p,o){return fetch(p,Object.assign({credentials:'same-origin'},o||{}))}a('/api/auth/me').then(function(r){return r.ok?r.json():null}).then(function(d){if(d&&(d.user||d.email||d.id)){var b=document.getElementById('gmSignout');if(b){b.style.display='';b.addEventListener('click',function(e){e.preventDefault();a('/api/auth/logout',{method:'POST'}).then(function(){location.href='/'})})}}}).catch(function(){})})();</script>
 </body>

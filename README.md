@@ -74,6 +74,17 @@ CLOUDFLARE_API_TOKEN=… npx wrangler@3 pages deploy . --project-name=geniemadei
 Merging a PR changes **nothing** in production until this runs. Use `--branch=<name>` for a preview
 deploy at `https://<name>.geniemadeit.pages.dev` — worth doing for anything that touches every page.
 
+### Transactional SMS enrollment
+
+Account signup and Studio order forms include optional Geniemadeit order status and customer care
+SMS enrollment. The form is hidden unless the engine returns `opt_in_enabled: true` from
+`/api/sms/config`. The checkbox is never preselected, Terms/Privacy acknowledgment is separate, and
+the engine must durably record the exact disclosure before accepting a phone number.
+
+This repository does not enable Twilio sending. The private engine owns the append-only consent
+ledger and keeps outbound delivery behind a separate A2P approval gate. Merge and Pages deployment
+do not apply the engine migration or enable either gate.
+
 Then purge the zone cache (assets are served `immutable`, so a same-path change needs a purge). When
 you change `assets/*.js`, bump its `?v=` in the referring page or returning browsers keep running
 the old bundle.
