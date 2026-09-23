@@ -7,7 +7,7 @@ export default {
       const path = url.pathname;
       if (path === "/" || path === "/index.html" || path === "/geniemade-cyberhope" || path === "/geniemade-cyberhope.html")
         return env.ASSETS.fetch(new Request(new URL("/geniemade-cyberhope", url), request));
-      if (path === "/privacy" || path === "/terms" || path.startsWith("/assets/"))
+      if (path === "/privacy" || path === "/terms" || path === "/sms-consent" || path.startsWith("/assets/"))
         return env.ASSETS.fetch(request);
       return Response.redirect("https://geniemadeit.com" + path + url.search, 302);
     }

@@ -81,6 +81,10 @@ SMS enrollment. The form is hidden unless the engine returns `opt_in_enabled: tr
 `/api/sms/config`. The checkbox is never preselected, Terms/Privacy acknowledgment is separate, and
 the engine must durably record the exact disclosure before accepting a phone number.
 
+`sms-consent.html` is the public carrier-review evidence page. It documents the actual account
+registration flow, reproduces the exact disclosure, links the policies, and includes a captured
+image of the public form. Keep it aligned with `assets/sms-consent.js` and the server disclosure.
+
 This repository does not enable Twilio sending. The private engine owns the append-only consent
 ledger and keeps outbound delivery behind a separate A2P approval gate. Merge and Pages deployment
 do not apply the engine migration or enable either gate.
