@@ -195,6 +195,8 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
       <h2>Credits</h2>
       <div class="row"><div><div class="bignum" id="creditBal">—</div><div class="k">wishes remaining</div></div>
         <a class="btn" href="/#pricing">Top up →</a></div>
+      <div class="field" style="margin-top:14px"><label for="rdCode">Have a code?</label><input id="rdCode" placeholder="Enter your code" autocomplete="off" autocapitalize="characters"><span class="ro">Codes add free credits to your account. Each code works once per account.</span></div>
+      <button class="btn sm" id="rdBtn">Redeem code</button> <span id="rdMsg" class="note"></span>
     </div>
 
     <div class="card">
@@ -363,6 +365,18 @@ document.getElementById("savePw").onclick=async function(){
   msg.className=r.ok?"note ok":"note err";
   if(r.ok){document.getElementById("pwOld").value="";document.getElementById("pwNew").value="";}
 };
+document.getElementById("rdBtn").onclick=async function(){
+  var inp=document.getElementById("rdCode"), msg=document.getElementById("rdMsg"), code=inp.value.trim();
+  if(!code){msg.textContent="Enter a code first.";msg.className="note err";return;}
+  msg.textContent="Checking…"; msg.className="note";
+  var r=await api("/api/credits/redeem",{method:"POST",headers:{"content-type":"application/json"},body:JSON.stringify({code:code})});
+  if(r.ok&&r.data.ok){
+    msg.textContent=r.data.credits_added+" credits added to your account."; msg.className="note ok"; inp.value="";
+    credBal=r.data.credits; document.getElementById("creditBal").textContent=r.data.credits;
+    var c=document.querySelector("#creditN"); if(c) c.textContent=r.data.credits;
+  } else { msg.textContent=r.data.message||"That code couldn’t be redeemed."; msg.className="note err"; }
+};
+(function(){try{var c=new URLSearchParams(location.search).get("code");if(c)document.getElementById("rdCode").value=c.slice(0,40);}catch(e){}})();
 document.getElementById("portalBtn").onclick=async function(){
   var msg=document.getElementById("portalMsg"); msg.textContent="Opening billing portal…"; msg.className="note";
   var r=await api("/api/billing/portal",{method:"POST"});
