@@ -204,8 +204,10 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   <div class="phz" id="fPhz"></div>
   <p class="muted">Choose “Use as cover” below a photo, then Save. This becomes the directory card image; it does not change which photos Studio uses.</p>
   <button type="button" class="btn ghost" id="chooseVault">Choose from my Vault</button>
+  <button type="button" class="btn ghost" id="chooseEverVerify">Choose from my EverVerify</button>
   <div id="vaultPicker" hidden>
-    <h3>Select Vault images</h3><p class="muted">Imports a separate copy; the Vault original stays unchanged. Generated images are not original photographs—prefer real photos for Studio likeness.</p>
+    <h3 id="libraryHeading">Select Vault images</h3><p class="muted">Imports a separate copy; the source stays unchanged. Generated images are not original photographs—prefer real photos for Studio likeness.</p>
+    <p id="libraryNotice" class="muted"></p><a id="openSourceLibrary" href="/app" target="_blank" rel="noopener">Open my full Vault in a new tab →</a>
     <div id="vaultImages" style="display:flex;flex-wrap:wrap;gap:12px;max-height:360px;overflow:auto"></div>
     <button type="button" class="btn gold" id="importVault">Import selected images</button>
     <button type="button" class="btn ghost" id="closeVault">Close picker</button>
@@ -222,7 +224,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
 <script>
 (function(){
   var W=document.getElementById("wrap"), OV=document.getElementById("ov");
-  var people=[], cur=null, curPhotos=[], curCover=null, curInterests=[], curOccasions=[], busy=false;
+  var people=[], cur=null, curPhotos=[], curCover=null, curInterests=[], curOccasions=[], busy=false, pickerSource='vault';
   fetch("/api/auth/me",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
     var u=d&&d.user; var signed=d&&d.authenticated&&u&&u.email;
     if(!signed){W.innerHTML='<div class="gate"><span class="eyebrow">My People</span><h1>Build your <em>circle</em></h1><p class="lead" style="margin:0 auto 18px">Save your friends & family so GenieMade can help you send the perfect card, right on time.</p><a class="btn gold" href="/app">Sign in to start →</a></div>';return;}
@@ -321,7 +323,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   document.getElementById("fInt").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();var v=this.value.trim().replace(/,$/,"");if(v){curInterests.push(v);this.value="";renderChips();}}});
   function renderPhz(){
     if(!curPhotos.includes(curCover))curCover=curPhotos[0]||null;
-    var h=curPhotos.map(function(u,i){return '<div class="t"><img src="'+esc(u)+'" alt="Photo '+(i+1)+'"><button class="x" aria-label="Remove photo '+(i+1)+'" data-i="'+i+'">✕</button><button type="button" class="cover" data-i="'+i+'" aria-pressed="'+(u===curCover)+'" '+(busy?'disabled':'')+'>'+(u===curCover?'★ Cover':'Use as cover')+'</button></div>';}).join("");
+    var h=curPhotos.map(function(u,i){return '<div class="t"><img src="'+esc(u)+'" alt="Photo '+(i+1)+'"><button class="x" aria-label="Remove photo '+(i+1)+'" data-i="'+i+'">✕</button><button type="button" class="cover" data-i="'+i+'" aria-pressed="'+(u===curCover)+'" '+(busy?'disabled':'')+'>'+(u===curCover?'★ Cover':'Use as cover')+'</button><a href="'+esc(u)+'" download>Download photo '+(i+1)+'</a></div>';}).join("");
     document.getElementById("fPhz").innerHTML=h+'<button class="phadd" id="phAdd" '+(busy||curPhotos.length>=100?'disabled':'')+'>＋</button><span>'+curPhotos.length+' / 100 photos</span>';
     [].forEach.call(document.querySelectorAll("#fPhz .x"),function(x){x.onclick=function(){if(busy)return;curPhotos.splice(+x.dataset.i,1);renderPhz();};});
     document.getElementById("phAdd").onclick=function(){document.getElementById("fFile").click();};
@@ -351,26 +353,35 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   document.getElementById("mCancel").onclick=function(){if(!busy)OV.classList.remove("on");};
   document.getElementById('personStudio').onclick=function(e){if(busy)e.preventDefault();};
   document.getElementById('closeVault').onclick=function(){if(!busy)document.getElementById('vaultPicker').hidden=true;};
-  document.getElementById('chooseVault').onclick=async function(){
+  document.getElementById('chooseVault').onclick=function(){openLibrary('vault');};
+  document.getElementById('chooseEverVerify').onclick=function(){openLibrary('eververify');};
+  async function openLibrary(source){
     if(busy)return;
     var status=document.getElementById('uploadStatus'),target=cur;
     if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before importing.';return;}
-    status.textContent='Loading your Vault…';
+    busy=true;document.getElementById('mSave').disabled=true;status.textContent='Loading your image library…';
     try{
-      var r=await fetch('/api/gallery',{credentials:'same-origin'}),d=await r.json();
-      if(!r.ok||!d.ok)throw new Error('Could not load your Vault.');
+      var r=await fetch(source==='eververify'?'/api/registry/mine':'/api/gallery',{credentials:'same-origin'}),d=await r.json();
+      if(!r.ok||!d.ok)throw new Error('Could not load your library.');
       if(cur!==target||!OV.classList.contains('on'))return;
-      var items=(d.generations||[]).filter(function(g){return /^\/asset\/.+\.(png|jpe?g|webp)$/i.test(g.url||'');});
+      pickerSource=source;
+      var records=source==='eververify'?(d.registrations||[]).map(function(g){return {id:g.receipt_id,url:g.thumb_url,prompt:g.title};}):(d.generations||[]);
+      var items=records.filter(function(g){return /^\/asset\/.+\.(png|jpe?g|webp)$/i.test(g.url||'');});
+      document.getElementById('libraryHeading').textContent=source==='eververify'?'Select my EverVerify images':'Select my Vault images';
+      document.getElementById('libraryNotice').textContent=source==='eververify'?'Shows registrations belonging to your current GenieMade account (up to the latest 500). Some stored images are previews, not full-resolution originals. Fingerprint-only records cannot be imported; upload the original from your device instead.':'Select images directly from your GenieMade Vault below (up to the latest 500).';
+      var link=document.getElementById('openSourceLibrary');link.href=source==='eververify'?'https://eververify.org/account':'/app';link.textContent=source==='eververify'?'Open EverVerify in a new tab →':'Open my full Vault in a new tab →';
       var box=document.getElementById('vaultImages');box.innerHTML='';
       items.forEach(function(g){
         var label=document.createElement('label');label.style.width='110px';
         var img=document.createElement('img');img.src=g.url;img.loading='lazy';img.alt=g.prompt||'Vault image';img.style.cssText='width:110px;height:110px;object-fit:cover';
         var check=document.createElement('input');check.type='checkbox';check.value=g.id;check.setAttribute('aria-label','Select Vault image '+g.id);
-        label.append(img,check);box.append(label);
+        var download=document.createElement('a');download.href=g.url;download.download='';download.textContent='Download image';
+        label.append(img,check,download);box.append(label);
       });
-      document.getElementById('vaultPicker').hidden=false;status.textContent=items.length?'Select images, then Import selected images.':'No supported images in your Vault yet.';
-    }catch(e){status.textContent='Could not load your Vault. Please try again.';}
-  };
+      document.getElementById('vaultPicker').hidden=false;status.textContent=items.length?'Select images, then Import selected images.':'No supported stored images in this account library.';
+    }catch(e){status.textContent='Could not load your image library. Please try again.';}
+    finally{busy=false;document.getElementById('mSave').disabled=false;}
+  }
   document.getElementById('importVault').onclick=async function(){
     if(busy)return;
     var ids=Array.from(document.querySelectorAll('#vaultImages input:checked')).map(function(c){return c.value;}),status=document.getElementById('uploadStatus');
@@ -381,7 +392,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     for(var i=0;i<ids.length;i++){
       status.textContent='Importing '+(i+1)+' of '+ids.length+'…';
       try{
-        var r=await fetch('/api/people/import-vault',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:ids[i],photo_permission:true})}),d=await r.json();
+        var r=await fetch('/api/people/import-vault',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:ids[i],source:pickerSource,photo_permission:true})}),d=await r.json();
         if(!r.ok||!d.ok||!d.url)throw new Error('Import failed');curPhotos.push(d.url);
         Array.from(document.querySelectorAll('#vaultImages input')).filter(function(c){return c.value===ids[i];}).forEach(function(c){c.checked=false;});
       }catch(e){failures++;}
