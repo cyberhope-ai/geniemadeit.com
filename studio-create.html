@@ -258,6 +258,8 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   <!-- STEP 1: upload -->
   <div class="card hidden" id="stepUpload">
     <h2>Add your photos</h2>
+    <div class="field"><label for="contactPicker">Choose someone from My People</label><select id="contactPicker"><option value="">Upload photos from this device</option></select></div>
+    <p class="note" id="contactStatus" role="status">Use a saved contact library without uploading again.</p>
     <p class="note"><b>2 or more clear photos</b> of one person — your best, closest, most recent shots. Just a couple of great ones works. <b style="color:var(--gold2)">Use full-resolution originals, not screenshots</b> — <a href="/studio-you/photo-tips" target="_blank" style="color:var(--magic)">see our photo tips →</a></p>
     <div class="drop" id="drop">📷 <b>Drop photos here</b> or click to choose<br><span class="note">JPG / PNG / WebP · select 2–6 references</span></div>
     <input type="file" id="fileInput" accept="image/png,image/jpeg,image/webp" multiple class="hidden">
@@ -366,7 +368,7 @@ const jpost=(p,body)=>api(p,{method:"POST",headers:{"content-type":"application/
 const CARDS=["gate","stepUpload","stepLooks","stepNotify","stepProcessing"];
 let CFG={min_photos:2,max_photos:25,looks:12}, photos=[], LOOKS=[], picks=new Set(), looksTotal=12, refUrls=[], curEmail="";
 let studioPerson=null, savedRefs=new Set();
-const personId=new URLSearchParams(location.search).get('person');
+let personId=new URLSearchParams(location.search).get('person'), studioContacts=[];
 let gmSeq=0; const grades={}; // per-photo analysis: id -> {v,label,reasons,w,h}
 let customLooks=[]; // user's own-idea prompts: [{name,prompt}]
 let PACKS=[], packState={}; // themed packs + which are selected
@@ -419,26 +421,45 @@ async function startUpload(){
   if(!looksTotal)return packageGate();
   setStep(1); show('stepUpload'); renderThumbs();
   $('#drop').textContent='Choose 2–6 clear reference photos (JPEG, PNG or WebP).';
-  if(!personId)return;
+  $('#contactPicker').disabled=true;
   try{
     const data=await api('/api/people').then(r=>r.json());
-    studioPerson=(data.people||[]).find(p=>p.id===personId);
-    if(!studioPerson)throw new Error('This person was not found in your account.');
-    if(!studioPerson.photo_permission)throw new Error('Open My People and confirm permission for this person’s photos first.');
-    $('#drop').hidden=true;$('#fileInput').disabled=true;
+    if(!Array.isArray(data.people))throw new Error('Could not load My People.');
+    studioContacts=data.people;const picker=$('#contactPicker');
+    picker.replaceChildren(new Option('Upload photos from this device',''));
+    studioContacts.forEach(p=>picker.add(new Option((p.name||'Unnamed')+' · '+(p.photos||[]).length+' photos',p.id)));
+    picker.value=personId||'';
+    selectStudioContact(personId||'');
+  }catch(e){$('#contactStatus').textContent='Could not load My People. Reload to try again.';if(personId){$('#uploadBtn').disabled=true;$('#fileInput').disabled=true;$('#drop').hidden=true;}}
+  finally{$('#contactPicker').disabled=false;}
+}
+function selectStudioContact(id){
+    personId=id||null;studioPerson=null;savedRefs.clear();refUrls=[];
+    photos.forEach(f=>{if(f._url)URL.revokeObjectURL(f._url);delete grades[f._gmid];});photos=[];
+    $('#savedLibrary')?.remove();$('#fileInput').value='';$('#ageInput').value='';$('#hairInput').value='';
+    $('#pmGrade').classList.add('hidden');picks.clear();customLooks=[];packState={};
+    $('#drop').hidden=!!id;$('#fileInput').disabled=!!id;renderThumbs();
+    const url=new URL(location.href);if(id)url.searchParams.set('person',id);else url.searchParams.delete('person');history.replaceState(null,'',url);
+    if(!id){$('#contactStatus').textContent='Upload 2–6 photos from your device, or choose a contact above.';return;}
+    studioPerson=studioContacts.find(p=>p.id===id);
+    if(!studioPerson){$('#contactStatus').textContent='That contact was not found. Choose another person or upload from this device.';return;}
+    if(!studioPerson.photo_permission){$('#contactStatus').textContent='Open My People and confirm photo permission for this contact, then reload Studio.';return;}
+    const library=[...new Set(studioPerson.photos||[])];savedRefs=new Set(library.slice(0,6));
+    $('#contactStatus').textContent='Loaded all '+library.length+' saved photos of '+studioPerson.name+'. The first '+savedRefs.size+' are selected—not a quality ranking. Review or change the selection below. Generation uses 2–6 selected references, not the whole library.';
     const box=document.createElement('div');box.id='savedLibrary';
     const title=document.createElement('h3');title.textContent='Choose 2–6 photos of '+studioPerson.name;box.append(title);
     const note=document.createElement('p');note.textContent='Only the selected photos are used as references. Your other originals stay in this person’s library. This does not train a permanent model.';box.append(note);
-    (studioPerson.photos||[]).forEach(url=>{
+    library.forEach(url=>{
       const label=document.createElement('label');label.style.cssText='display:inline-flex;flex-direction:column;margin:8px;width:110px';
-      const img=document.createElement('img');img.src=url;img.alt=studioPerson.name;img.style.cssText='width:100px;height:100px;object-fit:cover';
-      const input=document.createElement('input');input.type='checkbox';input.setAttribute('aria-label','Use this reference photo');
-      input.onchange=()=>{if(input.checked&&savedRefs.size>=6){input.checked=false;return;}if(input.checked)savedRefs.add(url);else savedRefs.delete(url);$('#uploadBtn').disabled=savedRefs.size<2;$('#upMsg').textContent=savedRefs.size+' of 6 references selected';};
+      const img=document.createElement('img');img.src=url;img.loading='lazy';img.alt=studioPerson.name;img.style.cssText='width:100px;height:100px;object-fit:cover';
+      const input=document.createElement('input');input.type='checkbox';input.checked=savedRefs.has(url);input.setAttribute('aria-label','Use this reference photo');
+      input.onchange=()=>{if(input.checked&&savedRefs.size>=6){input.checked=false;$('#upMsg').textContent='Six references selected. Uncheck one before choosing another.';return;}if(input.checked)savedRefs.add(url);else savedRefs.delete(url);$('#uploadBtn').disabled=savedRefs.size<2;$('#upMsg').textContent=savedRefs.size+' of 6 references selected';};
       label.append(img,input);box.append(label);
     });
     $('#thumbs').before(box);
-  }catch(e){gate('Photo library needs attention',e.message,'<a class="btn" href="/people">Open My People →</a>');}
+    $('#uploadBtn').disabled=savedRefs.size<2;$('#upMsg').textContent=savedRefs.size<2?'This library needs at least two photos. Add more in My People.':savedRefs.size+' of 6 references selected';
 }
+$('#contactPicker').onchange=()=>selectStudioContact($('#contactPicker').value);
 $('#newStudio').onclick=()=>startUpload();
 $("#drop").onclick=()=>$("#fileInput").click();
 ["dragover","dragenter"].forEach(e=>$("#drop").addEventListener(e,ev=>{ev.preventDefault();$("#drop").classList.add("hot");}));

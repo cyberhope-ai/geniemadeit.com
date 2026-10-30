@@ -4,7 +4,8 @@ import assert from 'node:assert/strict';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browser = await chromium.launch({ executablePath: process.env.CHROME_BIN || undefined, headless: true, args: ['--no-sandbox'] });
 const person = { id:'friend', name:'Christy', relationship:'sibling', photo_permission:true, photos:['/asset/uploads/user/a.jpg','/asset/uploads/user/b.jpg'], occasions:[] };
-let saved, used=0, currentPerson=person, importedSource;
+let saved, used=0, currentPerson=person, importedSource, studioTest=false;
+const mark={id:'mark',name:'Mark',photo_permission:true,photos:Array.from({length:9},(_,i)=>'/asset/uploads/user/mark'+i+'.jpg')};
 try {
   const page = await browser.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -15,7 +16,7 @@ try {
     if(url.pathname==='/api/auth/me')body={authenticated:true,user:{email:'test@example.invalid'}};
     else if(url.pathname==='/api/people'){
       if(route.request().method()==='POST'){saved=route.request().postDataJSON();currentPerson={...currentPerson,...saved};body={ok:true,people:[currentPerson]};}
-      else body={ok:true,people:[currentPerson]};
+      else body={ok:true,people:studioTest?[currentPerson,mark,{id:'no-permission',name:'No permission',photos:mark.photos},{id:'empty',name:'Empty',photo_permission:true,photos:[]}]:[currentPerson]};
     }else if(url.pathname==='/api/reminders')body={reminders:[]};
     else if(url.pathname==='/api/gallery')body={ok:true,generations:[{id:'vault-one',url:'/asset/gen/user/portrait.png'},{id:'video',url:'/asset/gen/user/video.mp4'}]};
     else if(url.pathname==='/api/registry/mine')body={ok:true,registrations:[{receipt_id:'ev-one',thumb_url:'/asset/reg/preview.jpg'},{receipt_id:'fingerprint-only',thumb_url:null}]};
@@ -85,14 +86,34 @@ try {
   await page.locator('#mSave').click();await page.locator('#ov').waitFor({state:'hidden'});assert.equal(saved.registry_anchor,'anchor-one');
   await page.reload();await page.locator('.pc').click();await page.locator('#choosePublic').click();assert.equal(await page.locator('#savedPublic').isVisible(),true);
   await page.locator('#savedPublic').click();await page.locator('#libraryHeading').filter({hasText:'Public EverVerify'}).waitFor();await page.locator('#mCancel').click();
+  studioTest=true;
   await page.goto('https://geniemadeit.com/studio-create');
   await page.locator('#newStudio').click();
   await page.locator('#stepUpload').waitFor({state:'visible'});
+  await page.locator('#contactPicker option[value="mark"]').waitFor({state:'attached'});
+  await page.locator('#contactPicker').selectOption('mark');
+  assert.equal(await page.locator('#savedLibrary img').count(),9);
+  assert.equal(await page.locator('#savedLibrary input:checked').count(),6);
+  await page.locator('#savedLibrary input').nth(6).click();
+  assert.equal(await page.locator('#savedLibrary input:checked').count(),6);
+  await page.locator('#savedLibrary input').first().uncheck();
+  await page.locator('#savedLibrary input').nth(6).check();
+  assert.equal(await page.locator('#savedLibrary input:checked').count(),6);
+  await page.locator('#ageInput').fill('40');
+  await page.locator('#contactPicker').selectOption('no-permission');
+  assert.equal(await page.locator('#savedLibrary').count(),0);
+  assert.equal(await page.locator('#uploadBtn').isDisabled(),true);
+  assert.equal(await page.locator('#ageInput').inputValue(),'');
+  await page.locator('#contactPicker').selectOption('empty');
+  assert.equal(await page.locator('#uploadBtn').isDisabled(),true);
+  await page.locator('#contactPicker').selectOption('');
+  assert.equal(await page.locator('#drop').isVisible(),true);
+  assert.equal(await page.locator('#savedLibrary').count(),0);
   await page.goto('https://geniemadeit.com/studio-create?person=friend');
   await page.locator('#savedLibrary').waitFor();
   assert.equal(await page.locator('#savedLibrary img').count(),5);
-  assert.equal(await page.locator('#uploadBtn').isDisabled(),true);
-  for(const checkbox of await page.locator('#savedLibrary input').all())await checkbox.check();
+  assert.equal(await page.locator('#uploadBtn').isDisabled(),false);
+  assert.equal(await page.locator('#savedLibrary input:checked').count(),5);
   assert.equal(await page.locator('#uploadBtn').isEnabled(),true);
   await page.locator('#ageInput').fill('40');
   await page.locator('#uploadBtn').click();
