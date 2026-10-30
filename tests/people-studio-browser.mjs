@@ -17,6 +17,8 @@ try {
       if(route.request().method()==='POST'){saved=route.request().postDataJSON();currentPerson={...currentPerson,...saved};body={ok:true,people:[currentPerson]};}
       else body={ok:true,people:[currentPerson]};
     }else if(url.pathname==='/api/reminders')body={reminders:[]};
+    else if(url.pathname==='/api/gallery')body={ok:true,generations:[{id:'vault-one',url:'/asset/gen/user/portrait.png'},{id:'video',url:'/asset/gen/user/video.mp4'}]};
+    else if(url.pathname==='/api/people/import-vault')body={ok:true,url:'/asset/uploads/user/imported.png'};
     else if(url.pathname==='/api/studio/session')body={session:{looks_total:6,looks_used:used},model:{job:{notified:true,total:6,done:6}},config:{min_photos:2,max_photos:25}};
     else if(url.pathname==='/api/studio/looks')body={looks:[]};
     else if(url.pathname.startsWith('/api/'))body={ok:true};
@@ -44,12 +46,24 @@ try {
   await page.locator('#fPhz .x').nth(1).click();
   assert.equal(await page.locator('#fPhz .cover').first().getAttribute('aria-pressed'),'true');
   await page.locator('#mCancel').click();
+  await page.locator('.pc').click();
+  await page.locator('#chooseVault').click();
+  await page.locator('#vaultImages input').waitFor();
+  assert.equal(await page.locator('#vaultImages input').count(),1);
+  await page.locator('#vaultImages input').check();
+  await page.locator('#importVault').click();
+  await page.getByText('1 images imported; 0 failed.',{exact:false}).waitFor();
+  await page.locator('#fPhz .cover').last().click();
+  await page.locator('#mSave').click();
+  await page.locator('#ov').waitFor({state:'hidden'});
+  assert.ok(saved.photos.includes('/asset/uploads/user/imported.png'));
+  assert.equal(saved.cover_photo,'/asset/uploads/user/imported.png');
   await page.goto('https://geniemadeit.com/studio-create');
   await page.locator('#newStudio').click();
   await page.locator('#stepUpload').waitFor({state:'visible'});
   await page.goto('https://geniemadeit.com/studio-create?person=friend');
   await page.locator('#savedLibrary').waitFor();
-  assert.equal(await page.locator('#savedLibrary img').count(),2);
+  assert.equal(await page.locator('#savedLibrary img').count(),3);
   assert.equal(await page.locator('#uploadBtn').isDisabled(),true);
   for(const checkbox of await page.locator('#savedLibrary input').all())await checkbox.check();
   assert.equal(await page.locator('#uploadBtn').isEnabled(),true);

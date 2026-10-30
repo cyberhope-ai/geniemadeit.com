@@ -203,6 +203,13 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   <p class="muted">Studio uses 2–6 photos you select, not all 100. Saving photos does not train a permanent model.</p>
   <div class="phz" id="fPhz"></div>
   <p class="muted">Choose “Use as cover” below a photo, then Save. This becomes the directory card image; it does not change which photos Studio uses.</p>
+  <button type="button" class="btn ghost" id="chooseVault">Choose from my Vault</button>
+  <div id="vaultPicker" hidden>
+    <h3>Select Vault images</h3><p class="muted">Imports a separate copy; the Vault original stays unchanged. Generated images are not original photographs—prefer real photos for Studio likeness.</p>
+    <div id="vaultImages" style="display:flex;flex-wrap:wrap;gap:12px;max-height:360px;overflow:auto"></div>
+    <button type="button" class="btn gold" id="importVault">Import selected images</button>
+    <button type="button" class="btn ghost" id="closeVault">Close picker</button>
+  </div>
   <input type="file" id="fFile" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
   <p id="uploadStatus" role="status" aria-live="polite"></p>
   <a class="btn ghost" id="personStudio" hidden>Create Studio photos for this person →</a>
@@ -277,6 +284,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     curOccasions=(p&&p.occasions||[]).map(function(o){return {label:o.label,date:o.date};}); renderOccasions();
     document.getElementById('fPermission').checked=!!(p&&p.photo_permission);
     document.getElementById('uploadStatus').textContent='';
+    document.getElementById('vaultPicker').hidden=true;
     var studio=document.getElementById('personStudio'); studio.hidden=!p;
     studio.href=p?'/studio-create?person='+encodeURIComponent(p.id):'#';
     var creations=document.getElementById('personCreations');creations.textContent='';
@@ -341,6 +349,46 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     status.textContent=(files.length-failed)+' uploaded; '+failed+' failed. Click Save to keep this library. JPEG, PNG or WebP, up to 12 MB each.';
   });
   document.getElementById("mCancel").onclick=function(){if(!busy)OV.classList.remove("on");};
+  document.getElementById('personStudio').onclick=function(e){if(busy)e.preventDefault();};
+  document.getElementById('closeVault').onclick=function(){if(!busy)document.getElementById('vaultPicker').hidden=true;};
+  document.getElementById('chooseVault').onclick=async function(){
+    if(busy)return;
+    var status=document.getElementById('uploadStatus'),target=cur;
+    if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before importing.';return;}
+    status.textContent='Loading your Vault…';
+    try{
+      var r=await fetch('/api/gallery',{credentials:'same-origin'}),d=await r.json();
+      if(!r.ok||!d.ok)throw new Error('Could not load your Vault.');
+      if(cur!==target||!OV.classList.contains('on'))return;
+      var items=(d.generations||[]).filter(function(g){return /^\/asset\/.+\.(png|jpe?g|webp)$/i.test(g.url||'');});
+      var box=document.getElementById('vaultImages');box.innerHTML='';
+      items.forEach(function(g){
+        var label=document.createElement('label');label.style.width='110px';
+        var img=document.createElement('img');img.src=g.url;img.loading='lazy';img.alt=g.prompt||'Vault image';img.style.cssText='width:110px;height:110px;object-fit:cover';
+        var check=document.createElement('input');check.type='checkbox';check.value=g.id;check.setAttribute('aria-label','Select Vault image '+g.id);
+        label.append(img,check);box.append(label);
+      });
+      document.getElementById('vaultPicker').hidden=false;status.textContent=items.length?'Select images, then Import selected images.':'No supported images in your Vault yet.';
+    }catch(e){status.textContent='Could not load your Vault. Please try again.';}
+  };
+  document.getElementById('importVault').onclick=async function(){
+    if(busy)return;
+    var ids=Array.from(document.querySelectorAll('#vaultImages input:checked')).map(function(c){return c.value;}),status=document.getElementById('uploadStatus');
+    if(!ids.length){status.textContent='Select at least one image.';return;}
+    if(ids.length+curPhotos.length>100){status.textContent='You have room for '+(100-curPhotos.length)+' more photos.';return;}
+    if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before importing.';return;}
+    busy=true;this.disabled=true;document.getElementById('mSave').disabled=true;renderPhz();var failures=0;
+    for(var i=0;i<ids.length;i++){
+      status.textContent='Importing '+(i+1)+' of '+ids.length+'…';
+      try{
+        var r=await fetch('/api/people/import-vault',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:ids[i],photo_permission:true})}),d=await r.json();
+        if(!r.ok||!d.ok||!d.url)throw new Error('Import failed');curPhotos.push(d.url);
+        Array.from(document.querySelectorAll('#vaultImages input')).filter(function(c){return c.value===ids[i];}).forEach(function(c){c.checked=false;});
+      }catch(e){failures++;}
+    }
+    busy=false;this.disabled=false;document.getElementById('mSave').disabled=false;renderPhz();
+    status.textContent=(ids.length-failures)+' images imported; '+failures+' failed. Choose a cover if desired, then Save this profile.';
+  };
   OV.addEventListener("click",function(e){if(e.target===OV&&!busy)OV.classList.remove("on");});
   document.getElementById("mSave").onclick=function(){
     var body={id:cur?cur.id:undefined,name:document.getElementById("fName").value.trim(),relationship:document.getElementById("fRel").value,
