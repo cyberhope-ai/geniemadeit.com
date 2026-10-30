@@ -214,6 +214,35 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     </div>
 
     <div class="card">
+      <h2>Text messages</h2>
+      <p class="note">Check your text connection here any time—no Studio session, photos or image credits needed.</p>
+      <p id="accountSmsStatus" class="note" role="status">Loading text settings…</p>
+      <button class="btn sm" id="accountTestSms" disabled>Send me a test text</button>
+      <button class="btn sm" id="refreshSms">Refresh status</button>
+      <p id="accountSmsResult" class="note" role="status"></p>
+      <p class="note">One account test every 10 minutes. The first test may also send an opt-in welcome. Provider acceptance is not confirmation that your phone received it. Reply STOP to a text to opt out.</p>
+      <details><summary>Add or change my text number</summary>
+        <p class="note">Use your own US mobile number. Saving permission does not send a test or change an already-running Studio order.</p>
+        <div id="accountSmsOptin" data-sms-optin="account" data-eligible="true" hidden>
+          <div class="field"><label for="accountSmsPhone">Mobile number</label><input id="accountSmsPhone" type="tel" autocomplete="tel" placeholder="(317) 555-0100"></div>
+          <label style="display:flex;gap:10px;margin:12px 0"><input id="accountSmsAccepted" type="checkbox" style="width:auto"><span data-sms-disclosure></span></label>
+          <label style="display:flex;gap:10px;margin:12px 0"><input id="accountSmsTerms" type="checkbox" style="width:auto"><span>I agree to the <a href="/terms" target="_blank" rel="noopener">Terms</a> and acknowledge the <a href="/privacy" target="_blank" rel="noopener">Privacy Policy</a>.</span></label>
+          <button class="btn sm" id="saveSmsNumber">Save text permission</button>
+        </div>
+      </details>
+    </div>
+
+    <div class="card">
+      <h2>EverVerify sharing</h2>
+      <p class="note">Registered does not mean public. Your creations remain private unless you publish them. Public images can appear in the registry gallery and homepage highlights.</p>
+      <p id="publicStatus" class="note" role="status">Loading sharing preference…</p>
+      <label style="display:flex;gap:10px;margin:12px 0"><input type="checkbox" id="autoPublish" style="width:auto"><span>Automatically share my future creations publicly on EverVerify</span></label>
+      <button class="btn sm" id="saveSharing" disabled>Save sharing preference</button>
+      <p class="note">This applies to future creations only. It does not publish your old private pictures. Only enable this for images you have permission to share publicly, including images of other people.</p>
+      <a href="/app#vault">Choose individual images in My Vault →</a>
+    </div>
+
+    <div class="card">
       <h2>Billing address</h2>
       <p class="note">Appears on your receipts and certificates of authenticity.</p>
       <div class="field" style="margin-top:12px"><label>Address line 1</label><input id="adLine1" placeholder="Street address"></div>
@@ -256,6 +285,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
 .pgbar{display:flex;align-items:center;gap:8px;margin:8px 0;flex-wrap:wrap}
 .pgbar select{background:#1c1140;color:#f7f1ff;border:1px solid #3a2a6b;border-radius:8px;padding:5px 9px}</style>
 
+<script src="/assets/sms-consent.js?v=20261030"></script>
 <script>
 function money(c,cur){return (cur&&cur!=="usd"?cur.toUpperCase()+" ":"$")+((Number(c)||0)/100).toFixed(2);}
 function esc(s){return String(s==null?"":s).replace(/[&<>"']/g,function(c){return {"&":"&amp;","<":"&lt;",">":"&gt;",'"':"&quot;","'":"&#39;"}[c];});}
@@ -269,11 +299,55 @@ async function boot(){
   }
   show("boot",false); show("acct",true);
   document.getElementById("gmSignout").style.display="";
-  loadAccount(); loadAddress();
+  loadAccount(); loadAddress(); loadAccountSms(); loadSharing();
   Promise.all([loadCredits(),loadInvoices()]).then(function(){loadCreations();});
 }
 var genPage=0, genPages=1, credBal=null, paidCents=0;
 var CREDIT_RETAIL=0.10; // list rate: starter pack $15 / 150 credits
+var accountSmsEnding='', accountSmsBusy=false;
+async function loadAccountSms(){
+  var r=await api('/api/account/sms'),d=r.data;
+  accountSmsEnding=d.phone_ending||'';
+  document.getElementById('accountTestSms').disabled=accountSmsBusy||!r.ok||!d.can_test;
+  document.getElementById('accountSmsStatus').textContent=!r.ok?'Text settings are unavailable. Please refresh after the update.':
+    (!d.opted_in?'No text permission saved. Add your number below.':'Text number ending '+accountSmsEnding+'. ')+
+    (!d.sending_enabled?'Text sending is currently off.':d.retry_at&&Date.parse(d.retry_at)>Date.now()?'Next account test available at '+new Date(d.retry_at).toLocaleTimeString()+'.':'Text sending is enabled.')+
+    (d.last_test_status?' Last account test: '+(d.last_test_status==='accepted'?'provider accepted; handset delivery not confirmed':d.last_test_status)+'.':'');
+}
+document.getElementById('refreshSms').onclick=loadAccountSms;
+document.getElementById('accountTestSms').onclick=async function(){
+  if(accountSmsBusy||!accountSmsEnding)return;
+  if(!confirm('Send a test text to your opted-in number ending '+accountSmsEnding+'? Your first text may also include the opt-in welcome. Message/data rates may apply. No image credits are used.'))return;
+  accountSmsBusy=true;this.disabled=true;
+  var msg=document.getElementById('accountSmsResult');msg.textContent='Submitting test…';
+  try{var r=await api('/api/account/test-sms',{method:'POST'});msg.textContent=r.ok&&r.data.ok?'Test accepted by the text provider. Check your phone to confirm receipt.':r.data.message||('Test not confirmed: '+(r.data.error||r.data.status||'request failed')+'.');}
+  catch(e){msg.textContent='Outcome unknown. Check your phone; no automatic retry will be made.';}
+  finally{accountSmsBusy=false;await loadAccountSms();}
+};
+document.getElementById('saveSmsNumber').onclick=async function(){
+  var msg=document.getElementById('accountSmsResult'),input=window.GenieSms.consentPayload('account');
+  if(!input.ok||!input.value){msg.textContent=input.error||'Enter your number and check both permission boxes.';return;}
+  this.disabled=true;
+  try{var r=await api('/api/account/sms',{method:'PUT',headers:{'content-type':'application/json'},body:JSON.stringify({sms_consent:input.value})});
+    msg.textContent=r.ok&&r.data.ok?'Text permission saved. No text sent. You can now use Send me a test text.':r.data.error||'Permission was not saved.';
+    if(r.ok){document.getElementById('accountSmsPhone').value='';document.getElementById('accountSmsAccepted').checked=false;document.getElementById('accountSmsTerms').checked=false;}
+    await loadAccountSms();
+  }catch(e){msg.textContent='Unable to confirm permission was saved. Refresh before trying again.';}finally{this.disabled=false;}
+};
+async function loadSharing(){
+  var r=await api('/api/settings/auto-publish');
+  document.getElementById('saveSharing').disabled=!r.ok;
+  document.getElementById('autoPublish').checked=r.ok&&r.data.auto_publish===true;
+  document.getElementById('publicStatus').textContent=!r.ok?'Unable to load sharing settings.':r.data.auto_publish?'Future creations are set to publish publicly.':'Automatic public sharing is off. Registration alone keeps new images private.';
+}
+document.getElementById('saveSharing').onclick=async function(){
+  var enabled=document.getElementById('autoPublish').checked;
+  if(enabled&&!confirm('Publish ALL future creations from this account to the public EverVerify registry? This includes Studio portraits. Existing private images will stay private.'))return;
+  this.disabled=true;
+  try{var r=await api('/api/settings/auto-publish',{method:'POST',headers:{'content-type':'application/json'},body:JSON.stringify({enabled:enabled})});
+    if(!r.ok)throw Error();await loadSharing();
+  }catch(e){document.getElementById('publicStatus').textContent='Could not confirm saving. Refresh to check your current setting.';this.disabled=false;}
+};
 function capName(c){var m={"image":"Image","image.pro":"Pro Image","image.nano":"Premium Image","image.gpt":"GPT Image","studio.photo":"Studio Photo","studio.train":"Studio Training","video.text2video":"Video (from text)","video.image2video":"Video (from photo)","bgremove":"Background Remove","upscale":"Upscale","restore":"Photo Restore"};return m[c]||c||"Creation";}
 async function loadCreations(){
   var w=document.getElementById("genWrap");
