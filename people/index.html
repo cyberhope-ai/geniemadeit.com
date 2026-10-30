@@ -58,8 +58,10 @@ input:focus,select:focus,textarea:focus{outline:none;border-color:var(--gold)}
 .chip{background:var(--panel2);border:1px solid var(--line);border-radius:20px;padding:4px 10px;font-size:.82rem;display:inline-flex;gap:6px;align-items:center}
 .chip b{cursor:pointer;color:var(--faint)}
 .phz{display:flex;gap:8px;flex-wrap:wrap;margin-top:8px}
-.phz .t{position:relative;width:60px;height:60px}
-.phz img{width:60px;height:60px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.phz .t{position:relative;width:100px;min-height:135px}
+.phz img{width:100px;height:100px;object-fit:cover;border-radius:10px;border:1px solid var(--line)}
+.phz .cover{width:100%;min-height:32px;cursor:pointer;border:1px solid var(--line);border-radius:6px;background:#241331;color:#fff}
+.phz .cover[aria-pressed="true"]{background:#735822;border-color:#f0cf86;color:#fff}
 .phz .x{position:absolute;top:-6px;right:-6px;width:20px;height:20px;border-radius:50%;border:none;background:#2a1140;color:#ffb3c6;cursor:pointer;font-size:12px}
 .phadd{width:60px;height:60px;border:1px dashed var(--line);border-radius:10px;background:transparent;color:var(--gold2);font-size:1.4rem;cursor:pointer}
 .mbtns{display:flex;gap:10px;margin-top:20px}.mbtns .btn{flex:1;justify-content:center}
@@ -187,7 +189,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     <div><label>Relationship</label><select id="fRel">
       <option value="spouse">Spouse / Partner</option><option value="child">Child</option><option value="parent">Parent</option>
       <option value="sibling">Sibling</option><option value="relative">Relative</option><option value="friend" selected>Friend</option>
-      <option value="coworker">Coworker</option><option value="me">Me</option><option value="other">Other</option></select></div></div>
+      <option value="coworker">Coworker</option><option value="brother-in-law">Brother-in-law</option><option value="sister-in-law">Sister-in-law</option><option value="cousin">Cousin</option><option value="close friend">Close friend</option><option value="fraternity brother">Fraternity brother</option><option value="sorority sister">Sorority sister</option><option value="work colleague">Work colleague</option><option value="schoolmate">Schoolmate</option><option value="me">Me</option><option value="other">Other</option></select></div></div>
   <label>Birthday</label><input id="fBday" type="date">
   <label>Other important dates</label><div id="fOccasions"></div>
   <button type="button" class="btn ghost" id="addOccasion">＋ Add anniversary or occasion</button>
@@ -200,6 +202,14 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   <label><input type="checkbox" id="fPermission"> These are my photos, or I have permission to use this person's likeness (including guardian permission for a child).</label>
   <p class="muted">Studio uses 2–6 photos you select, not all 100. Saving photos does not train a permanent model.</p>
   <div class="phz" id="fPhz"></div>
+  <p class="muted">Choose “Use as cover” below a photo, then Save. This becomes the directory card image; it does not change which photos Studio uses.</p>
+  <button type="button" class="btn ghost" id="chooseVault">Choose from my Vault</button>
+  <div id="vaultPicker" hidden>
+    <h3>Select Vault images</h3><p class="muted">Imports a separate copy; the Vault original stays unchanged. Generated images are not original photographs—prefer real photos for Studio likeness.</p>
+    <div id="vaultImages" style="display:flex;flex-wrap:wrap;gap:12px;max-height:360px;overflow:auto"></div>
+    <button type="button" class="btn gold" id="importVault">Import selected images</button>
+    <button type="button" class="btn ghost" id="closeVault">Close picker</button>
+  </div>
   <input type="file" id="fFile" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
   <p id="uploadStatus" role="status" aria-live="polite"></p>
   <a class="btn ghost" id="personStudio" hidden>Create Studio photos for this person →</a>
@@ -212,7 +222,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
 <script>
 (function(){
   var W=document.getElementById("wrap"), OV=document.getElementById("ov");
-  var people=[], cur=null, curPhotos=[], curInterests=[], curOccasions=[], busy=false;
+  var people=[], cur=null, curPhotos=[], curCover=null, curInterests=[], curOccasions=[], busy=false;
   fetch("/api/auth/me",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
     var u=d&&d.user; var signed=d&&d.authenticated&&u&&u.email;
     if(!signed){W.innerHTML='<div class="gate"><span class="eyebrow">My People</span><h1>Build your <em>circle</em></h1><p class="lead" style="margin:0 auto 18px">Save your friends & family so GenieMade can help you send the perfect card, right on time.</p><a class="btn gold" href="/app">Sign in to start →</a></div>';return;}
@@ -233,7 +243,8 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     if(!m)return esc(s); if(m.length===4)return mo[+m[2]-1]+" "+(+m[3]); return mo[+m[1]-1]+" "+(+m[2]);}
   function render(){
     var cards=people.map(function(p){
-      var ph=(p.photos&&p.photos[0])?'<img src="'+esc(p.photos[0])+'" alt="'+esc(p.name)+'">':'<span class="ini">'+esc((p.name||"?").slice(0,1).toUpperCase())+'</span>';
+      var cover=(p.photos||[]).includes(p.cover_photo)?p.cover_photo:(p.photos||[])[0];
+      var ph=cover?'<img src="'+esc(cover)+'" alt="'+esc(p.name)+'">':'<span class="ini">'+esc((p.name||"?").slice(0,1).toUpperCase())+'</span>';
       var occ=nextOccasion(p);
       return '<div class="pc" data-id="'+p.id+'"><div class="ph">'+ph+'</div><div class="b"><div class="nm">'+esc(p.name||"Unnamed")+'</div><div class="rel">'+esc(p.relationship||"")+'</div>'+(occ?'<div class="dt">'+occ+'</div>':'')+'</div></div>';
     }).join("");
@@ -269,9 +280,11 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   function edit(p,rel){
     if(busy)return;
     cur=p||null; curPhotos=p?(p.photos||[]).slice():[]; curInterests=p?(p.interests||[]).slice():[];
+    curCover=p&&curPhotos.includes(p.cover_photo)?p.cover_photo:(curPhotos[0]||null);
     curOccasions=(p&&p.occasions||[]).map(function(o){return {label:o.label,date:o.date};}); renderOccasions();
     document.getElementById('fPermission').checked=!!(p&&p.photo_permission);
     document.getElementById('uploadStatus').textContent='';
+    document.getElementById('vaultPicker').hidden=true;
     var studio=document.getElementById('personStudio'); studio.hidden=!p;
     studio.href=p?'/studio-create?person='+encodeURIComponent(p.id):'#';
     var creations=document.getElementById('personCreations');creations.textContent='';
@@ -307,10 +320,12 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   }
   document.getElementById("fInt").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();var v=this.value.trim().replace(/,$/,"");if(v){curInterests.push(v);this.value="";renderChips();}}});
   function renderPhz(){
-    var h=curPhotos.map(function(u,i){return '<div class="t"><img src="'+esc(u)+'"><button class="x" data-i="'+i+'">✕</button></div>';}).join("");
+    if(!curPhotos.includes(curCover))curCover=curPhotos[0]||null;
+    var h=curPhotos.map(function(u,i){return '<div class="t"><img src="'+esc(u)+'" alt="Photo '+(i+1)+'"><button class="x" aria-label="Remove photo '+(i+1)+'" data-i="'+i+'">✕</button><button type="button" class="cover" data-i="'+i+'" aria-pressed="'+(u===curCover)+'" '+(busy?'disabled':'')+'>'+(u===curCover?'★ Cover':'Use as cover')+'</button></div>';}).join("");
     document.getElementById("fPhz").innerHTML=h+'<button class="phadd" id="phAdd" '+(busy||curPhotos.length>=100?'disabled':'')+'>＋</button><span>'+curPhotos.length+' / 100 photos</span>';
     [].forEach.call(document.querySelectorAll("#fPhz .x"),function(x){x.onclick=function(){if(busy)return;curPhotos.splice(+x.dataset.i,1);renderPhz();};});
     document.getElementById("phAdd").onclick=function(){document.getElementById("fFile").click();};
+    [].forEach.call(document.querySelectorAll('#fPhz .cover'),function(b){b.onclick=function(){if(busy)return;curCover=curPhotos[+b.dataset.i];renderPhz();};});
   }
   document.getElementById("fFile").addEventListener("change",async function(){
     if(busy)return;
@@ -334,11 +349,51 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     status.textContent=(files.length-failed)+' uploaded; '+failed+' failed. Click Save to keep this library. JPEG, PNG or WebP, up to 12 MB each.';
   });
   document.getElementById("mCancel").onclick=function(){if(!busy)OV.classList.remove("on");};
+  document.getElementById('personStudio').onclick=function(e){if(busy)e.preventDefault();};
+  document.getElementById('closeVault').onclick=function(){if(!busy)document.getElementById('vaultPicker').hidden=true;};
+  document.getElementById('chooseVault').onclick=async function(){
+    if(busy)return;
+    var status=document.getElementById('uploadStatus'),target=cur;
+    if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before importing.';return;}
+    status.textContent='Loading your Vault…';
+    try{
+      var r=await fetch('/api/gallery',{credentials:'same-origin'}),d=await r.json();
+      if(!r.ok||!d.ok)throw new Error('Could not load your Vault.');
+      if(cur!==target||!OV.classList.contains('on'))return;
+      var items=(d.generations||[]).filter(function(g){return /^\/asset\/.+\.(png|jpe?g|webp)$/i.test(g.url||'');});
+      var box=document.getElementById('vaultImages');box.innerHTML='';
+      items.forEach(function(g){
+        var label=document.createElement('label');label.style.width='110px';
+        var img=document.createElement('img');img.src=g.url;img.loading='lazy';img.alt=g.prompt||'Vault image';img.style.cssText='width:110px;height:110px;object-fit:cover';
+        var check=document.createElement('input');check.type='checkbox';check.value=g.id;check.setAttribute('aria-label','Select Vault image '+g.id);
+        label.append(img,check);box.append(label);
+      });
+      document.getElementById('vaultPicker').hidden=false;status.textContent=items.length?'Select images, then Import selected images.':'No supported images in your Vault yet.';
+    }catch(e){status.textContent='Could not load your Vault. Please try again.';}
+  };
+  document.getElementById('importVault').onclick=async function(){
+    if(busy)return;
+    var ids=Array.from(document.querySelectorAll('#vaultImages input:checked')).map(function(c){return c.value;}),status=document.getElementById('uploadStatus');
+    if(!ids.length){status.textContent='Select at least one image.';return;}
+    if(ids.length+curPhotos.length>100){status.textContent='You have room for '+(100-curPhotos.length)+' more photos.';return;}
+    if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before importing.';return;}
+    busy=true;this.disabled=true;document.getElementById('mSave').disabled=true;renderPhz();var failures=0;
+    for(var i=0;i<ids.length;i++){
+      status.textContent='Importing '+(i+1)+' of '+ids.length+'…';
+      try{
+        var r=await fetch('/api/people/import-vault',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:ids[i],photo_permission:true})}),d=await r.json();
+        if(!r.ok||!d.ok||!d.url)throw new Error('Import failed');curPhotos.push(d.url);
+        Array.from(document.querySelectorAll('#vaultImages input')).filter(function(c){return c.value===ids[i];}).forEach(function(c){c.checked=false;});
+      }catch(e){failures++;}
+    }
+    busy=false;this.disabled=false;document.getElementById('mSave').disabled=false;renderPhz();
+    status.textContent=(ids.length-failures)+' images imported; '+failures+' failed. Choose a cover if desired, then Save this profile.';
+  };
   OV.addEventListener("click",function(e){if(e.target===OV&&!busy)OV.classList.remove("on");});
   document.getElementById("mSave").onclick=function(){
     var body={id:cur?cur.id:undefined,name:document.getElementById("fName").value.trim(),relationship:document.getElementById("fRel").value,
       birthday:document.getElementById("fBday").value,phone:document.getElementById("fPhone").value.trim(),email:document.getElementById("fEmail").value.trim(),
-      interests:curInterests,photos:curPhotos,occasions:curOccasions,notes:cur&&cur.notes||'',photo_permission:document.getElementById('fPermission').checked};
+      interests:curInterests,photos:curPhotos,cover_photo:curCover,occasions:curOccasions,notes:cur&&cur.notes||'',photo_permission:document.getElementById('fPermission').checked};
     if(busy)return;
     if(curOccasions.some(function(o){return !o.label.trim()||!o.date;})){alert('Give each occasion a name and date, or remove the empty row.');return;}
     if(!body.name&&!body.photos.length){alert("Add a name.");return;}
