@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browser = await chromium.launch({ executablePath: process.env.CHROME_BIN || undefined, headless: true, args: ['--no-sandbox'] });
 const person = { id:'friend', name:'Christy', relationship:'sibling', photo_permission:true, photos:['/asset/uploads/user/a.jpg','/asset/uploads/user/b.jpg'], occasions:[] };
-let saved, used=0, currentPerson=person, importedSource, studioTest=false;
+let saved, used=0, currentPerson=person, importedSource, studioTest=false, smsStatus='unknown', smsTests=0;
 const mark={id:'mark',name:'Mark',photo_permission:true,photos:Array.from({length:9},(_,i)=>'/asset/uploads/user/mark'+i+'.jpg')};
 try {
   const page = await browser.newPage();
@@ -22,7 +22,8 @@ try {
     else if(url.pathname==='/api/registry/mine')body={ok:true,registrations:[{receipt_id:'ev-one',thumb_url:'/asset/reg/preview.jpg'},{receipt_id:'fingerprint-only',thumb_url:null}]};
     else if(url.pathname==='/api/people/public-registry')body=url.searchParams.has('anchor')?{ok:true,owner:'pierce',registrations:[{receipt_id:'public-one',title:'Swashbuckling Pirate',thumb_url:'/asset/reg/pirate.png'}],next_cursor:null}:{ok:true,owners:[{owner:'pierce',anchor:'anchor-one'},{owner:'pierce',anchor:'anchor-two'}]};
     else if(url.pathname==='/api/people/import-vault'){importedSource=route.request().postDataJSON().source;body={ok:true,url:importedSource==='public-eververify'?'/asset/uploads/user/public.png':importedSource==='eververify'?'/asset/uploads/user/eververify.jpg':'/asset/uploads/user/imported.png'};}
-    else if(url.pathname==='/api/studio/session')body={session:{looks_total:6,looks_used:used},model:{job:{notified:true,total:6,done:6}},config:{min_photos:2,max_photos:25}};
+    else if(url.pathname==='/api/studio/session')body={session:{looks_total:6,looks_used:used},model:{job:{notified:true,total:6,done:6,notify_phone:'+13175550100',sms_status:smsStatus}},config:{min_photos:2,max_photos:25}};
+    else if(url.pathname==='/api/studio/test-sms'){smsTests++;body={ok:true,status:'accepted',provider_status:'queued'};}
     else if(url.pathname==='/api/studio/looks')body={looks:[]};
     else if(url.pathname.startsWith('/api/'))body={ok:true};
     else return route.fulfill({status:200,body:''});
@@ -123,6 +124,12 @@ try {
   await page.locator('#newStudio').click();
   await page.locator('#gate').waitFor({state:'visible'});
   assert.match(await page.locator('#gateTitle').textContent(),/new Studio package/);
+  smsStatus='disabled';await page.goto('https://geniemadeit.com/studio-create');
+  await page.locator('#smsDelivery').filter({hasText:'switched off'}).waitFor();assert.equal(await page.locator('#testSms').isVisible(),false);
+  smsStatus='accepted';await page.goto('https://geniemadeit.com/studio-create');
+  await page.locator('#smsDelivery').filter({hasText:'Handset delivery is not yet confirmed'}).waitFor();
+  page.once('dialog',dialog=>dialog.accept());await page.locator('#testSms').click();
+  await page.locator('#smsTestResult').filter({hasText:'Test accepted'}).waitFor();assert.equal(smsTests,1);assert.equal(await page.locator('#testSms').isDisabled(),true);
   assert.deepEqual(errors,[]);
   console.log('PASS: cover selection/save/reload/removal fallback, relationship save, occasion save, completed-session restart, person reference selection, exhausted-package gate; zero browser errors.');
 } finally { await browser.close(); }
