@@ -4,7 +4,7 @@ import assert from 'node:assert/strict';
 const { chromium } = await import(process.env.PLAYWRIGHT_MODULE || 'playwright');
 const browser = await chromium.launch({ executablePath: process.env.CHROME_BIN || undefined, headless: true, args: ['--no-sandbox'] });
 const person = { id:'friend', name:'Christy', relationship:'sibling', photo_permission:true, photos:['/asset/uploads/user/a.jpg','/asset/uploads/user/b.jpg'], occasions:[] };
-let saved, used=0, currentPerson=person;
+let saved, used=0, currentPerson=person, importedSource;
 try {
   const page = await browser.newPage();
   const errors=[];page.on('pageerror',e=>errors.push(e.message));
@@ -18,7 +18,8 @@ try {
       else body={ok:true,people:[currentPerson]};
     }else if(url.pathname==='/api/reminders')body={reminders:[]};
     else if(url.pathname==='/api/gallery')body={ok:true,generations:[{id:'vault-one',url:'/asset/gen/user/portrait.png'},{id:'video',url:'/asset/gen/user/video.mp4'}]};
-    else if(url.pathname==='/api/people/import-vault')body={ok:true,url:'/asset/uploads/user/imported.png'};
+    else if(url.pathname==='/api/registry/mine')body={ok:true,registrations:[{receipt_id:'ev-one',thumb_url:'/asset/reg/preview.jpg'},{receipt_id:'fingerprint-only',thumb_url:null}]};
+    else if(url.pathname==='/api/people/import-vault'){importedSource=route.request().postDataJSON().source;body={ok:true,url:importedSource==='eververify'?'/asset/uploads/user/eververify.jpg':'/asset/uploads/user/imported.png'};}
     else if(url.pathname==='/api/studio/session')body={session:{looks_total:6,looks_used:used},model:{job:{notified:true,total:6,done:6}},config:{min_photos:2,max_photos:25}};
     else if(url.pathname==='/api/studio/looks')body={looks:[]};
     else if(url.pathname.startsWith('/api/'))body={ok:true};
@@ -58,12 +59,25 @@ try {
   await page.locator('#ov').waitFor({state:'hidden'});
   assert.ok(saved.photos.includes('/asset/uploads/user/imported.png'));
   assert.equal(saved.cover_photo,'/asset/uploads/user/imported.png');
+  await page.locator('.pc').click();
+  assert.equal(await page.locator('#fPhz a[download]').count(),3);
+  await page.locator('#chooseEverVerify').click();
+  await page.locator('#libraryHeading').filter({hasText:'EverVerify'}).waitFor();
+  assert.equal(await page.locator('#vaultImages input').count(),1);
+  assert.match(await page.locator('#libraryNotice').textContent(),/previews, not full-resolution/);
+  await page.locator('#vaultImages input').check();
+  await page.locator('#importVault').click();
+  await page.getByText('1 images imported; 0 failed.',{exact:false}).waitFor();
+  assert.equal(importedSource,'eververify');
+  await page.locator('#mSave').click();
+  await page.locator('#ov').waitFor({state:'hidden'});
+  assert.ok(saved.photos.includes('/asset/uploads/user/eververify.jpg'));
   await page.goto('https://geniemadeit.com/studio-create');
   await page.locator('#newStudio').click();
   await page.locator('#stepUpload').waitFor({state:'visible'});
   await page.goto('https://geniemadeit.com/studio-create?person=friend');
   await page.locator('#savedLibrary').waitFor();
-  assert.equal(await page.locator('#savedLibrary img').count(),3);
+  assert.equal(await page.locator('#savedLibrary img').count(),4);
   assert.equal(await page.locator('#uploadBtn').isDisabled(),true);
   for(const checkbox of await page.locator('#savedLibrary input').all())await checkbox.check();
   assert.equal(await page.locator('#uploadBtn').isEnabled(),true);
