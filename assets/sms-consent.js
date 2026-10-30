@@ -12,6 +12,9 @@
     box.hidden = !(loaded && config.opt_in_enabled && box.dataset.eligible === "true");
     const disclosure = box.querySelector("[data-sms-disclosure]");
     if (disclosure && config.disclosure_text) disclosure.textContent = config.disclosure_text;
+    let availability=box.querySelector('[data-sms-availability]');
+    if(!availability){availability=document.createElement('p');availability.dataset.smsAvailability='';availability.setAttribute('role','status');box.append(availability);}
+    availability.textContent=config.sending_enabled?'Text updates are enabled; carrier delivery is not guaranteed.':'Text sending is currently off. Opt-in can be saved, but this is not a promise of a text for this order.';
   }
 
   async function load() {
