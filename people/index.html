@@ -205,10 +205,23 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   <p class="muted">Choose “Use as cover” below a photo, then Save. This becomes the directory card image; it does not change which photos Studio uses.</p>
   <button type="button" class="btn ghost" id="chooseVault">Choose from my Vault</button>
   <button type="button" class="btn ghost" id="chooseEverVerify">Choose from my EverVerify</button>
+  <button type="button" class="btn ghost" id="choosePublic">Import from public EverVerify</button>
+  <div id="publicSearch" hidden>
+    <label>Registry owner name or receipt link</label><input id="publicQuery" placeholder="pierce or https://eververify.org/r/…" maxlength="200">
+    <button type="button" class="btn ghost" id="searchPublic">Find public account</button>
+    <button type="button" class="btn ghost" id="savedPublic" hidden>Open saved registry account</button>
+    <button type="button" class="btn ghost" id="clearPublic">Forget saved registry account</button>
+    <p class="muted">Owner names may not be unique. Select the correct account; registration does not prove the person pictured or permission to reuse an image.</p>
+    <div id="publicOwners"></div>
+    <label><input type="checkbox" id="publicConfirmed"> I confirm this is the intended registry account for this contact and I have permission to reuse the selected images.</label>
+  </div>
   <div id="vaultPicker" hidden>
     <h3 id="libraryHeading">Select Vault images</h3><p class="muted">Imports a separate copy; the source stays unchanged. Generated images are not original photographs—prefer real photos for Studio likeness.</p>
     <p id="libraryNotice" class="muted"></p><a id="openSourceLibrary" href="/app" target="_blank" rel="noopener">Open my full Vault in a new tab →</a>
     <div id="vaultImages" style="display:flex;flex-wrap:wrap;gap:12px;max-height:360px;overflow:auto"></div>
+    <label>Filter loaded images by title</label><input id="imageFilter" placeholder="e.g. Pirate">
+    <button type="button" class="btn ghost" id="selectImages">Select loaded images (up to available space)</button>
+    <button type="button" class="btn ghost" id="morePublic" hidden>Load more public records</button>
     <button type="button" class="btn gold" id="importVault">Import selected images</button>
     <button type="button" class="btn ghost" id="closeVault">Close picker</button>
   </div>
@@ -225,6 +238,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
 (function(){
   var W=document.getElementById("wrap"), OV=document.getElementById("ov");
   var people=[], cur=null, curPhotos=[], curCover=null, curInterests=[], curOccasions=[], busy=false, pickerSource='vault';
+  var registryAnchor=null, publicCursor=null;
   fetch("/api/auth/me",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
     var u=d&&d.user; var signed=d&&d.authenticated&&u&&u.email;
     if(!signed){W.innerHTML='<div class="gate"><span class="eyebrow">My People</span><h1>Build your <em>circle</em></h1><p class="lead" style="margin:0 auto 18px">Save your friends & family so GenieMade can help you send the perfect card, right on time.</p><a class="btn gold" href="/app">Sign in to start →</a></div>';return;}
@@ -287,6 +301,12 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     document.getElementById('fPermission').checked=!!(p&&p.photo_permission);
     document.getElementById('uploadStatus').textContent='';
     document.getElementById('vaultPicker').hidden=true;
+    registryAnchor=p&&p.registry_anchor||null;publicCursor=null;
+    document.getElementById('publicSearch').hidden=true;
+    document.getElementById('publicOwners').innerHTML='';
+    document.getElementById('publicQuery').value='';
+    document.getElementById('publicConfirmed').checked=false;
+    document.getElementById('savedPublic').hidden=!registryAnchor;
     var studio=document.getElementById('personStudio'); studio.hidden=!p;
     studio.href=p?'/studio-create?person='+encodeURIComponent(p.id):'#';
     var creations=document.getElementById('personCreations');creations.textContent='';
@@ -355,6 +375,52 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   document.getElementById('closeVault').onclick=function(){if(!busy)document.getElementById('vaultPicker').hidden=true;};
   document.getElementById('chooseVault').onclick=function(){openLibrary('vault');};
   document.getElementById('chooseEverVerify').onclick=function(){openLibrary('eververify');};
+  function renderLibraryItems(items,append){
+    var box=document.getElementById('vaultImages');if(!append)box.innerHTML='';
+    items.forEach(function(g){
+      var label=document.createElement('label');label.style.width='110px';label.dataset.title=(g.prompt||'').toLowerCase();
+      var img=document.createElement('img');img.src=g.url;img.loading='lazy';img.alt=g.prompt||'Stored image';img.style.cssText='width:110px;height:110px;object-fit:cover';
+      var check=document.createElement('input');check.type='checkbox';check.value=g.id;check.setAttribute('aria-label','Select Vault image '+g.id);
+      var title=document.createElement('span');title.textContent=g.prompt||'Untitled image';
+      var download=document.createElement('a');download.href=g.url;download.download='';download.textContent='Download image';
+      label.append(img,title,check,download);box.append(label);
+    });
+    document.getElementById('imageFilter').value='';
+  }
+  document.getElementById('imageFilter').oninput=function(){var q=this.value.toLowerCase();document.querySelectorAll('#vaultImages label').forEach(function(l){l.hidden=!l.dataset.title.includes(q);if(l.hidden)l.querySelector('input').checked=false;});};
+  document.getElementById('selectImages').onclick=function(){if(busy)return;var space=100-curPhotos.length;document.querySelectorAll('#vaultImages label').forEach(function(l){var c=l.querySelector('input');c.checked=!l.hidden&&space>0;if(c.checked)space--;});};
+  document.getElementById('choosePublic').onclick=function(){if(busy)return;document.getElementById('publicSearch').hidden=false;document.getElementById('publicQuery').focus();};
+  document.getElementById('clearPublic').onclick=function(){if(busy)return;registryAnchor=null;document.getElementById('savedPublic').hidden=true;document.getElementById('publicConfirmed').checked=false;if(pickerSource==='public-eververify')document.getElementById('vaultPicker').hidden=true;document.getElementById('uploadStatus').textContent='Registry link cleared in this draft. Save to keep the change.';};
+  document.getElementById('searchPublic').onclick=async function(){
+    if(busy)return;busy=true;document.getElementById('mSave').disabled=true;
+    var box=document.getElementById('publicOwners');box.textContent='Searching public accounts…';
+    try{
+      var r=await fetch('/api/people/public-registry?q='+encodeURIComponent(document.getElementById('publicQuery').value.trim()),{credentials:'same-origin'}),d=await r.json();
+      if(!r.ok||!d.ok)throw new Error(d.message||'Search failed');box.innerHTML='';
+      (d.owners||[]).forEach(function(o){var row=document.createElement('div'),b=document.createElement('button'),a=document.createElement('a');b.className='btn ghost';b.textContent='View '+o.owner+' · receipt '+o.anchor.slice(0,8);b.onclick=function(){loadPublic(o.anchor,false);};a.href='https://eververify.org/r/'+encodeURIComponent(o.anchor);a.target='_blank';a.rel='noopener';a.textContent=' Inspect public receipt ↗';row.append(b,a);box.append(row);});
+      if(!(d.owners||[]).length)box.textContent='No public account with that exact owner name or receipt. Try a receipt link.';
+      if(d.truncated)box.append(document.createTextNode('More matching accounts exist. Paste a receipt link to identify the correct one.'));
+    }catch(e){box.textContent=e.message;}finally{busy=false;document.getElementById('mSave').disabled=false;}
+  };
+  document.getElementById('savedPublic').onclick=function(){loadPublic(registryAnchor,false);};
+  document.getElementById('morePublic').onclick=function(){loadPublic(registryAnchor,true);};
+  async function loadPublic(anchor,more){
+    if(busy||!anchor)return;busy=true;document.getElementById('mSave').disabled=true;
+    var status=document.getElementById('uploadStatus');status.textContent='Loading public images…';
+    try{
+      var r=await fetch('/api/people/public-registry?anchor='+encodeURIComponent(anchor)+(more&&publicCursor?'&cursor='+encodeURIComponent(publicCursor):''),{credentials:'same-origin'}),d=await r.json();
+      if(!r.ok||!d.ok)throw new Error(d.message||'Could not load this account');
+      if(!more)document.getElementById('publicConfirmed').checked=false;
+      registryAnchor=anchor;pickerSource='public-eververify';publicCursor=d.next_cursor;
+      document.getElementById('libraryHeading').textContent='Public EverVerify images · '+d.owner;
+      document.getElementById('libraryNotice').textContent='Only public records from this selected account. Stored images may be previews, not full-resolution originals. Fingerprint-only records have no image. Check the subject and permission before importing; no automatic sync occurs.';
+      var link=document.getElementById('openSourceLibrary');link.href='https://eververify.org/r/'+encodeURIComponent(anchor);link.textContent='Inspect selected public receipt ↗';
+      var items=(d.registrations||[]).filter(function(g){return /^\/asset\/.+\.(png|jpe?g|webp)$/i.test(g.thumb_url||'');}).map(function(g){return{id:g.receipt_id,url:g.thumb_url,prompt:g.title};});
+      renderLibraryItems(items,more);document.getElementById('vaultPicker').hidden=false;
+      document.getElementById('morePublic').hidden=!publicCursor;document.getElementById('savedPublic').hidden=false;
+      status.textContent=items.length+' stored images on this page. Confirm the account, select images, then Import. Save the profile to remember this account.';
+    }catch(e){status.textContent=e.message;}finally{busy=false;document.getElementById('mSave').disabled=false;}
+  }
   async function openLibrary(source){
     if(busy)return;
     var status=document.getElementById('uploadStatus'),target=cur;
@@ -365,19 +431,13 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
       if(!r.ok||!d.ok)throw new Error('Could not load your library.');
       if(cur!==target||!OV.classList.contains('on'))return;
       pickerSource=source;
+      document.getElementById('morePublic').hidden=true;
       var records=source==='eververify'?(d.registrations||[]).map(function(g){return {id:g.receipt_id,url:g.thumb_url,prompt:g.title};}):(d.generations||[]);
       var items=records.filter(function(g){return /^\/asset\/.+\.(png|jpe?g|webp)$/i.test(g.url||'');});
       document.getElementById('libraryHeading').textContent=source==='eververify'?'Select my EverVerify images':'Select my Vault images';
       document.getElementById('libraryNotice').textContent=source==='eververify'?'Shows registrations belonging to your current GenieMade account (up to the latest 500). Some stored images are previews, not full-resolution originals. Fingerprint-only records cannot be imported; upload the original from your device instead.':'Select images directly from your GenieMade Vault below (up to the latest 500).';
       var link=document.getElementById('openSourceLibrary');link.href=source==='eververify'?'https://eververify.org/account':'/app';link.textContent=source==='eververify'?'Open EverVerify in a new tab →':'Open my full Vault in a new tab →';
-      var box=document.getElementById('vaultImages');box.innerHTML='';
-      items.forEach(function(g){
-        var label=document.createElement('label');label.style.width='110px';
-        var img=document.createElement('img');img.src=g.url;img.loading='lazy';img.alt=g.prompt||'Vault image';img.style.cssText='width:110px;height:110px;object-fit:cover';
-        var check=document.createElement('input');check.type='checkbox';check.value=g.id;check.setAttribute('aria-label','Select Vault image '+g.id);
-        var download=document.createElement('a');download.href=g.url;download.download='';download.textContent='Download image';
-        label.append(img,check,download);box.append(label);
-      });
+      renderLibraryItems(items,false);
       document.getElementById('vaultPicker').hidden=false;status.textContent=items.length?'Select images, then Import selected images.':'No supported stored images in this account library.';
     }catch(e){status.textContent='Could not load your image library. Please try again.';}
     finally{busy=false;document.getElementById('mSave').disabled=false;}
@@ -388,11 +448,12 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     if(!ids.length){status.textContent='Select at least one image.';return;}
     if(ids.length+curPhotos.length>100){status.textContent='You have room for '+(100-curPhotos.length)+' more photos.';return;}
     if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before importing.';return;}
+    if(pickerSource==='public-eververify'&&!document.getElementById('publicConfirmed').checked){status.textContent='Confirm the registry account and permission before importing.';return;}
     busy=true;this.disabled=true;document.getElementById('mSave').disabled=true;renderPhz();var failures=0;
     for(var i=0;i<ids.length;i++){
       status.textContent='Importing '+(i+1)+' of '+ids.length+'…';
       try{
-        var r=await fetch('/api/people/import-vault',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:ids[i],source:pickerSource,photo_permission:true})}),d=await r.json();
+        var r=await fetch('/api/people/import-vault',{method:'POST',credentials:'same-origin',headers:{'content-type':'application/json'},body:JSON.stringify({id:ids[i],source:pickerSource,owner_anchor:registryAnchor,contact_confirmed:document.getElementById('publicConfirmed').checked,photo_permission:true})}),d=await r.json();
         if(!r.ok||!d.ok||!d.url)throw new Error('Import failed');curPhotos.push(d.url);
         Array.from(document.querySelectorAll('#vaultImages input')).filter(function(c){return c.value===ids[i];}).forEach(function(c){c.checked=false;});
       }catch(e){failures++;}
@@ -406,6 +467,8 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
       birthday:document.getElementById("fBday").value,phone:document.getElementById("fPhone").value.trim(),email:document.getElementById("fEmail").value.trim(),
       interests:curInterests,photos:curPhotos,cover_photo:curCover,occasions:curOccasions,notes:cur&&cur.notes||'',photo_permission:document.getElementById('fPermission').checked};
     if(busy)return;
+    if(registryAnchor&&registryAnchor!==(cur&&cur.registry_anchor)&&!document.getElementById('publicConfirmed').checked){alert('Confirm the selected registry account before saving its link.');return;}
+    body.registry_anchor=registryAnchor;
     if(curOccasions.some(function(o){return !o.label.trim()||!o.date;})){alert('Give each occasion a name and date, or remove the empty row.');return;}
     if(!body.name&&!body.photos.length){alert("Add a name.");return;}
     var b=this;b.textContent="Saving…";b.disabled=true;
