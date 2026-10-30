@@ -19,7 +19,8 @@ try {
     }else if(url.pathname==='/api/reminders')body={reminders:[]};
     else if(url.pathname==='/api/gallery')body={ok:true,generations:[{id:'vault-one',url:'/asset/gen/user/portrait.png'},{id:'video',url:'/asset/gen/user/video.mp4'}]};
     else if(url.pathname==='/api/registry/mine')body={ok:true,registrations:[{receipt_id:'ev-one',thumb_url:'/asset/reg/preview.jpg'},{receipt_id:'fingerprint-only',thumb_url:null}]};
-    else if(url.pathname==='/api/people/import-vault'){importedSource=route.request().postDataJSON().source;body={ok:true,url:importedSource==='eververify'?'/asset/uploads/user/eververify.jpg':'/asset/uploads/user/imported.png'};}
+    else if(url.pathname==='/api/people/public-registry')body=url.searchParams.has('anchor')?{ok:true,owner:'pierce',registrations:[{receipt_id:'public-one',title:'Swashbuckling Pirate',thumb_url:'/asset/reg/pirate.png'}],next_cursor:null}:{ok:true,owners:[{owner:'pierce',anchor:'anchor-one'},{owner:'pierce',anchor:'anchor-two'}]};
+    else if(url.pathname==='/api/people/import-vault'){importedSource=route.request().postDataJSON().source;body={ok:true,url:importedSource==='public-eververify'?'/asset/uploads/user/public.png':importedSource==='eververify'?'/asset/uploads/user/eververify.jpg':'/asset/uploads/user/imported.png'};}
     else if(url.pathname==='/api/studio/session')body={session:{looks_total:6,looks_used:used},model:{job:{notified:true,total:6,done:6}},config:{min_photos:2,max_photos:25}};
     else if(url.pathname==='/api/studio/looks')body={looks:[]};
     else if(url.pathname.startsWith('/api/'))body={ok:true};
@@ -72,12 +73,24 @@ try {
   await page.locator('#mSave').click();
   await page.locator('#ov').waitFor({state:'hidden'});
   assert.ok(saved.photos.includes('/asset/uploads/user/eververify.jpg'));
+  await page.locator('.pc').click();
+  await page.locator('#choosePublic').click();
+  await page.locator('#publicQuery').fill('pierce');await page.locator('#searchPublic').click();
+  await page.locator('#publicOwners button').first().waitFor();assert.equal(await page.locator('#publicOwners button').count(),2);
+  await page.locator('#publicOwners button').first().click();await page.locator('#libraryHeading').filter({hasText:'Public EverVerify'}).waitFor();
+  await page.locator('#selectImages').click();await page.locator('#importVault').click();
+  await page.getByText('Confirm the registry account and permission before importing.',{exact:true}).waitFor();
+  await page.locator('#publicConfirmed').check();await page.locator('#importVault').click();
+  await page.getByText('1 images imported; 0 failed.',{exact:false}).waitFor();assert.equal(importedSource,'public-eververify');
+  await page.locator('#mSave').click();await page.locator('#ov').waitFor({state:'hidden'});assert.equal(saved.registry_anchor,'anchor-one');
+  await page.reload();await page.locator('.pc').click();await page.locator('#choosePublic').click();assert.equal(await page.locator('#savedPublic').isVisible(),true);
+  await page.locator('#savedPublic').click();await page.locator('#libraryHeading').filter({hasText:'Public EverVerify'}).waitFor();await page.locator('#mCancel').click();
   await page.goto('https://geniemadeit.com/studio-create');
   await page.locator('#newStudio').click();
   await page.locator('#stepUpload').waitFor({state:'visible'});
   await page.goto('https://geniemadeit.com/studio-create?person=friend');
   await page.locator('#savedLibrary').waitFor();
-  assert.equal(await page.locator('#savedLibrary img').count(),4);
+  assert.equal(await page.locator('#savedLibrary img').count(),5);
   assert.equal(await page.locator('#uploadBtn').isDisabled(),true);
   for(const checkbox of await page.locator('#savedLibrary input').all())await checkbox.check();
   assert.equal(await page.locator('#uploadBtn').isEnabled(),true);
