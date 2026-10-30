@@ -189,13 +189,22 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
       <option value="sibling">Sibling</option><option value="relative">Relative</option><option value="friend" selected>Friend</option>
       <option value="coworker">Coworker</option><option value="me">Me</option><option value="other">Other</option></select></div></div>
   <label>Birthday</label><input id="fBday" type="date">
+  <label>Other important dates</label><div id="fOccasions"></div>
+  <button type="button" class="btn ghost" id="addOccasion">＋ Add anniversary or occasion</button>
+  <p class="muted">These dates create in-app reminders only. They do not automatically generate, charge for, or send gifts.</p>
   <label>Interests (they love…)</label>
   <div class="chipin" id="fIntWrap"><span id="fIntChips"></span><input id="fInt" placeholder="type an interest, press Enter (sports, music…)"></div>
   <div class="row2"><div><label>Phone (for text reminders)</label><input id="fPhone" maxlength="24" placeholder="+1 555 123 4567"></div>
     <div><label>Email</label><input id="fEmail" maxlength="80" placeholder="optional"></div></div>
-  <label>Their photos <span style="text-transform:none;color:var(--faint)">(up to 25 — for putting them in the scene)</span></label>
+  <label>Their photo library <span style="text-transform:none;color:var(--faint)">(up to 100 originals, separate for each person)</span></label>
+  <label><input type="checkbox" id="fPermission"> These are my photos, or I have permission to use this person's likeness (including guardian permission for a child).</label>
+  <p class="muted">Studio uses 2–6 photos you select, not all 100. Saving photos does not train a permanent model.</p>
   <div class="phz" id="fPhz"></div>
-  <input type="file" id="fFile" accept="image/*" multiple style="display:none">
+  <input type="file" id="fFile" accept="image/jpeg,image/png,image/webp" multiple style="display:none">
+  <p id="uploadStatus" role="status" aria-live="polite"></p>
+  <a class="btn ghost" id="personStudio" hidden>Create Studio photos for this person →</a>
+  <p class="muted">Save changes before opening Studio. New person-linked creations appear below and also remain in your account Vault.</p>
+  <div id="personCreations"></div>
   <div class="mbtns"><button class="del" id="mDel" style="display:none">Delete</button>
     <button class="btn ghost" id="mCancel">Cancel</button><button class="btn gold" id="mSave">Save</button></div>
 </div></div>
@@ -203,7 +212,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
 <script>
 (function(){
   var W=document.getElementById("wrap"), OV=document.getElementById("ov");
-  var people=[], cur=null, curPhotos=[], curInterests=[];
+  var people=[], cur=null, curPhotos=[], curInterests=[], curOccasions=[], busy=false;
   fetch("/api/auth/me",{credentials:"same-origin"}).then(function(r){return r.json()}).then(function(d){
     var u=d&&d.user; var signed=d&&d.authenticated&&u&&u.email;
     if(!signed){W.innerHTML='<div class="gate"><span class="eyebrow">My People</span><h1>Build your <em>circle</em></h1><p class="lead" style="margin:0 auto 18px">Save your friends & family so GenieMade can help you send the perfect card, right on time.</p><a class="btn gold" href="/app">Sign in to start →</a></div>';return;}
@@ -231,14 +240,14 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     W.innerHTML=
       '<span class="eyebrow">My People</span><h1>Your <em>circle</em></h1>'+
       '<p class="lead">Save the people you love — their photos, birthdays and what they’re into — so we can help you make and send the perfect card, right on time.</p>'+
-      '<div class="quick"><button data-rel="spouse">＋ Spouse</button><button data-rel="child">＋ Child</button><button data-rel="parent">＋ Parent</button><button data-rel="relative">＋ Relative</button><button data-rel="friend">＋ Friend</button></div>'+
+      '<div class="quick"><button data-rel="me">My own photo library</button><button data-rel="spouse">＋ Spouse</button><button data-rel="child">＋ Child</button><button data-rel="parent">＋ Parent</button><button data-rel="relative">＋ Relative</button><button data-rel="friend">＋ Friend</button></div>'+
       '<div id="upcoming"></div>'+
       '<h2 style="font-family:var(--serif);font-size:1.2rem;font-weight:600;margin:26px 0 2px">Everyone</h2>'+
       '<div class="grid">'+cards+'<div class="addcard" id="addBtn"><span class="plus">＋</span>Add someone</div></div>'+
       '<div class="skilldna">✨ <b>Coming soon:</b> the interests you save here unlock a <b>free SkillDNA trial</b> — a science-backed read on what makes each person tick, so every card lands.</div>';
     [].forEach.call(document.querySelectorAll(".pc"),function(c){c.onclick=function(){edit(people.find(function(x){return x.id===c.dataset.id;}));};});
     document.getElementById("addBtn").onclick=function(){edit(null,"friend");};
-    [].forEach.call(document.querySelectorAll(".quick button"),function(b){b.onclick=function(){edit(null,b.dataset.rel);};});
+    [].forEach.call(document.querySelectorAll(".quick button"),function(b){b.onclick=function(){edit(b.dataset.rel==='me'?people.find(function(p){return p.relationship==='me';}):null,b.dataset.rel);};});
     loadReminders();
   }
   function loadReminders(){
@@ -258,7 +267,19 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   }
   // ---- editor ----
   function edit(p,rel){
+    if(busy)return;
     cur=p||null; curPhotos=p?(p.photos||[]).slice():[]; curInterests=p?(p.interests||[]).slice():[];
+    curOccasions=(p&&p.occasions||[]).map(function(o){return {label:o.label,date:o.date};}); renderOccasions();
+    document.getElementById('fPermission').checked=!!(p&&p.photo_permission);
+    document.getElementById('uploadStatus').textContent='';
+    var studio=document.getElementById('personStudio'); studio.hidden=!p;
+    studio.href=p?'/studio-create?person='+encodeURIComponent(p.id):'#';
+    var creations=document.getElementById('personCreations');creations.textContent='';
+    if(p)fetch('/api/people?creations='+encodeURIComponent(p.id),{credentials:'same-origin'}).then(function(r){return r.json();}).then(function(d){
+      if(cur!==p)return;
+      creations.innerHTML='<h3>Studio creations for '+esc(p.name)+'</h3>'+(d.creations||[]).map(function(c){return '<a href="'+esc(c.url)+'" target="_blank" rel="noopener"><img loading="lazy" src="'+esc(c.url)+'" alt="'+esc(c.look_name||'Studio portrait')+'" style="width:110px;height:140px;object-fit:cover;margin:4px"></a>';}).join('');
+      if(!(d.creations||[]).length)creations.append(document.createTextNode('No person-linked creations yet. Older Vault images are not automatically assigned.'));
+    }).catch(function(){if(cur===p)creations.textContent='Could not load creations. Reopen this person to try again.';});
     document.getElementById("mTitle").textContent=p?("Edit "+(p.name||"person")):"Add someone";
     document.getElementById("fName").value=p?p.name||"":"";
     document.getElementById("fRel").value=p?p.relationship||"friend":(rel||"friend");
@@ -268,6 +289,18 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     document.getElementById("mDel").style.display=p?"":"none";
     renderChips(); renderPhz(); OV.classList.add("on");
   }
+  function renderOccasions(){
+    var box=document.getElementById('fOccasions');box.innerHTML='';
+    curOccasions.forEach(function(o,i){
+      var row=document.createElement('div');row.className='row2';
+      var label=document.createElement('input');label.placeholder='Wedding, work or pet anniversary';label.maxLength=40;label.value=o.label||'';label.setAttribute('aria-label','Occasion name');label.oninput=function(){o.label=this.value;};
+      var date=document.createElement('input');date.type='date';date.value=o.date||'';date.setAttribute('aria-label','Occasion date');date.oninput=function(){o.date=this.value;};
+      var remove=document.createElement('button');remove.textContent='Remove occasion';remove.onclick=function(){curOccasions.splice(i,1);renderOccasions();};
+      row.append(label,date,remove);box.append(row);
+    });
+    document.getElementById('addOccasion').disabled=curOccasions.length>=12;
+  }
+  document.getElementById('addOccasion').onclick=function(){if(curOccasions.length<12){curOccasions.push({label:'',date:''});renderOccasions();}};
   function renderChips(){
     document.getElementById("fIntChips").innerHTML=curInterests.map(function(t,i){return '<span class="chip">'+esc(t)+'<b data-i="'+i+'">✕</b></span>';}).join("");
     [].forEach.call(document.querySelectorAll("#fIntChips b"),function(x){x.onclick=function(){curInterests.splice(+x.dataset.i,1);renderChips();};});
@@ -275,24 +308,39 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
   document.getElementById("fInt").addEventListener("keydown",function(e){if(e.key==="Enter"||e.key===","){e.preventDefault();var v=this.value.trim().replace(/,$/,"");if(v){curInterests.push(v);this.value="";renderChips();}}});
   function renderPhz(){
     var h=curPhotos.map(function(u,i){return '<div class="t"><img src="'+esc(u)+'"><button class="x" data-i="'+i+'">✕</button></div>';}).join("");
-    document.getElementById("fPhz").innerHTML=h+'<button class="phadd" id="phAdd">＋</button>';
-    [].forEach.call(document.querySelectorAll("#fPhz .x"),function(x){x.onclick=function(){curPhotos.splice(+x.dataset.i,1);renderPhz();};});
+    document.getElementById("fPhz").innerHTML=h+'<button class="phadd" id="phAdd" '+(busy||curPhotos.length>=100?'disabled':'')+'>＋</button><span>'+curPhotos.length+' / 100 photos</span>';
+    [].forEach.call(document.querySelectorAll("#fPhz .x"),function(x){x.onclick=function(){if(busy)return;curPhotos.splice(+x.dataset.i,1);renderPhz();};});
     document.getElementById("phAdd").onclick=function(){document.getElementById("fFile").click();};
   }
-  document.getElementById("fFile").addEventListener("change",function(){
+  document.getElementById("fFile").addEventListener("change",async function(){
+    if(busy)return;
     var files=[].slice.call(this.files||[]); this.value="";
-    files.slice(0,25-curPhotos.length).forEach(function(f){
-      if(!/^image\//.test(f.type))return; var fd=new FormData();fd.append("file",f);
-      var add=document.getElementById("phAdd"); if(add)add.textContent="…";
-      fetch("/api/upload",{method:"POST",body:fd,credentials:"same-origin"}).then(function(r){return r.json()}).then(function(j){if(j&&j.url){curPhotos.push(j.url);renderPhz();}});
-    });
+    var status=document.getElementById('uploadStatus');
+    if(!document.getElementById('fPermission').checked){status.textContent='Confirm photo permission before uploading.';return;}
+    if(files.length>100-curPhotos.length){status.textContent='Choose no more than '+(100-curPhotos.length)+' additional photos.';return;}
+    busy=true;document.getElementById('mSave').disabled=true;renderPhz();
+    var failed=0;
+    for(var i=0;i<files.length;i++){
+      status.textContent='Uploading '+(i+1)+' of '+files.length+'…';
+      try{
+        var f=files[i];if(!/^image\/(jpeg|png|webp)$/.test(f.type)||f.size>12*1024*1024)throw new Error('Use JPEG, PNG or WebP, at most 12 MB.');
+        var fd=new FormData();fd.append('file',f);
+        var response=await fetch('/api/upload',{method:'POST',body:fd,credentials:'same-origin'});var j=await response.json();
+        if(!response.ok||!j.ok||!j.url)throw new Error('Upload failed');curPhotos.push(j.url);
+      }catch(e){failed++;}
+      renderPhz();
+    }
+    busy=false;document.getElementById('mSave').disabled=false;renderPhz();
+    status.textContent=(files.length-failed)+' uploaded; '+failed+' failed. Click Save to keep this library. JPEG, PNG or WebP, up to 12 MB each.';
   });
-  document.getElementById("mCancel").onclick=function(){OV.classList.remove("on");};
-  OV.addEventListener("click",function(e){if(e.target===OV)OV.classList.remove("on");});
+  document.getElementById("mCancel").onclick=function(){if(!busy)OV.classList.remove("on");};
+  OV.addEventListener("click",function(e){if(e.target===OV&&!busy)OV.classList.remove("on");});
   document.getElementById("mSave").onclick=function(){
     var body={id:cur?cur.id:undefined,name:document.getElementById("fName").value.trim(),relationship:document.getElementById("fRel").value,
       birthday:document.getElementById("fBday").value,phone:document.getElementById("fPhone").value.trim(),email:document.getElementById("fEmail").value.trim(),
-      interests:curInterests,photos:curPhotos};
+      interests:curInterests,photos:curPhotos,occasions:curOccasions,notes:cur&&cur.notes||'',photo_permission:document.getElementById('fPermission').checked};
+    if(busy)return;
+    if(curOccasions.some(function(o){return !o.label.trim()||!o.date;})){alert('Give each occasion a name and date, or remove the empty row.');return;}
     if(!body.name&&!body.photos.length){alert("Add a name.");return;}
     var b=this;b.textContent="Saving…";b.disabled=true;
     fetch("/api/people",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify(body)}).then(function(r){return r.json()}).then(function(d){
@@ -302,6 +350,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
     }).catch(function(){b.textContent="Save";b.disabled=false;alert("Network error.");});
   };
   document.getElementById("mDel").onclick=function(){
+    if(busy)return;
     if(!cur||!confirm("Remove "+(cur.name||"this person")+"?"))return;
     fetch("/api/people/delete",{method:"POST",credentials:"same-origin",headers:{"content-type":"application/json"},body:JSON.stringify({id:cur.id})}).then(function(r){return r.json()}).then(function(d){people=(d&&d.people)||people;OV.classList.remove("on");render();});
   };
