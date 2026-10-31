@@ -21,6 +21,7 @@ export const STUDIO = {
     ["/director", "\u{1F3A5} Director"],
     ["/films", "\u{1F3AC} Films"],
     ["/studio-you", "\u2728 Studio You"],
+    ["/ai-influencer", "AI Influencers · Ultra Premium"],
     ["/people/", "\u{1F465} My People"],
     ["/import", "\u2B06 Import"],
   ],

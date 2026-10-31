@@ -34,6 +34,7 @@ const ROOT_PAGES = [
   ["films.html", "/films"],
   ["account.html", "/account"],
   ["studio-you.html", "/studio-you"],
+  ["ai-influencer.html", "/ai-influencer"],
   ["studio-create.html", "/studio-you"],
   ["import.html", "/import"],
   ["verify.html", "/verify"],
