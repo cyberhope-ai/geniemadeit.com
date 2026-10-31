@@ -8,12 +8,15 @@
   const $ = (s, r = document) => r.querySelector(s);
   const $$ = (s, r = document) => [...r.querySelectorAll(s)];
   const LS = window.localStorage;
+  let referencePicker;
+  let capabilityItems = [];
 
   // ---- state ----
   const state = {
     capability: "image.text",
     aspect: "1:1",
-    refUrl: "",       // uploaded reference photo (same-origin /asset URL)
+    refs: [],
+    get refUrl() { return this.refs[0]?.url || ""; }, // legacy packs/video use the first reference
     uploading: false,
     packMode: false,  // user picked an occasion pack — a face photo is required ("With You In It")
     pack: null,       // { id, look, label } — we send ids, never the (server-side, secret) prompt
@@ -121,7 +124,7 @@
       } catch (_) { continue; } // transient network blip — keep polling
       if (j && j.status === "completed") return j;
       if (j && j.status === "failed")
-        return { ok: false, error: "gen_failed", message: j.error || "The video couldn't be generated — your credits were refunded." };
+        return { ok: false, error: "gen_failed", credits_remaining: j.credits_remaining, message: j.error || "The creation couldn't be generated — your credits were refunded." };
       if (onTick) onTick(j || {}); // still processing
     }
     return { ok: false, error: "timeout", message: "This is taking longer than usual — it'll appear in your Vault when it's ready." };
@@ -136,11 +139,15 @@
   const SUMMON_STEPS = ["warming the lamp", "reading your wish", "shaping the vision", "sealing the certificate"];
 
   async function makeWish() {
+    if (els.make.disabled) return;
     const prompt = els.prompt.value.trim();
     if (!prompt && !state.packMode) { els.prompt.focus(); return; } // packs carry no visible prompt
     if (!state.signedIn) { openAuth("signup"); return; } // registration required before a wish
-    if (state.credits <= 0) { openModal("payModal"); return; }
+    const included = state.plan === 'unlimited' || (state.plan === 'bronze' && kindOf(state.capability) === 'image' && state.capability !== 'image.ultra');
+    const rate = capabilityItems.find(x => x.id === state.capability)?.credits || 1;
+    if (!included && state.credits < rate) { openModal("payModal"); return; }
     if (state.uploading) { setRefHint("Hang on — your photo is still uploading."); return; }
+    if (state.refs.length > referenceLimit(state.capability)) { setRefHint('Remove extra references or choose Pro Image / Ultra Realism. No photos will be silently dropped.'); return; }
     if (state.capability === "video.image2video" && !state.refUrl) {
       setRefHint("Add a photo to animate first.");
       const rb = $("#refBtn"); if (rb) rb.focus();
@@ -166,19 +173,20 @@
     const kind = kindOf(state.capability);
     // Pack wish: send only the pack+look ids + the photo. The engine holds the (secret) prompt.
     const body = (state.packMode && state.pack)
-      ? { pack: state.pack.id, look: state.pack.look, image_url: state.refUrl }
+      ? { pack: state.pack.id, look: state.pack.look, image_urls: state.refs.map(x => x.url) }
       : {
           capability: state.capability, prompt,
           ...(kind === "audio" ? {} : { aspect: state.aspect }),
-          ...(state.refUrl ? { image_url: state.refUrl } : {}),
+          ...(state.refUrl ? { image_urls: state.refs.map(x => x.url) } : {}),
         };
     let resp = await generate(body);
 
     // Async job (video): the engine accepted the wish and is rendering. Keep the
     // lamp animating and poll until the finished creation (or a refunded failure).
     if (resp.ok && resp.status === "processing" && resp.poll_url) {
-      els.summonSb.textContent = "rendering your video — this can take a couple of minutes";
-      resp = await pollJob(resp.poll_url, () => { els.summonSb.textContent = "rendering your video — still working, hang tight"; });
+      if (typeof resp.credits_remaining === 'number') state.credits = resp.credits_remaining;
+      els.summonSb.textContent = "Rendering your creation — this can take a few minutes";
+      resp = await pollJob(resp.poll_url, () => { els.summonSb.textContent = "Rendering your creation — still working, hang tight"; });
     }
     clearInterval(timer);
 
@@ -189,6 +197,7 @@
       els.summon.classList.remove("on"); els.make.disabled = false; openModal("payModal"); return;
     }
     if (!resp.ok) {
+      if (typeof resp.credits_remaining === 'number') state.credits = resp.credits_remaining;
       els.summonSt.textContent = resp.message || "That didn't work — please try again.";
       els.make.disabled = false; setTimeout(() => els.summon.classList.remove("on"), 2600); return;
     }
@@ -510,33 +519,15 @@
   // Does this capability use a reference/source photo, and is it required?
   function refMode(id) {
     if (id === "video.image2video") return { show: true, required: true, label: "Add a photo to animate", hint: "Required — your photo becomes the first frame." };
-    if (kindOf(id) === "image") return { show: true, required: false, label: "Add a photo (optional)", hint: "Optional — upload a face/photo to star in the result." };
+    if (kindOf(id) === "image") return { show: true, required: false, label: "Choose / add reference photos", hint: "Choose from device, My Vault, EverVerify or My People. Up to five with Pro, Realistic Portrait or Ultra." };
     return { show: false, required: false, label: "", hint: "" };
   }
   // Upload a reference photo to the engine; store the returned same-origin URL.
   async function uploadRef(file) {
-    if (!file) return;
-    if (!state.signedIn) { openAuth("signup"); return; }
-    if (!/^image\//.test(file.type)) { setRefHint("Please choose a JPG, PNG, or WebP image."); return; }
-    if (file.size > 12 * 1024 * 1024) { setRefHint("That image is over 12MB — pick a smaller one."); return; }
-    state.uploading = true; setRefHint("Uploading…");
-    try {
-      const fd = new FormData(); fd.append("file", file);
-      const r = await fetch("/api/upload", { method: "POST", body: fd, credentials: "same-origin" });
-      const j = await r.json().catch(() => ({}));
-      if (!j.ok || !j.url) { setRefHint(j.message || "Upload failed — try again."); state.uploading = false; return; }
-      state.refUrl = j.url;
-      const thumb = $("#refThumb"), prev = $("#refPreview"), btn = $("#refBtn");
-      if (thumb) thumb.src = j.url;
-      if (prev) prev.style.display = "flex";
-      if (btn) $("#refBtnLabel").textContent = "Change photo";
-      setRefHint("");
-      savePhoto(j.url); // remember it in My Photos so they never re-find it on their device
-    } catch (_) { setRefHint("Upload failed — try again."); }
-    finally { state.uploading = false; }
+    if (file) await referencePicker?.upload([file]);
   }
   function clearRef() {
-    state.refUrl = "";
+    referencePicker?.clear();
     const prev = $("#refPreview"), inp = $("#refInput");
     if (prev) prev.style.display = "none";
     if (inp) inp.value = "";
@@ -582,12 +573,7 @@
     $$(".myphdel", row).forEach((b) => b.onclick = (e) => { e.stopPropagation(); deletePhoto(b.parentNode.dataset.id); });
   }
   function useSavedPhoto(url) {
-    state.refUrl = url;
-    const thumb = $("#refThumb"), prev = $("#refPreview");
-    if (thumb) thumb.src = url;
-    if (prev) prev.style.display = "flex";
-    if ($("#refBtnLabel")) $("#refBtnLabel").textContent = "Change photo";
-    setRefHint("Using your saved photo — hit Make a wish.");
+    referencePicker?.add(url, 'Saved photo');
   }
   /* Deliberate multi-file add. The engine's POST /api/photos already accepts multipart directly
      (handlePhotoSave branches on content-type), so this needs no backend change — it posts each
@@ -672,14 +658,25 @@
       ? "Type what you want spoken aloud — e.g. Welcome to GenieMade, where your words come to life…"
       : id === "video.image2video"
       ? "Describe the motion — e.g. gentle zoom, confetti falling, hair blowing in the wind…"
-      : "a regal fox in a velvet coat, cinematic light, ultra detailed…";
+      : "Describe your wish. With photos, explain who or what Reference 1, Reference 2, etc. should contribute…";
     $("#makeBtn").textContent = k === "audio" ? "✦ Speak it" : id === "video.image2video" ? "✦ Animate it" : "✦ Make a wish";
     // reference/upload control — required for Animate Photo, optional for images
     const m = refMode(id);
     const rb = $("#refBox");
     if (rb) rb.style.display = m.show ? "flex" : "none";
-    if ($("#refBtnLabel")) $("#refBtnLabel").textContent = state.refUrl ? "Change photo" : (m.label || "Add a photo");
+    if ($("#refBtnLabel")) $("#refBtnLabel").textContent = "Choose / add reference photos";
     setRefHint(state.refUrl ? "" : m.hint);
+    referencePicker?.limit(referenceLimit(id));
+    paintWishQuality();
+  }
+  function referenceLimit(id) {
+    return ['image.pro','image.nano','image.ultra'].includes(id) ? 5 : (kindOf(id) === 'image' || id === 'video.image2video') ? 1 : 0;
+  }
+  function paintWishQuality() {
+    const item = capabilityItems.find(x => x.id === state.capability);
+    const included = state.plan === 'unlimited' || (state.plan === 'bronze' && kindOf(state.capability) === 'image' && state.capability !== 'image.ultra');
+    const message = (item?.name || 'Image') + ' · ' + (included ? 'included in your plan' : (item?.credits || 1) + ' credits per creation') + ' · ' + state.refs.length + '/' + referenceLimit(state.capability) + ' reference photos.';
+    const box = $('#wishQuality'); if (box) box.textContent = message + (state.capability === 'image.ultra' ? ' High-quality 2K output, natural-texture direction. Likeness varies; preview before sharing. Ultra uses credits separately from Bronze or Studio session looks.' : '');
   }
   async function renderCapabilities() {
     let cats = null;
@@ -689,14 +686,16 @@
       if (r.ok && ct.includes("application/json")) { const j = await r.json(); cats = j.capabilities || j.categories; }
     } catch (_) {}
     const items = cats ? cats.flatMap((c) => c.items || []) : DEFAULT_CAPS;
+    capabilityItems = items;
     let live = items.filter((it) => it.status === "live");
     const soon = items.filter((it) => it.status && it.status !== "live");
     if (!live.length) live = [DEFAULT_CAPS[0]];
     const seg = $("#typeSeg");
     seg.innerHTML = live.map((it, i) =>
-      `<button data-cap="${it.id}" aria-pressed="${i === 0}" title="${it.credits || 1} credit${(it.credits || 1) > 1 ? "s" : ""}">${ICON[kindOf(it.id)] || "✦"} ${shortName(it)}</button>`).join("");
+      `<button data-cap="${it.id}" aria-pressed="${i === 0}" title="${it.credits || 1} credit${(it.credits || 1) > 1 ? "s" : ""}">${ICON[kindOf(it.id)] || "✦"} ${shortName(it)} · ${it.credits || 1} cr</button>`).join("");
     $$("#typeSeg button").forEach((b) => b.onclick = () => { exitPackUI(); selectCapability(b.dataset.cap); });
-    selectCapability(live[0].id);
+    const requested = new URLSearchParams(location.search).get('quality') === 'ultra' ? 'image.ultra' : null;
+    selectCapability(live.some(x => x.id === requested) ? requested : live[0].id);
     const hint = $("#soonHint");
     if (hint) hint.textContent = soon.length ? "More coming soon: " + soon.map((s) => s.name).join(" · ") : "";
   }
@@ -815,14 +814,16 @@
     $$("#chips .chip").forEach((c) => c.onclick = () => { els.prompt.value = c.textContent; els.prompt.focus(); });
     // reference-photo upload (click, pick, drag-drop, clear)
     const refInput = $("#refInput"), refBtn = $("#refBtn"), refClear = $("#refClear"), refBox = $("#refBox");
-    if (refBtn && refInput) refBtn.onclick = () => refInput.click();
-    if (refInput) refInput.onchange = (e) => uploadRef(e.target.files && e.target.files[0]);
+    referencePicker = window.GenieWishReferences({root: $('#wishReferences'), onChange: items => { state.refs = items; paintWishQuality(); }, onBusy: busy => { state.uploading = busy; }, signedIn: () => !!state.signedIn, signIn: () => openAuth('signin'), hint: setRefHint});
+    referencePicker.limit(referenceLimit(state.capability));
+    if (refBtn) refBtn.onclick = () => referencePicker.open();
+    if (refInput) refInput.onchange = e => referencePicker.upload(e.target.files);
     if (refClear) refClear.onclick = clearRef;
     const packClear = $("#packClear"); if (packClear) packClear.onclick = clearPack;
     if (refBox) {
       refBox.addEventListener("dragover", (e) => { e.preventDefault(); refBox.style.opacity = ".7"; });
       refBox.addEventListener("dragleave", () => { refBox.style.opacity = "1"; });
-      refBox.addEventListener("drop", (e) => { e.preventDefault(); refBox.style.opacity = "1"; const f = e.dataTransfer.files && e.dataTransfer.files[0]; if (f) uploadRef(f); });
+      refBox.addEventListener("drop", (e) => { e.preventDefault(); refBox.style.opacity = "1"; referencePicker.upload(e.dataTransfer.files); });
     }
     els.make.onclick = makeWish;
     els.prompt.addEventListener("keydown", (e) => { if ((e.metaKey || e.ctrlKey) && e.key === "Enter") makeWish(); });
@@ -903,6 +904,7 @@
       if (j && j.authenticated && u && u.email) { LS.setItem("gm_user", u.email); state.signedIn = u.email; setName(u); }
       else { LS.removeItem("gm_user"); state.signedIn = ""; setName(null); }
       if (u && u.plan) state.plan = u.plan;
+      paintWishQuality();
       paintAccount();
       loadGallery();
       loadMyPhotos();
