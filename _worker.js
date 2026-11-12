@@ -30,23 +30,18 @@ export default {
         return new Response(JSON.stringify({ ok:false, error:"server" }), { status:500, headers:{ "content-type":"application/json" }});
       }
     }
-    // Cache generated/registry images at the geniemadeit edge (immutable, content-addressed):
-    // repeat views serve from cache and skip the engine + R2 entirely.
-    if (url.pathname.startsWith("/asset/") && request.method === "GET") {
-      // Never cache or serve manifests — they hold the pack's secret prompts. Pass straight to the
-      // engine (which returns 404). Bypassing the cache here also stops serving any already-cached copy.
-      if (/\/manifest\.json$/.test(url.pathname)) {
-        const t = new URL(request.url); t.protocol = "https:"; t.hostname = "geniemade-engine.cyberhopeai.workers.dev"; t.port = "";
-        return fetch(new Request(t.toString(), request));
-      }
-      const cache = caches.default;
-      const hit = await cache.match(request);
-      if (hit) return hit;
+    // Every media request must reach the engine's current access/deletion policy.
+    // Do not consult old edge entries: they may contain private or revoked media.
+    // Public showcase files in /assets/ still use Pages' normal static caching.
+    if (url.pathname.startsWith("/asset/")) {
       const t = new URL(request.url);
       t.protocol = "https:"; t.hostname = "geniemade-engine.cyberhopeai.workers.dev"; t.port = "";
       const resp = await fetch(new Request(t.toString(), request));
-      if (resp.ok) { const c = new Response(resp.body, resp); ctx.waitUntil(cache.put(request, c.clone())); return c; }
-      return resp;
+      const headers = new Headers(resp.headers);
+      headers.set("cache-control", "private, no-store");
+      headers.set("cdn-cache-control", "no-store");
+      headers.set("cloudflare-cdn-cache-control", "no-store");
+      return new Response(resp.body, { status: resp.status, statusText: resp.statusText, headers });
     }
     // Affiliate admin — proxy the Rewardful REST API server-side (its SECRET must never reach the
     // browser). Distinct /rwadmin/ prefix so it never collides with the engine's /api/* (incl.
