@@ -123,6 +123,8 @@
         j = await res.json().catch(() => ({}));
       } catch (_) { continue; } // transient network blip — keep polling
       if (j && j.status === "completed") return j;
+      if (j && ["refunding", "refund_review"].includes(j.status))
+        return {ok:false,error:"refund_review",credits_remaining:j.credits_remaining,message:j.error || "Your creation failed and the refund needs verification. Please do not resubmit."};
       if (j && j.status === "failed")
         return { ok: false, error: "gen_failed", credits_remaining: j.credits_remaining, message: j.error || "The creation couldn't be generated — your credits were refunded." };
       if (onTick) onTick(j || {}); // still processing

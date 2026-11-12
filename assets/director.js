@@ -213,6 +213,7 @@
       await new Promise((r) => setTimeout(r, 4000));
       const j = await api("/api/jobs/" + jobId);
       if (j.status === "completed" && j.generation) return void (await landed(j, scene, shot));
+      if (["refunding", "refund_review"].includes(j.status)) { say(j.error || "Your refund needs verification. Please do not resubmit.", "err"); return; }
       if (j.status === "failed") { say(j.error || "The render failed — your credits were refunded.", "err"); return; }
       say(`Rendering… ${Math.round((Date.now() - t0) / 1000)}s`);
     }
@@ -271,5 +272,15 @@
   (async () => {
     await loadMenu();
     if (await loadMe()) await loadProjects();
+    try {
+      const raw = sessionStorage.getItem("geniemade:starter-handoff");
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (typeof draft.idea === "string") $("scene").value = draft.idea.slice(0, 2000);
+        if ([...$("style").options].some(o => o.value === draft.style)) $("style").value = draft.style;
+        sessionStorage.removeItem("geniemade:starter-handoff");
+        say("Your starter is ready. Adapt it to one storyboard frame before rendering.");
+      }
+    } catch { /* blocked storage must not break Director */ }
   })();
 })();
