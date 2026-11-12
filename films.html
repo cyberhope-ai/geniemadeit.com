@@ -390,7 +390,7 @@ color:#f7f1ff;font-size:18px;padding:5px 11px;cursor:pointer;width:auto;font-fam
         var detail = o.error ? '<div class="fine">' + esc(o.error) + '</div>' : '';
         var ready = o.status === 'completed' ? ' <a href="/app#vault">Watch in my Vault ↗</a>' : '';
         return '<div class="order-row"><span>' + esc(o.scenes) + '-scene noir · ' + esc(who) +
-          '<div class="fine">Order ' + esc(o.id.slice(-8)) + ' · Updated ' + esc(updated) + '</div>' + detail + ready + '</span>' +
+          '<div class="fine">Order ' + esc(typeof o.id === 'string' ? o.id.slice(-8) : 'ID unavailable') + ' · Updated ' + esc(updated) + '</div>' + detail + ready + '</span>' +
           '<span class="status">' + esc(stages[o.status] || o.status) + '</span></div>';
       }).join("");
     }).catch(function(){
