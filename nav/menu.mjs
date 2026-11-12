@@ -20,6 +20,7 @@ export const STUDIO = {
     ["/app", "\u{1FA84} Make a wish"],
     ["/director", "\u{1F3A5} Director"],
     ["/films", "\u{1F3AC} Films"],
+    ["/prompt-studio", "\u2728 Prompt Studio"],
     ["/studio-you", "\u2728 Studio You"],
     ["/ai-influencer", "AI Influencers · Ultra Premium"],
     ["/people/", "\u{1F465} My People"],

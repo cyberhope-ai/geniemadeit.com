@@ -271,5 +271,15 @@
   (async () => {
     await loadMenu();
     if (await loadMe()) await loadProjects();
+    try {
+      const raw = sessionStorage.getItem("geniemade:starter-handoff");
+      if (raw) {
+        const draft = JSON.parse(raw);
+        if (typeof draft.idea === "string") $("scene").value = draft.idea.slice(0, 2000);
+        if ([...$("style").options].some(o => o.value === draft.style)) $("style").value = draft.style;
+        sessionStorage.removeItem("geniemade:starter-handoff");
+        say("Your starter is ready. Adapt it to one storyboard frame before rendering.");
+      }
+    } catch { /* blocked storage must not break Director */ }
   })();
 })();
