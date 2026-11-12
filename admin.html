@@ -93,8 +93,16 @@ html{overflow-x:clip}.gm-header{position:sticky;top:0;z-index:50;background:rgba
     <button class="tab" data-tab="customers">Customers</button>
     <button class="tab" data-tab="consumption">P&amp;L</button>
     <button class="tab" data-tab="jobs">Studio Jobs</button>
+    <button class="tab" data-tab="refunds">Refund reviews</button>
   </div>
 
+  <section id="view-refunds" hidden>
+    <h2>Refunds requiring investigation</h2>
+    <p class="muted">Read-only · Triage owner: astra4-axiom. Verify debit and refund evidence before any balance adjustment.</p>
+    <p id="refundNote" role="status" aria-live="polite">Select this tab to load current cases.</p>
+    <div id="refundCases"></div>
+    <p class="muted">Refresh checks the server again. This screen does not issue refunds or send scheduled alerts.</p>
+  </section>
   <section id="view-affiliates">
     <div class="muted" id="loadNote">Loading affiliate data…</div>
     <div class="cards" id="cards" hidden></div>
@@ -178,7 +186,7 @@ document.getElementById("pw").addEventListener("keydown",function(e){if(e.key===
 document.getElementById("logoutBtn").onclick=function(){sessionStorage.removeItem(TKEY);showGate("");};
 document.getElementById("refreshBtn").onclick=function(){
   var active=(document.querySelector(".tab.on")||{}).getAttribute?document.querySelector(".tab.on").getAttribute("data-tab"):"affiliates";
-  if(active==="customers"){custLoaded=false;loadCustomers();}else if(active==="jobs"){loadJobs();}else{load();}
+  if(active==="refunds"){loadRefundReviews();}else if(active==="customers"){custLoaded=false;loadCustomers();}else if(active==="jobs"){loadJobs();}else{load();}
 };
 var custLoaded=false;
 function activeTab(){var t=document.querySelector(".tab.on");return t?t.getAttribute("data-tab"):"affiliates";}
@@ -190,14 +198,42 @@ document.querySelectorAll(".tab").forEach(function(t){
     document.getElementById("view-customers").hidden=(tab!=="customers");
     document.getElementById("view-jobs").hidden=(tab!=="jobs");
     document.getElementById("view-consumption").hidden=(tab!=="consumption");
+    document.getElementById("view-refunds").hidden=(tab!=="refunds");
     document.getElementById("statusTag").textContent=(tab==="customers"?"Customers":tab==="jobs"?"Studio Jobs":tab==="consumption"?"Consumption":"Rewardful");
     if(tab==="consumption"){loadConsumption();}
     if(tab==="customers"&&!custLoaded){loadCustomers();}
     if(tab==="jobs"){loadJobs();}
+    if(tab==="refunds"){document.getElementById("statusTag").textContent="Refund reviews";loadRefundReviews();}
   };
 });
 
 // ---- Studio Jobs queue (customer-service live view) ----
+var refundRequest=0;
+async function loadRefundReviews(){
+  var sequence=++refundRequest, note=document.getElementById('refundNote'), box=document.getElementById('refundCases');
+  box.replaceChildren();note.textContent='Checking refund reviews…';
+  var credential=token();
+  if(!credential){note.textContent='Unlock admin access to view refund reviews.';showGate('');return;}
+  try{
+    var response=await fetch('/gmadmin/refund-reviews?limit=100',{headers:{'x-admin-token':credential},cache:'no-store'});
+    if(sequence!==refundRequest||token()!==credential)return;
+    if(response.status===401){showGate('Admin access expired.');throw Error('auth');}
+    if(!response.ok)throw Error('unavailable');
+    var data=await response.json();
+    if(sequence!==refundRequest||token()!==credential)return;
+    if(!data.ok||!Array.isArray(data.reviews))throw Error('invalid');
+    note.textContent=data.total ? String(data.total)+' cases awaiting verification'+(data.truncated?' — showing the oldest 100.':'') : 'No refunds currently awaiting verification.';
+    data.reviews.forEach(function(item){
+      var card=document.createElement('article');card.className='card';
+      var title=document.createElement('h3');title.textContent=String(item.id||'Order ID unavailable');card.append(title);
+      var details=document.createElement('p');
+      details.textContent='Account: '+String(item.user_id||'Unknown')+' · '+String(item.status||'Unknown')+' · Credits: '+String(item.cost??'Unknown');card.append(details);
+      var age=document.createElement('p');age.textContent=(item.needs_attention?'Needs attention · ':'')+(Number.isFinite(item.age_seconds)?Math.floor(item.age_seconds/60)+' minutes in this state':'Age unavailable');card.append(age);
+      var action=document.createElement('p');action.textContent='Inspect the original debit and refund receipts. Do not blindly retry an uncertain refund.';card.append(action);
+      box.append(card);
+    });
+  }catch(_){if(sequence===refundRequest&&token()===credential){box.replaceChildren();note.textContent='Could not check refund reviews. Status is unknown; refresh to retry.';}}
+}
 var jobsTimer=null;
 function jobStage(j){
   if(j.notified) return {label:"Done",cls:"active"};
