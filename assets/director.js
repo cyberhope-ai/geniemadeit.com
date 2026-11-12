@@ -213,6 +213,7 @@
       await new Promise((r) => setTimeout(r, 4000));
       const j = await api("/api/jobs/" + jobId);
       if (j.status === "completed" && j.generation) return void (await landed(j, scene, shot));
+      if (["refunding", "refund_review"].includes(j.status)) { say(j.error || "Your refund needs verification. Please do not resubmit.", "err"); return; }
       if (j.status === "failed") { say(j.error || "The render failed — your credits were refunded.", "err"); return; }
       say(`Rendering… ${Math.round((Date.now() - t0) / 1000)}s`);
     }
